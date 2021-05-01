@@ -20,9 +20,7 @@ export class Product {
     @Column('varchar')
     code: string;
 
-    @OneToMany(() => Batch, batch => batch.product, {
-        eager: true,
-    })
+    @OneToMany(() => Batch, batch => batch.product, { eager: true })
     batches: Array<Batch>;
 
     @CreateDateColumn()

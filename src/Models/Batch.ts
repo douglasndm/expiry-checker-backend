@@ -5,6 +5,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
+    JoinColumn,
 } from 'typeorm';
 
 import { Product } from './Product';
@@ -30,6 +31,7 @@ export class Batch {
     status: 'checked' | 'unchecked';
 
     @ManyToOne(() => Product, product => product.batches)
+    @JoinColumn({ name: 'product_id' })
     product: Product;
 
     @CreateDateColumn()
