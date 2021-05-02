@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import * as Yup from 'yup';
+
 import { User } from '../Models/User';
+
+import AuthConfig from '../Config/Auth';
 
 class SessionController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -31,7 +35,7 @@ class SessionController {
             if (!user) {
                 return res
                     .status(401)
-                    .json({ error: 'Email or password not valid' });
+                    .json({ error: 'Email or password is not valid' });
             }
 
             const passwordResult = await bcrypt.compare(
@@ -42,10 +46,28 @@ class SessionController {
             if (!passwordResult) {
                 return res
                     .status(401)
-                    .json({ error: 'Email or password not valid' });
+                    .json({ error: 'Email or password is not valid' });
             }
 
-            return res.status(200).json(user);
+            const { id, name, lastName } = user;
+
+            if (!AuthConfig.secret) {
+                return res
+                    .status(500)
+                    .json({ error: 'Server is missing some variables' });
+            }
+
+            return res.status(200).json({
+                user: {
+                    id,
+                    name,
+                    lastName,
+                    email,
+                },
+                token: jwt.sign({ id }, AuthConfig.secret, {
+                    expiresIn: AuthConfig.expiresIn,
+                }),
+            });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
