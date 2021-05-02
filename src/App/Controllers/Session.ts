@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 
 import { User } from '../Models/User';
 
-import AuthConfig from '../Config/Auth';
+import AuthConfig from '../../Config/Auth';
 
 class SessionController {
     async store(req: Request, res: Response): Promise<Response> {

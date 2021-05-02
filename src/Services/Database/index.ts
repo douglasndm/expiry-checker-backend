@@ -1,10 +1,10 @@
 import { createConnection, getConnectionOptions } from 'typeorm';
 
-import { Batch } from '../../Models/Batch';
-import { Category } from '../../Models/Category';
-import { Product } from '../../Models/Product';
-import { Team } from '../../Models/Team';
-import { User } from '../../Models/User';
+import { Batch } from '../../App/Models/Batch';
+import { Category } from '../../App/Models/Category';
+import { Product } from '../../App/Models/Product';
+import { Team } from '../../App/Models/Team';
+import { User } from '../../App/Models/User';
 
 async function setConnection(): Promise<void> {
     const defaultOptions = await getConnectionOptions();
