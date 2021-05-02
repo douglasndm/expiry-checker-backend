@@ -2,17 +2,26 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    PrimaryColumn,
+    PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
-    @PrimaryColumn('varchar')
-    firebase_uuid: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column('varchar')
-    role: 'manager' | 'supervisor' | 'repositor';
+    name: string;
+
+    @Column('varchar', { name: 'last_name' })
+    lastName: string;
+
+    @Column('varchar')
+    email: string;
+
+    @Column('varchar')
+    password: string;
 
     @CreateDateColumn()
     created_at: Date;
