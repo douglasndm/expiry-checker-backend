@@ -2,9 +2,14 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { Team } from './Team';
+import UserRoles from './UserRoles';
 
 @Entity({ name: 'users' })
 export class User {
@@ -22,6 +27,9 @@ export class User {
 
     @Column('varchar')
     password: string;
+
+    @OneToMany(type => UserRoles, userRoles => userRoles.user)
+    roles: Array<UserRoles>;
 
     @CreateDateColumn()
     created_at: Date;

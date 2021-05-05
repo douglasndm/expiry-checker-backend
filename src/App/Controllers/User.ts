@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import EnvConfig from 'dotenv';
 import * as Yup from 'yup';
 
 import { User } from '../Models/User';
@@ -50,6 +49,27 @@ class UserController {
             delete savedUser.password;
 
             return res.status(201).json(savedUser);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    async index(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id } = req.params;
+
+            const repository = getRepository(User);
+
+            const user = await repository.findOne({
+                where: { id },
+                relations: ['roles'],
+            });
+
+            if (!user) {
+                return res.status(400).json({ error: 'User was not found' });
+            }
+
+            return res.status(200).json(user);
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
