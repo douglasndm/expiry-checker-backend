@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { Batch } from './Batch';
+import ProductTeams from './ProductTeams';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -22,6 +23,9 @@ export class Product {
 
     @OneToMany(() => Batch, batch => batch.product, { eager: true })
     batches: Array<Batch>;
+
+    @OneToMany(type => ProductTeams, productTeams => productTeams.product)
+    team: Array<ProductTeams>;
 
     @CreateDateColumn()
     created_at: Date;

@@ -2,13 +2,13 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import { Category } from './Category';
-import { User } from './User';
+import ProductTeams from './ProductTeams';
+
 import UserRoles from './UserRoles';
 
 @Entity({ name: 'teams' })
@@ -27,6 +27,9 @@ export class Team {
 
     @OneToMany(type => UserRoles, userRoles => userRoles.user)
     users: Array<UserRoles>;
+
+    @OneToMany(type => ProductTeams, productTeams => productTeams.team)
+    products: Array<ProductTeams>;
 
     @CreateDateColumn()
     created_at: Date;

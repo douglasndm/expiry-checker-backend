@@ -6,13 +6,22 @@ import { Product } from '../../App/Models/Product';
 import { Team } from '../../App/Models/Team';
 import { User } from '../../App/Models/User';
 import UserRoles from '../../App/Models/UserRoles';
+import ProductTeams from '../../App/Models/ProductTeams';
 
 async function setConnection(): Promise<void> {
     const defaultOptions = await getConnectionOptions();
 
     createConnection(
         Object.assign(defaultOptions, {
-            entities: [Batch, Category, Product, Team, User, UserRoles],
+            entities: [
+                Batch,
+                Category,
+                Product,
+                Team,
+                User,
+                UserRoles,
+                ProductTeams,
+            ],
         }),
     );
 }
