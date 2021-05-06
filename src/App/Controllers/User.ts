@@ -69,7 +69,16 @@ class UserController {
                 return res.status(400).json({ error: 'User was not found' });
             }
 
-            return res.status(200).json(user);
+            const organizedUser = {
+                id: user.id,
+                name: user.name,
+                lastName: user.lastName,
+                email: user.email,
+
+                roles: user.roles.map(r => ({ role: r.role, team: r.team })),
+            };
+
+            return res.status(200).json(organizedUser);
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
