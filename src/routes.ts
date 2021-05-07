@@ -28,6 +28,7 @@ routes.get('/products/:user/all', ProductByUser.getAll);
 
 routes.get('/batches/:id', Batch.index);
 routes.post('/batches', Batch.store);
+routes.put('/batches/:id', Batch.update);
 
 routes.get('/team/:team_id/products', Team.index);
 
