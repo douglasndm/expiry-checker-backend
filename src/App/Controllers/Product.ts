@@ -13,7 +13,10 @@ class ProductController {
         try {
             const reposity = getRepository(Product);
 
-            const product = await reposity.findOne(id);
+            const product = await reposity.findOne({
+                where: { id },
+                relations: ['batches'],
+            });
 
             return res.status(200).json(product);
         } catch (err) {
