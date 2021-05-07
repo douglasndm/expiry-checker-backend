@@ -22,9 +22,6 @@ export class Team {
     @OneToMany(() => Category, category => category.team)
     categories: Array<Category>;
 
-    // @ManyToMany(() => User, user => user.teams)
-    // users: Array<User>;
-
     @OneToMany(type => UserRoles, userRoles => userRoles.user)
     users: Array<UserRoles>;
 
