@@ -5,19 +5,19 @@ import Session from './App/Controllers/Session';
 import Product from './App/Controllers/Product';
 import Batch from './App/Controllers/Batch';
 import Team from './App/Controllers/Team';
+import TeamUsers from './App/Controllers/TeamUsers';
 
 import AuthMiddleware from './App/Middlewares/Auth';
 
 const routes = Router();
 
-routes.get('/users/:id', User.index);
-
-routes.post('/users', User.store);
-
 routes.post('/sessions', Session.store);
+routes.post('/users', User.store);
 
 // from now on all routes need authentication
 routes.use(AuthMiddleware);
+
+routes.get('/users/:id', User.index);
 
 routes.get('/products/:id', Product.show);
 routes.post('/products', Product.create);
@@ -28,5 +28,7 @@ routes.post('/batches', Batch.store);
 routes.put('/batches/:id', Batch.update);
 
 routes.get('/team/:team_id/products', Team.index);
+
+routes.get('/team/:id/users', TeamUsers.index);
 
 export default routes;

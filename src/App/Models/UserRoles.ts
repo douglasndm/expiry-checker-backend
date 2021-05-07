@@ -19,12 +19,18 @@ class UserRoles {
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-    @ManyToOne(type => Team, team => team.users, { eager: true })
+    @ManyToOne(type => Team, team => team.users)
     @JoinColumn({ name: 'team_id' })
     team: Team;
 
     @Column()
     role: string;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 }
 
 export default UserRoles;
