@@ -21,7 +21,7 @@ export class Product {
     @Column('varchar')
     code: string;
 
-    @OneToMany(() => Batch, batch => batch.product, { eager: true })
+    @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;
 
     @OneToMany(type => ProductTeams, productTeams => productTeams.product)
