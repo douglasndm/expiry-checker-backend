@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import { Product } from '../Models/Product';
 
 import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
+import { getAllUsersByTeam } from '../../Functions/Teams';
+import { checkIfProductAlreadyExists } from '../../Functions/Products';
 
 class ProductController {
     async show(req: Request, res: Response): Promise<Response> {
@@ -39,17 +41,40 @@ class ProductController {
 
     async create(req: Request, res: Response): Promise<Response> {
         try {
-            const { name, code } = req.body;
-
             const schema = Yup.object().shape({
                 name: Yup.string().required(),
                 code: Yup.string(),
+                team_id: Yup.string().required().uuid(),
             });
 
             if (!(await schema.isValid(req.body))) {
                 return res
                     .status(400)
                     .json({ error: 'Check the info provider' });
+            }
+
+            const { name, code, team_id } = req.body;
+
+            const usersInTeam = await getAllUsersByTeam({ team_id });
+
+            const isUserInTeam = usersInTeam.filter(ut => ut.id === req.userId);
+
+            if (isUserInTeam.length <= 0) {
+                return res
+                    .status(401)
+                    .json({ error: 'You dont have authorization to be here' });
+            }
+
+            const productAlreadyExists = await checkIfProductAlreadyExists({
+                name,
+                code,
+                team_id,
+            });
+
+            if (productAlreadyExists) {
+                return res.status(400).json({
+                    error: 'This product already exists. Try add a new batch',
+                });
             }
 
             const prod: Product = new Product();
