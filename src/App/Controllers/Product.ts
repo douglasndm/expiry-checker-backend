@@ -11,6 +11,19 @@ class ProductController {
         const { id } = req.params;
 
         try {
+            const userHasAccessToProduct = await checkIfUserHasAccessToAProduct(
+                {
+                    product_id: id,
+                    user_id: req.userId,
+                },
+            );
+
+            if (!userHasAccessToProduct) {
+                return res
+                    .status(401)
+                    .json({ error: 'You dont have authorization to do that' });
+            }
+
             const reposity = getRepository(Product);
 
             const product = await reposity.findOne({
