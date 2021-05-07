@@ -104,6 +104,78 @@ class TeamController {
             return res.status(500).json({ error: err.message });
         }
     }
+
+    async update(req: Request, res: Response): Promise<Response> {
+        const schemaParams = Yup.object().shape({
+            id: Yup.string().required().uuid(),
+        });
+
+        const schema = Yup.object().shape({
+            name: Yup.string().required(),
+        });
+
+        if (
+            !(await schemaParams.isValid(req.params)) ||
+            !(await schema.isValid(req.body))
+        ) {
+            return res.status(400).json({ error: 'Validation fails' });
+        }
+
+        try {
+            const { id } = req.params;
+            const { name } = req.body;
+
+            const userRolesRepository = getRepository(UserRoles);
+
+            const userRoles = await userRolesRepository.findOne({
+                where: {
+                    user: { id: req.userId },
+                    team: { id },
+                },
+            });
+
+            // this check if person has access and it is a manager to update the team
+            if (
+                !userRoles ||
+                userRoles.role.toLocaleLowerCase() !== 'manager'
+            ) {
+                return res
+                    .status(401)
+                    .json({ error: 'You dont have authorization to be here' });
+            }
+
+            const teamRepository = getRepository(Team);
+            const team = await teamRepository.findOne(id);
+
+            if (!team) {
+                return res.status(400).json({ error: 'Team was not found' });
+            }
+
+            // Check if user already has a team with the same name
+            const userTeams = await userRolesRepository.find({
+                where: {
+                    user: { id: req.userId },
+                },
+                relations: ['team'],
+            });
+
+            const existsName = userTeams.filter(ur => ur.team.name === name);
+
+            if (existsName.length > 0) {
+                return res
+                    .status(400)
+                    .json({ error: 'You already have a team with that name' });
+            }
+
+            team.name = name;
+
+            const updatedTeam = await teamRepository.save(team);
+
+            return res.json(updatedTeam);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
 }
 
 export default new TeamController();
