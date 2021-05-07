@@ -21,6 +21,7 @@ export async function checkIfUserHasAccessToAProduct({
                 id: user_id,
             },
         },
+        relations: ['team'],
     });
 
     const productTeam = await productTeamRepository.findOne({
