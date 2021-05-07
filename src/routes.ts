@@ -9,6 +9,7 @@ import TeamUsers from './App/Controllers/TeamUsers';
 import UserManager from './App/Controllers/UserManager';
 
 import AuthMiddleware from './App/Middlewares/Auth';
+import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
 
 const routes = Router();
 
@@ -33,6 +34,20 @@ routes.put('/team/:id', Team.update);
 routes.get('/team/:team_id/products', Team.index);
 routes.get('/team/:id/users', TeamUsers.index);
 
-routes.put('/team/:id/manager/user/:user_id', UserManager.update);
+routes.post(
+    '/team/:id/manager/user/:user_id',
+    ManagerCheckerMiddleware,
+    UserManager.create,
+);
+routes.put(
+    '/team/:id/manager/user/:user_id',
+    ManagerCheckerMiddleware,
+    UserManager.update,
+);
+routes.delete(
+    '/team/:id/manager/user/:user_id',
+    ManagerCheckerMiddleware,
+    UserManager.delete,
+);
 
 export default routes;
