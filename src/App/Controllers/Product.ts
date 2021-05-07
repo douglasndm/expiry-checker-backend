@@ -3,6 +3,8 @@ import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import { Product } from '../Models/Product';
+import ProductTeams from '../Models/ProductTeams';
+import { Team } from '../Models/Team';
 
 import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
 import { getAllUsersByTeam } from '../../Functions/Teams';
@@ -77,15 +79,29 @@ class ProductController {
                 });
             }
 
+            const repository = getRepository(Product);
+            const teamRepository = getRepository(Team);
+            const productTeamRepository = getRepository(ProductTeams);
+
+            const team = await teamRepository.findOne(team_id);
+
+            if (!team) {
+                return res.status(400).json({ error: 'Team was not found' });
+            }
+
             const prod: Product = new Product();
             prod.name = name;
             prod.code = code;
 
-            const repository = getRepository(Product);
+            const savedProd = await repository.save(prod);
 
-            const response = await repository.save(prod);
+            const productTeam = new ProductTeams();
+            productTeam.product = savedProd;
+            productTeam.team = team;
 
-            return res.status(201).json(response);
+            await productTeamRepository.save(productTeam);
+
+            return res.status(201).json(savedProd);
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
