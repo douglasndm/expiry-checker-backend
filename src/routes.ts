@@ -6,6 +6,7 @@ import Product from './App/Controllers/Product';
 import Batch from './App/Controllers/Batch';
 import Team from './App/Controllers/Team';
 import TeamUsers from './App/Controllers/TeamUsers';
+import UserManager from './App/Controllers/UserManager';
 
 import AuthMiddleware from './App/Middlewares/Auth';
 
@@ -31,5 +32,7 @@ routes.post('/team', Team.store);
 routes.put('/team/:id', Team.update);
 routes.get('/team/:team_id/products', Team.index);
 routes.get('/team/:id/users', TeamUsers.index);
+
+routes.put('/team/:id/manager/user/:user_id', UserManager.update);
 
 export default routes;
