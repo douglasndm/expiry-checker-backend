@@ -60,10 +60,17 @@ class UserController {
 
             const repository = getRepository(User);
 
-            const user = await repository.findOne({
-                where: { id },
-                relations: ['roles'],
-            });
+            const user = await repository
+                .createQueryBuilder('user')
+                .where('user.id = :id', { id })
+                .leftJoinAndSelect('user.roles', 'roles')
+                .leftJoinAndSelect('roles.team', 'team')
+                .getOne();
+
+            // const user = await repository.findOne({
+            //     where: { id },
+            //     relations: ['roles'],
+            // });
 
             if (!user) {
                 return res.status(400).json({ error: 'User was not found' });
