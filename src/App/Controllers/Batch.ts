@@ -102,6 +102,7 @@ class BatchController {
             exp_date: Yup.date(),
             amount: Yup.number(),
             price: Yup.number(),
+            status: Yup.string(),
         });
 
         const schemaBatchId = Yup.object().shape({
@@ -117,7 +118,7 @@ class BatchController {
 
         try {
             const { id } = req.params;
-            const { name, exp_date, amount, price } = req.body;
+            const { name, exp_date, amount, price, status } = req.body;
 
             const batchReposity = getRepository(Batch);
             const batch = await batchReposity.findOne({
@@ -140,12 +141,11 @@ class BatchController {
                     .json({ error: 'You dont have authorization to be here' });
             }
 
-            return res.json(batch);
-
             batch.name = name;
             batch.exp_date = exp_date;
             batch.amount = amount;
             batch.price = price;
+            batch.status = String(status).toLowerCase();
 
             const updatedBatch = await batchReposity.save(batch);
 
