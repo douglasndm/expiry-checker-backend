@@ -5,6 +5,7 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    JoinColumn,
 } from 'typeorm';
 import { Team } from './Team';
 
@@ -17,6 +18,7 @@ export class Category {
     name: string;
 
     @ManyToOne(() => Team, team => team.categories)
+    @JoinColumn({ name: 'team_id' })
     team: Team;
 
     @CreateDateColumn()

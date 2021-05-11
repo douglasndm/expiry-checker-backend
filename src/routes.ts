@@ -5,6 +5,7 @@ import Session from './App/Controllers/Session';
 import Product from './App/Controllers/Product';
 import Batch from './App/Controllers/Batch';
 import Team from './App/Controllers/Team';
+import Category from './App/Controllers/Category';
 import TeamUsers from './App/Controllers/TeamUsers';
 import UserManager from './App/Controllers/UserManager';
 
@@ -28,6 +29,8 @@ routes.put('/products/:product_id', Product.update);
 routes.get('/batches/:id', Batch.index);
 routes.post('/batches', Batch.store);
 routes.put('/batches/:id', Batch.update);
+
+routes.get('/categories', Category.index);
 
 routes.post('/team', Team.store);
 routes.put('/team/:id', Team.update);
