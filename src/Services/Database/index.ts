@@ -7,6 +7,7 @@ import { Team } from '../../App/Models/Team';
 import { User } from '../../App/Models/User';
 import UserRoles from '../../App/Models/UserRoles';
 import ProductTeams from '../../App/Models/ProductTeams';
+import ProductCategory from '../../App/Models/ProductCategory';
 
 async function setConnection(): Promise<void> {
     const defaultOptions = await getConnectionOptions();
@@ -21,6 +22,7 @@ async function setConnection(): Promise<void> {
                 User,
                 UserRoles,
                 ProductTeams,
+                ProductCategory,
             ],
         }),
     );

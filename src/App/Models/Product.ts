@@ -9,6 +9,7 @@ import {
 
 import { Batch } from './Batch';
 import ProductTeams from './ProductTeams';
+import ProductCategory from './ProductCategory';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -20,6 +21,12 @@ export class Product {
 
     @Column('varchar')
     code: string;
+
+    @OneToMany(
+        type => ProductCategory,
+        productCategory => productCategory.product,
+    )
+    categories: Array<ProductCategory>;
 
     @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;

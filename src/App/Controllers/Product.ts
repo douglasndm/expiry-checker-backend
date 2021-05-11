@@ -30,10 +30,13 @@ class ProductController {
 
             const reposity = getRepository(Product);
 
-            const product = await reposity.findOne({
-                where: { id },
-                relations: ['batches'],
-            });
+            const product = await reposity
+                .createQueryBuilder('product')
+                .where('product.id = :id', { id })
+                .leftJoinAndSelect('product.categories', 'categories')
+                .leftJoinAndSelect('product.batches', 'batches')
+                .leftJoinAndSelect('categories.category', 'category')
+                .getOne();
 
             return res.status(200).json(product);
         } catch (err) {
