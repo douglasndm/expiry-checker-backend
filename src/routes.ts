@@ -8,6 +8,7 @@ import Team from './App/Controllers/Team';
 import Category from './App/Controllers/Category';
 import TeamUsers from './App/Controllers/TeamUsers';
 import UserManager from './App/Controllers/UserManager';
+import ProductCategory from './App/Controllers/ProductCategory';
 
 import AuthMiddleware from './App/Middlewares/Auth';
 import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
@@ -31,6 +32,8 @@ routes.post('/batches', Batch.store);
 routes.put('/batches/:id', Batch.update);
 
 routes.get('/categories', Category.index);
+
+routes.post('/categories/:id', ProductCategory.create);
 
 routes.post('/team', Team.store);
 routes.put('/team/:id', Team.update);
