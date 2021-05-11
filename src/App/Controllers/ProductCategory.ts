@@ -72,6 +72,54 @@ class ProductCategoryController {
             return res.status(500).json({ error: err.message });
         }
     }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            id: Yup.string().required().uuid(),
+        });
+        const schemaBody = Yup.object().shape({
+            product_id: Yup.string().required().uuid(),
+        });
+
+        if (
+            !(await schema.isValid(req.params)) ||
+            !(await schemaBody.isValid(req.body))
+        ) {
+            return res.status(400).json({ error: 'Validation fails' });
+        }
+
+        try {
+            const { id } = req.params;
+            const { product_id } = req.body;
+
+            const repository = getRepository(ProductCategory);
+
+            const exists = await repository.findOne({
+                where: {
+                    category: {
+                        id,
+                    },
+                    product: {
+                        id: product_id,
+                    },
+                },
+            });
+
+            if (!exists) {
+                return res
+                    .status(400)
+                    .json({ error: 'Product was not in category' });
+            }
+
+            const savedProductCategory = await repository.remove(exists);
+
+            return res
+                .status(200)
+                .json({ success: 'Product was removed from category' });
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
 }
 
 export default new ProductCategoryController();

@@ -34,6 +34,7 @@ routes.put('/batches/:id', Batch.update);
 routes.get('/categories', Category.index);
 
 routes.post('/categories/:id', ProductCategory.create);
+routes.delete('/categories/:id', ProductCategory.delete);
 
 routes.post('/team', Team.store);
 routes.put('/team/:id', Team.update);
