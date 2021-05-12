@@ -34,6 +34,13 @@ class UserController {
                 });
             }
 
+            const repository = getRepository(User);
+            const existsUser = await repository.findOne({ where: { email } });
+
+            if (existsUser) {
+                return res.status(400).json({ error: 'User already exists' });
+            }
+
             const encryptyedPassword = await bcrypt.hash(password, 8);
 
             const user = new User();
@@ -41,8 +48,6 @@ class UserController {
             user.lastName = lastName;
             user.email = email;
             user.password = encryptyedPassword;
-
-            const repository = getRepository(User);
 
             const savedUser = await repository.save(user);
 
