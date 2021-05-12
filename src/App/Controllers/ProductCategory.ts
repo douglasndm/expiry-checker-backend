@@ -9,6 +9,45 @@ import { Product } from '../Models/Product';
 import ProductCategory from '../Models/ProductCategory';
 
 class ProductCategoryController {
+    async index(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            id: Yup.string().required().uuid(),
+        });
+
+        if (!(await schema.isValid(req.params))) {
+            return res.status(400).json({ error: 'Validation fails' });
+        }
+
+        try {
+            const { id } = req.params;
+
+            const productCategoryRepository = getRepository(ProductCategory);
+            const productsInCategory = await productCategoryRepository
+                .createQueryBuilder('prod_cat')
+                .leftJoinAndSelect('prod_cat.product', 'product')
+                .leftJoinAndSelect('product.team', 'team')
+                .leftJoinAndSelect('team.team', 'teamObj')
+                .leftJoinAndSelect('prod_cat.category', 'category')
+                .where('category.id = :id', { id })
+                .getMany();
+
+            const userHasAccess = await checkIfUserHasAccessToTeam({
+                team_id: productsInCategory[0].product.team[0].team.id,
+                user_id: req.userId,
+            });
+
+            if (!userHasAccess) {
+                return res
+                    .status(401)
+                    .json({ error: 'You dont have authorization to do this' });
+            }
+
+            return res.json(productsInCategory);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
     async create(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             id: Yup.string().required().uuid(),
