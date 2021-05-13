@@ -33,6 +33,7 @@ routes.put('/batches/:id', Batch.update);
 
 routes.get('/categories', Category.index);
 routes.post('/categories', Category.create);
+routes.put('/categories/:id', Category.update);
 routes.delete('/categories/:id', Category.delete);
 
 routes.get('/categories/:id/products', ProductCategory.index);
