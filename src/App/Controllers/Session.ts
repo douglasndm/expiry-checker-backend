@@ -26,11 +26,10 @@ class SessionController {
 
             const repository = getRepository(User);
 
-            const user = await repository.findOne({
-                where: {
-                    email,
-                },
-            });
+            const user = await repository
+                .createQueryBuilder('user')
+                .where('LOWER(email) = LOWER(:email)', { email })
+                .getOne();
 
             if (!user) {
                 return res
