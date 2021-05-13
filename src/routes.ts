@@ -32,6 +32,7 @@ routes.post('/batches', Batch.store);
 routes.put('/batches/:id', Batch.update);
 
 routes.get('/categories', Category.index);
+routes.post('/categories', Category.create);
 
 routes.get('/categories/:id/products', ProductCategory.index);
 routes.post('/categories/:id', ProductCategory.create);
