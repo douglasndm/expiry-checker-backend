@@ -107,6 +107,47 @@ class CategoryController {
             return res.status(500).json({ error: err.message });
         }
     }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            id: Yup.string().required().uuid(),
+        });
+
+        if (!(await schema.isValid(req.params))) {
+            return res.status(400).json({ error: 'Validation fails' });
+        }
+        try {
+            const { id } = req.params;
+
+            const categoryRepository = getRepository(Category);
+            const category = await categoryRepository.findOne(id, {
+                relations: ['team'],
+            });
+
+            if (!category) {
+                return res
+                    .status(400)
+                    .json({ error: 'Category was not found' });
+            }
+            // Check if user has access and it is a manager on team
+            const isManager = await isUserManager({
+                user_id: req.userId,
+                team_id: category.team.id,
+            });
+
+            if (!isManager) {
+                return res.status(401).json({
+                    error: "You don't have authorization to do that.",
+                });
+            }
+
+            await categoryRepository.remove(category);
+
+            return res.status(200).json({ success: 'Category was removed' });
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
 }
 
 export default new CategoryController();
