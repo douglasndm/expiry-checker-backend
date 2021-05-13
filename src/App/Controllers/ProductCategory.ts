@@ -31,6 +31,12 @@ class ProductCategoryController {
                 .where('category.id = :id', { id })
                 .getMany();
 
+            if (productsInCategory.length <= 0) {
+                return res
+                    .status(400)
+                    .json({ error: 'Category was not found' });
+            }
+
             const userHasAccess = await checkIfUserHasAccessToTeam({
                 team_id: productsInCategory[0].product.team[0].team.id,
                 user_id: req.userId,
