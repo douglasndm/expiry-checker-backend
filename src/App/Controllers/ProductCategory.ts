@@ -25,6 +25,7 @@ class ProductCategoryController {
             const productsInCategory = await productCategoryRepository
                 .createQueryBuilder('prod_cat')
                 .leftJoinAndSelect('prod_cat.product', 'product')
+                .leftJoinAndSelect('product.batches', 'batches')
                 .leftJoinAndSelect('product.team', 'team')
                 .leftJoinAndSelect('team.team', 'teamObj')
                 .leftJoinAndSelect('prod_cat.category', 'category')
@@ -48,7 +49,36 @@ class ProductCategoryController {
                     .json({ error: 'You dont have authorization to do this' });
             }
 
-            return res.json(productsInCategory);
+            let categoryName;
+
+            const products: Array<Product> = productsInCategory.map(p => ({
+                id: p.product.id,
+                name: p.product.name,
+                code: p.product.code,
+                team: p.product.team,
+                batches: p.product.batches,
+            }));
+
+            if (productsInCategory.length > 0) {
+                categoryName = productsInCategory[0].category.name;
+            } else {
+                // This will return the category name even if no results where found
+                const categoryRepository = getRepository(Category);
+                const cate = await categoryRepository.findOne({
+                    where: {
+                        id,
+                    },
+                });
+
+                categoryName = cate?.name;
+                if (!cate) {
+                    return res
+                        .status(400)
+                        .json({ error: 'Category was not found' });
+                }
+            }
+
+            return res.json({ category: categoryName, products });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
