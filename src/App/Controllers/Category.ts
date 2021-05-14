@@ -15,12 +15,12 @@ class CategoryController {
             team_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.body))) {
+        if (!(await schema.isValid(req.params))) {
             return res.status(400).json({ error: 'Validation fails' });
         }
 
         try {
-            const { team_id } = req.body;
+            const { team_id } = req.params;
 
             const usersInTeam = await getAllUsersByTeam({ team_id });
 
