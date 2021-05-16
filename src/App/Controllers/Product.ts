@@ -10,7 +10,10 @@ import { Category } from '../Models/Category';
 import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
 import { getAllUsersByTeam } from '../../Functions/Teams';
 import { checkIfProductAlreadyExists } from '../../Functions/Products';
-import { addProductToCategory } from '../../Functions/Category/Products';
+import {
+    addProductToCategory,
+    removeAllCategoriesFromProduct,
+} from '../../Functions/Category/Products';
 
 class ProductController {
     async show(req: Request, res: Response): Promise<Response> {
@@ -107,7 +110,7 @@ class ProductController {
 
             await productTeamRepository.save(productTeam);
 
-            if (categories.length > 0) {
+            if (!!categories && categories.length > 0) {
                 const categoryRepository = getRepository(Category);
                 const category = await categoryRepository.findOne({
                     where: {
@@ -141,6 +144,7 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string(),
+            categories: Yup.array().of(Yup.string()),
         });
 
         if (
@@ -152,7 +156,7 @@ class ProductController {
 
         try {
             const { product_id } = req.params;
-            const { name, code } = req.body;
+            const { name, code, categories } = req.body;
 
             const userHasAccessToProduct = await checkIfUserHasAccessToAProduct(
                 {
@@ -179,6 +183,30 @@ class ProductController {
             product.code = code;
 
             const updatedProduct = await productRepository.save(product);
+
+            await removeAllCategoriesFromProduct({
+                product_id: updatedProduct.id,
+            });
+
+            if (!!categories && categories.length > 0) {
+                const categoryRepository = getRepository(Category);
+                const category = await categoryRepository.findOne({
+                    where: {
+                        id: categories[0],
+                    },
+                });
+
+                if (!category) {
+                    return res
+                        .status(400)
+                        .json({ error: 'Category was not found' });
+                }
+
+                await addProductToCategory({
+                    product_id: updatedProduct.id,
+                    category,
+                });
+            }
 
             return res.status(200).json(updatedProduct);
         } catch (err) {
