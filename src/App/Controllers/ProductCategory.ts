@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import { checkIfUserHasAccessToTeam } from '../../Functions/Security/UserAccessTeam';
+import { addProductToCategory } from '../../Functions/Category/Products';
 
 import { Category } from '../Models/Category';
 import { Product } from '../Models/Product';
@@ -103,21 +104,17 @@ class ProductCategoryController {
             const { id } = req.params;
             const { product_id } = req.body;
 
-            const productRepository = getRepository(Product);
             const categoryRepository = getRepository(Category);
 
-            const product = await productRepository.findOne({
-                where: { id: product_id },
-            });
             const category = await categoryRepository.findOne({
                 where: { id },
                 relations: ['team'],
             });
 
-            if (!product || !category) {
+            if (!category) {
                 return res
                     .status(400)
-                    .json({ error: 'Category or Product was not found' });
+                    .json({ error: 'Category was not found' });
             }
 
             const userHasAccess = await checkIfUserHasAccessToTeam({
@@ -131,30 +128,10 @@ class ProductCategoryController {
                     .json({ error: 'You dont have authorization to do this' });
             }
 
-            const repository = getRepository(ProductCategory);
-
-            const alreadyExists = await repository.findOne({
-                where: {
-                    category: {
-                        id,
-                    },
-                    product: {
-                        id: product_id,
-                    },
-                },
+            const savedProductCategory = await addProductToCategory({
+                category,
+                product_id,
             });
-
-            if (alreadyExists) {
-                return res
-                    .status(400)
-                    .json({ error: 'Product is already in category' });
-            }
-
-            const productCategory = new ProductCategory();
-            productCategory.category = category;
-            productCategory.product = product;
-
-            const savedProductCategory = await repository.save(productCategory);
 
             return res.status(200).json(savedProductCategory);
         } catch (err) {
