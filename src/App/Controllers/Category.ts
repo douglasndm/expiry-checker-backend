@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+import { createCategory } from '../../Functions/Category';
 
 import { getAllUsersByTeam } from '../../Functions/Teams';
 import { isUserManager } from '../../Functions/Users/UserRoles';
 
 import { Category } from '../Models/Category';
-import { Team } from '../Models/Team';
-import UserRoles from '../Models/UserRoles';
 
 class CategoryController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -72,35 +71,10 @@ class CategoryController {
                 });
             }
 
-            const categoryRepository = getRepository(Category);
-            const alreadyExists = await categoryRepository
-                .createQueryBuilder('category')
-                .where('LOWER(category.name) = LOWER(:name)', { name })
-                .andWhere('team_id = :team_id', { team_id })
-                .getOne();
-
-            if (alreadyExists) {
-                return res
-                    .status(400)
-                    .json({ error: 'Category already exists on team' });
-            }
-
-            const teamRepository = getRepository(Team);
-            const team = await teamRepository.findOne({
-                where: {
-                    id: team_id,
-                },
+            const savedCategory = await createCategory({
+                name,
+                team_id,
             });
-
-            if (!team) {
-                return res.status(400).json({ error: 'Team was not found' });
-            }
-
-            const category = new Category();
-            category.name = name;
-            category.team = team;
-
-            const savedCategory = await categoryRepository.save(category);
 
             return res.status(201).json(savedCategory);
         } catch (err) {
