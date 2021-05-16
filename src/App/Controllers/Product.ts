@@ -5,10 +5,12 @@ import * as Yup from 'yup';
 import { Product } from '../Models/Product';
 import ProductTeams from '../Models/ProductTeams';
 import { Team } from '../Models/Team';
+import { Category } from '../Models/Category';
 
 import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
 import { getAllUsersByTeam } from '../../Functions/Teams';
 import { checkIfProductAlreadyExists } from '../../Functions/Products';
+import { addProductToCategory } from '../../Functions/Category/Products';
 
 class ProductController {
     async show(req: Request, res: Response): Promise<Response> {
@@ -49,6 +51,7 @@ class ProductController {
             const schema = Yup.object().shape({
                 name: Yup.string().required(),
                 code: Yup.string(),
+                categories: Yup.array().of(Yup.string()),
                 team_id: Yup.string().required().uuid(),
             });
 
@@ -58,7 +61,7 @@ class ProductController {
                     .json({ error: 'Check the info provider' });
             }
 
-            const { name, code, team_id } = req.body;
+            const { name, code, categories, team_id } = req.body;
 
             const usersInTeam = await getAllUsersByTeam({ team_id });
 
@@ -103,6 +106,26 @@ class ProductController {
             productTeam.team = team;
 
             await productTeamRepository.save(productTeam);
+
+            if (categories.length > 0) {
+                const categoryRepository = getRepository(Category);
+                const category = await categoryRepository.findOne({
+                    where: {
+                        id: categories[0],
+                    },
+                });
+
+                if (!category) {
+                    return res
+                        .status(400)
+                        .json({ error: 'Category was not found' });
+                }
+
+                await addProductToCategory({
+                    product_id: prod.id,
+                    category,
+                });
+            }
 
             return res.status(201).json(savedProd);
         } catch (err) {
