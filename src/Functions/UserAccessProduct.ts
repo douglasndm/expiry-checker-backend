@@ -18,7 +18,7 @@ export async function checkIfUserHasAccessToAProduct({
     const userTeams = await userTeamRepository.find({
         where: {
             user: {
-                id: user_id,
+                firebaseUid: user_id,
             },
         },
         relations: ['team'],

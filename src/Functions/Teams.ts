@@ -34,7 +34,7 @@ export async function getAllUsersByTeam({
     });
 
     const users: Array<UserResponse> = userTeams.map(u => ({
-        id: u.user.id,
+        id: u.user.firebaseUid,
         name: u.user.name,
         email: u.user.email,
         role: u.role,

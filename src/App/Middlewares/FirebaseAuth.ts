@@ -6,10 +6,12 @@ export default async function checkFirebaseAuth(
     res: Response,
     next: NextFunction,
 ): Promise<void | Response> {
-    if (req.headers.authtoken) {
+    if (req.headers.authorization) {
         try {
+            const [, token] = req.headers.authorization.split(' ');
+
             const auth = admin.auth();
-            const verifyToken = await auth.verifyIdToken(req.headers.authtoken);
+            const verifyToken = await auth.verifyIdToken(token);
 
             req.userId = verifyToken.uid;
 

@@ -16,7 +16,7 @@ class UserRoles {
     id: number;
 
     @ManyToOne(type => User, user => user.roles)
-    @JoinColumn({ name: 'user_id' })
+    @JoinColumn({ name: 'user_id', referencedColumnName: 'firebaseUid' })
     user: User;
 
     @ManyToOne(type => Team, team => team.users)
