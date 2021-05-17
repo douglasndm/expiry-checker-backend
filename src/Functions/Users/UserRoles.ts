@@ -14,7 +14,7 @@ export async function isUserManager({
     const userRolesRepository = getRepository(UserRoles);
     const userRole = await userRolesRepository.findOne({
         where: {
-            user: { id: user_id },
+            user: { firebaseUid: user_id },
             team: { id: team_id },
         },
     });
