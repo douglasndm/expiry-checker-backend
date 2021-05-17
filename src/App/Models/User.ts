@@ -2,8 +2,6 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinTable,
-    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -15,6 +13,9 @@ import UserRoles from './UserRoles';
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
+
+    @Column('varchar', { name: 'firebase_uid' })
+    firebaseUid: string;
 
     @Column('varchar')
     name: string;

@@ -9,6 +9,7 @@ class UserController {
     async store(req: Request, res: Response): Promise<Response> {
         try {
             const schema = Yup.object().shape({
+                firebaseUid: Yup.string().required(),
                 name: Yup.string().required(),
                 lastName: Yup.string().required(),
                 email: Yup.string().required().email(),
@@ -21,6 +22,7 @@ class UserController {
             }
 
             const {
+                firebaseUid,
                 name,
                 lastName,
                 email,
@@ -44,6 +46,7 @@ class UserController {
             const encryptyedPassword = await bcrypt.hash(password, 8);
 
             const user = new User();
+            user.firebaseUid = firebaseUid;
             user.name = name;
             user.lastName = lastName;
             user.email = email;
