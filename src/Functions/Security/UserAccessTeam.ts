@@ -16,7 +16,7 @@ export async function checkIfUserHasAccessToTeam({
         const result = await userRolesRepository.findOne({
             where: {
                 user: {
-                    id: user_id,
+                    firebaseUid: user_id,
                 },
                 team: {
                     id: team_id,

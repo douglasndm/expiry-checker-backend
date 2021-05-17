@@ -63,7 +63,11 @@ class TeamController {
             const userRepository = getRepository(User);
             const userRolesRepository = getRepository(UserRoles);
 
-            const user = await userRepository.findOne(req.userId);
+            const user = await userRepository.findOne({
+                where: {
+                    firebaseUid: req.userId,
+                },
+            });
 
             if (!user) {
                 return res.status(401).json({ error: 'You need to sign in' });
