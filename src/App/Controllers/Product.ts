@@ -43,7 +43,17 @@ class ProductController {
                 .leftJoinAndSelect('categories.category', 'category')
                 .getOne();
 
-            return res.status(200).json(product);
+            const categories = product?.categories.map(cat => ({
+                id: cat.category.id,
+                name: cat.category.name,
+            }));
+
+            const organizedProduct = {
+                ...product,
+                categories,
+            };
+
+            return res.status(200).json(organizedProduct);
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
