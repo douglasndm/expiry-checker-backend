@@ -11,6 +11,7 @@ import UserManager from './App/Controllers/UserManager';
 import ProductCategory from './App/Controllers/ProductCategory';
 
 import AuthMiddleware from './App/Middlewares/Auth';
+import FirebaseAuth from './App/Middlewares/FirebaseAuth';
 import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
 
 const routes = Router();
@@ -19,7 +20,8 @@ routes.post('/sessions', Session.store);
 routes.post('/users', User.store);
 
 // from now on all routes need authentication
-routes.use(AuthMiddleware);
+// routes.use(AuthMiddleware);
+routes.use(FirebaseAuth);
 
 routes.get('/users/:id', User.index);
 
