@@ -6,6 +6,7 @@ import { Product } from '../Models/Product';
 import ProductTeams from '../Models/ProductTeams';
 import { Team } from '../Models/Team';
 import { Category } from '../Models/Category';
+import { Batch } from '../Models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
 import { getAllUsersByTeam } from '../../Functions/Teams';
@@ -14,6 +15,7 @@ import {
     addProductToCategory,
     removeAllCategoriesFromProduct,
 } from '../../Functions/Category/Products';
+import { sortBatchesByExpDate } from '../../Functions/Batches';
 
 class ProductController {
     async show(req: Request, res: Response): Promise<Response> {
@@ -48,9 +50,16 @@ class ProductController {
                 name: cat.category.name,
             }));
 
+            let batches: Array<Batch> = [];
+
+            if (product?.batches) {
+                batches = sortBatchesByExpDate(product.batches);
+            }
+
             const organizedProduct = {
                 ...product,
                 categories,
+                batches,
             };
 
             return res.status(200).json(organizedProduct);
