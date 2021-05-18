@@ -28,12 +28,13 @@ class UserManagerController {
             const { email } = req.body;
 
             const userRolesRepository = getRepository(UserRoles);
-            const alreadyInARole = await userRolesRepository.findOne({
-                where: {
-                    user: { email },
-                    team: { id },
-                },
-            });
+
+            const alreadyInARole = await userRolesRepository
+                .createQueryBuilder('userRole')
+                .leftJoinAndSelect('userRole.user', 'user')
+                .where('userRole.team.id = :team_id', { team_id: id })
+                .andWhere('user.email = :email', { email })
+                .getOne();
 
             if (alreadyInARole) {
                 return res
