@@ -48,7 +48,7 @@ routes.get('/team/:team_id/products', Team.index);
 routes.get('/team/:id/users', TeamUsers.index);
 
 routes.post(
-    '/team/:id/manager/user/:user_id',
+    '/team/:id/manager/user',
     ManagerCheckerMiddleware,
     UserManager.create,
 );

@@ -24,7 +24,7 @@ async function CheckIfUserIsManager(
         const user = await userRolesRepository.findOne({
             where: {
                 team: { id },
-                user: { id: req.userId },
+                user: { firebaseUid: req.userId },
             },
         });
 

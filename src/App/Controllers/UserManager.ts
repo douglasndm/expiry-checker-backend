@@ -10,20 +10,27 @@ class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             id: Yup.string().required().uuid(),
-            user_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.params))) {
+        const schemaBody = Yup.object().shape({
+            email: Yup.string().required().email(),
+        });
+
+        if (
+            !(await schema.isValid(req.params)) ||
+            !(await schemaBody.isValid(req.body))
+        ) {
             return res.status(400).json({ error: 'Validation fails' });
         }
 
         try {
-            const { id, user_id } = req.params;
+            const { id } = req.params;
+            const { email } = req.body;
 
             const userRolesRepository = getRepository(UserRoles);
             const alreadyInARole = await userRolesRepository.findOne({
                 where: {
-                    user: { id: user_id },
+                    user: { email },
                     team: { id },
                 },
             });
@@ -38,7 +45,11 @@ class UserManagerController {
             const userRepository = getRepository(User);
 
             const team = await teamRepository.findOne(id);
-            const user = await userRepository.findOne(user_id);
+            const user = await userRepository.findOne({
+                where: {
+                    email,
+                },
+            });
 
             if (!team || !user) {
                 return res
@@ -50,6 +61,8 @@ class UserManagerController {
             teamUser.user = user;
             teamUser.team = team;
             teamUser.role = 'Repositor';
+            teamUser.code = Math.random().toString(36).substring(7);
+            teamUser.status = 'Pending';
 
             const savedRole = await userRolesRepository.save(teamUser);
 

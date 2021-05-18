@@ -26,6 +26,12 @@ class UserRoles {
     @Column()
     role: string;
 
+    @Column({ name: 'enter_code' })
+    code: string;
+
+    @Column()
+    status: string;
+
     @CreateDateColumn()
     created_at: Date;
 
