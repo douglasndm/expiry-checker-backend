@@ -138,7 +138,7 @@ class UserManagerController {
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             id: Yup.string().required().uuid(),
-            user_id: Yup.string().required().uuid(),
+            user_id: Yup.string().required(),
         });
 
         if (!(await schema.isValid(req.params))) {
@@ -152,7 +152,7 @@ class UserManagerController {
             const role = await userRolesRepository.findOne({
                 where: {
                     team: { id },
-                    user: { id: user_id },
+                    user: { firebaseUid: user_id },
                 },
             });
 
