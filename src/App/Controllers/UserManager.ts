@@ -33,7 +33,7 @@ class UserManagerController {
                 .createQueryBuilder('userRole')
                 .leftJoinAndSelect('userRole.user', 'user')
                 .where('userRole.team.id = :team_id', { team_id: id })
-                .andWhere('user.email = :email', { email })
+                .andWhere('LOWER(user.email) = LOWER(:email)', { email })
                 .getOne();
 
             if (alreadyInARole) {
@@ -46,11 +46,10 @@ class UserManagerController {
             const userRepository = getRepository(User);
 
             const team = await teamRepository.findOne(id);
-            const user = await userRepository.findOne({
-                where: {
-                    email,
-                },
-            });
+            const user = await userRepository
+                .createQueryBuilder('user')
+                .where('LOWER(user.email) = LOWER(:email)', { email })
+                .getOne();
 
             if (!team || !user) {
                 return res
