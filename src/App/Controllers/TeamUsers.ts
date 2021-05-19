@@ -21,14 +21,18 @@ class TeamUsersController {
 
             const usersInTeam = await getAllUsersByTeam({ team_id: id });
 
-            const isUserInTeam = usersInTeam.filter(
+            const isUserInTeam = usersInTeam.find(
                 user => user.id === req.userId,
             );
 
-            if (isUserInTeam.length <= 0) {
+            if (!isUserInTeam) {
                 return res
                     .status(401)
                     .json({ error: 'You dont have permission to be here' });
+            }
+
+            if (isUserInTeam.role.toLowerCase() !== 'manager') {
+                delete isUserInTeam.code;
             }
 
             return res.status(200).json(usersInTeam);

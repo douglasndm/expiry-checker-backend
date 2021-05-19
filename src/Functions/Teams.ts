@@ -39,6 +39,7 @@ export async function getAllUsersByTeam({
         email: u.user.email,
         role: u.role,
         status: u.status,
+        code: u.code,
     }));
 
     return users;
