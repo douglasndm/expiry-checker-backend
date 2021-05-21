@@ -85,7 +85,11 @@ class UserController {
                 lastName: user.lastName,
                 email: user.email,
 
-                roles: user.roles.map(r => ({ role: r.role, team: r.team })),
+                roles: user.roles.map(r => ({
+                    role: r.role,
+                    status: r.status,
+                    team: r.team,
+                })),
             };
 
             return res.status(200).json(organizedUser);
