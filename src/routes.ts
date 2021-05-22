@@ -9,6 +9,7 @@ import Category from './App/Controllers/Category';
 import TeamUsers from './App/Controllers/TeamUsers';
 import UserManager from './App/Controllers/UserManager';
 import ProductCategory from './App/Controllers/ProductCategory';
+import TeamSubscriptions from './App/Controllers/TeamSubscription';
 
 import AuthMiddleware from './App/Middlewares/Auth';
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
@@ -48,6 +49,8 @@ routes.get('/team/:team_id/products', Team.index);
 routes.get('/team/:id/users', TeamUsers.index);
 
 routes.post('/team/:team_id/join', TeamUsers.store);
+
+routes.get('/team/:team_id/subscriptions', TeamSubscriptions.index);
 
 routes.post(
     '/team/:id/manager/user',

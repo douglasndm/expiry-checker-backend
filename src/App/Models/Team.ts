@@ -6,9 +6,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+
 import { Category } from './Category';
 import ProductTeams from './ProductTeams';
-
+import TeamSubscription from './TeamSubscription';
 import UserRoles from './UserRoles';
 
 @Entity({ name: 'teams' })
@@ -27,6 +28,9 @@ export class Team {
 
     @OneToMany(type => ProductTeams, productTeams => productTeams.team)
     products: Array<ProductTeams>;
+
+    @OneToMany(type => TeamSubscription, subscriptions => subscriptions.team)
+    subscriptions: Array<TeamSubscription>;
 
     @CreateDateColumn()
     created_at: Date;
