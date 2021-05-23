@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import { checkIfUserHasAccessToTeam } from '../../Functions/Security/UserAccessTeam';
+import { getAllSubscriptionsFromTeam } from '../../Functions/Team';
 
 import TeamSubscription from '../Models/TeamSubscription';
 
@@ -30,13 +31,7 @@ class TeamSubscriptionsController {
                     .json({ error: 'You dont have access to do that' });
             }
 
-            const repository = getRepository(TeamSubscription);
-
-            const response = await repository
-                .createQueryBuilder('subs')
-                .leftJoinAndSelect('subs.team', 'team')
-                .where('team.id = :team_id', { team_id })
-                .getMany();
+            const response = await getAllSubscriptionsFromTeam({ team_id });
 
             return res.json(response);
         } catch (err) {

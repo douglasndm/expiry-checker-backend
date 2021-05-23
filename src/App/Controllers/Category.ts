@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 import { createCategory } from '../../Functions/Category';
+import { checkIfTeamIsActive } from '../../Functions/Team';
 
 import { getAllUsersByTeam } from '../../Functions/Teams';
 import { isUserManager } from '../../Functions/Users/UserRoles';
@@ -20,6 +21,14 @@ class CategoryController {
 
         try {
             const { team_id } = req.params;
+
+            const subscription = await checkIfTeamIsActive({ team_id });
+
+            if (!subscription) {
+                return res.status(401).json({
+                    error: "Team doesn't have an active subscription",
+                });
+            }
 
             const usersInTeam = await getAllUsersByTeam({ team_id });
 

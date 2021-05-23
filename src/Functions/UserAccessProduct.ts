@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 
 import UserTeam from '../App/Models/UserRoles';
 import ProductTeam from '../App/Models/ProductTeams';
+import { checkIfTeamIsActive } from './Team';
 
 interface checkIfUserHasAccessToAProductProps {
     product_id: string;
@@ -32,6 +33,16 @@ export async function checkIfUserHasAccessToAProduct({
         },
         relations: ['team'],
     });
+
+    if (productTeam && productTeam.team.id) {
+        const teamSubscription = await checkIfTeamIsActive({
+            team_id: productTeam.team.id,
+        });
+
+        if (!teamSubscription) {
+            throw new Error("Team doesn't have an active subscription");
+        }
+    }
 
     const hasAccessToProduct = userTeams.filter(
         userTeam => userTeam.team.id === productTeam?.team.id,

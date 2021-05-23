@@ -8,6 +8,7 @@ import { User } from '../Models/User';
 import { Team } from '../Models/Team';
 
 import { getAllUsersByTeam } from '../../Functions/Teams';
+import { checkIfTeamIsActive } from '../../Functions/Team';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -16,6 +17,14 @@ class TeamController {
 
             const teamRepository = getRepository(Team);
             const productTeamsRepository = getRepository(ProductTeams);
+
+            const subscription = await checkIfTeamIsActive({ team_id });
+
+            if (!subscription) {
+                return res.status(401).json({
+                    error: "Team doesn't have an active subscription",
+                });
+            }
 
             const usersInTeam = await getAllUsersByTeam({ team_id });
 
