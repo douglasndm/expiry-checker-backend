@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcryptjs';
+import { isBefore } from 'date-fns';
 import * as Yup from 'yup';
 
 import { User } from '../Models/User';
@@ -73,6 +74,7 @@ class UserController {
                 .where('user.firebaseUid = :id', { id })
                 .leftJoinAndSelect('user.roles', 'roles')
                 .leftJoinAndSelect('roles.team', 'team')
+                .leftJoinAndSelect('team.subscriptions', 'subscriptions')
                 .getOne();
 
             if (!user) {
@@ -85,11 +87,21 @@ class UserController {
                 lastName: user.lastName,
                 email: user.email,
 
-                roles: user.roles.map(r => ({
-                    role: r.role,
-                    status: r.status,
-                    team: r.team,
-                })),
+                roles: user.roles.map(r => {
+                    const subscriptions = r.team.subscriptions.filter(sub =>
+                        isBefore(new Date(), sub.expireIn),
+                    );
+
+                    return {
+                        role: r.role,
+                        status: r.status,
+                        team: {
+                            id: r.team.id,
+                            name: r.team.name,
+                            isActive: subscriptions.length > 0,
+                        },
+                    };
+                }),
             };
 
             return res.status(200).json(organizedUser);
