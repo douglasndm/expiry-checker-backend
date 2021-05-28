@@ -2,7 +2,8 @@ import { getRepository } from 'typeorm';
 
 import UserTeam from '../App/Models/UserRoles';
 import ProductTeam from '../App/Models/ProductTeams';
-import { checkIfTeamIsActive } from './Team';
+
+import { checkIfUserHasAccessToTeam } from './Security/UserAccessTeam';
 
 interface checkIfUserHasAccessToAProductProps {
     product_id: string;
@@ -25,23 +26,24 @@ export async function checkIfUserHasAccessToAProduct({
         relations: ['team'],
     });
 
-    const productTeam = await productTeamRepository.findOne({
-        where: {
-            product: {
-                id: product_id,
-            },
-        },
-        relations: ['team'],
+    const productTeam = await productTeamRepository
+        .createQueryBuilder('prodTeam')
+        .leftJoinAndSelect('prodTeam.product', 'prod')
+        .leftJoinAndSelect('prodTeam.team', 'team')
+        .where('prod.id = :id', { id: product_id })
+        .getOne();
+
+    if (!productTeam) {
+        throw new Error('Product and Team relatioship was not found');
+    }
+
+    const checkTeamAccess = await checkIfUserHasAccessToTeam({
+        user_id,
+        team_id: productTeam?.team.id,
     });
 
-    if (productTeam && productTeam.team.id) {
-        const teamSubscription = await checkIfTeamIsActive({
-            team_id: productTeam.team.id,
-        });
-
-        if (!teamSubscription) {
-            throw new Error("Team doesn't have an active subscription");
-        }
+    if (!checkTeamAccess) {
+        throw new Error('User doesnt have access to the team');
     }
 
     const hasAccessToProduct = userTeams.filter(
