@@ -31,7 +31,7 @@ export async function checkIfUserHasAccessToTeam({
             },
         });
 
-        if (!result) {
+        if (!result || (!!result && result.status !== 'Completed')) {
             return false;
         }
 
