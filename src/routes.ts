@@ -11,7 +11,6 @@ import UserManager from './App/Controllers/UserManager';
 import ProductCategory from './App/Controllers/ProductCategory';
 import TeamSubscriptions from './App/Controllers/TeamSubscription';
 
-import AuthMiddleware from './App/Middlewares/Auth';
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
 import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
 
