@@ -6,6 +6,8 @@ import UserRoles from '../Models/UserRoles';
 import { Team } from '../Models/Team';
 import { User } from '../Models/User';
 
+import { checkMembersLimit } from '../../Functions/Team';
+
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -55,6 +57,16 @@ class UserManagerController {
                 return res
                     .status(400)
                     .json({ error: 'User or team was not found' });
+            }
+
+            const membersChecker = await checkMembersLimit({
+                team_id: id,
+            });
+
+            if (membersChecker.members >= membersChecker.limit) {
+                return res
+                    .status(401)
+                    .json({ error: 'Team has reach the limit of members' });
             }
 
             const teamUser = new UserRoles();
