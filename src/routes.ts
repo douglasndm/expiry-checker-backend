@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 import User from './App/Controllers/User';
-import Session from './App/Controllers/Session';
 import Product from './App/Controllers/Product';
 import Batch from './App/Controllers/Batch';
 import Team from './App/Controllers/Team';
@@ -16,7 +15,6 @@ import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
 
 const routes = Router();
 
-routes.post('/sessions', Session.store);
 routes.post('/users', User.store);
 
 // from now on all routes need authentication
