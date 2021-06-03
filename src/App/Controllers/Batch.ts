@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
-import { addHours, addMinutes, addSeconds, parseISO } from 'date-fns';
+import { parseISO, startOfDay } from 'date-fns';
 
 import { Product } from '../Models/Product';
 import { Batch } from '../Models/Batch';
@@ -81,10 +81,7 @@ class BatchController {
                 return res.status(400).json({ error: 'Product not found' });
             }
 
-            const date = addHours(
-                addMinutes(addSeconds(parseISO(exp_date), 0), 0),
-                0,
-            );
+            const date = startOfDay(parseISO(exp_date));
 
             const batch = new Batch();
             batch.name = name;
