@@ -43,7 +43,7 @@ export async function checkIfUserHasAccessToAProduct({
     });
 
     if (!checkTeamAccess) {
-        throw new Error('User doesnt have access to the team');
+        throw new Error("User doesn't have access to the team");
     }
 
     const hasAccessToProduct = userTeams.filter(
