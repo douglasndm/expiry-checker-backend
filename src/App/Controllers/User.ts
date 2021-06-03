@@ -11,11 +11,11 @@ class UserController {
         try {
             const schema = Yup.object().shape({
                 firebaseUid: Yup.string().required(),
-                name: Yup.string().required(),
-                lastName: Yup.string().required(),
+                name: Yup.string(),
+                lastName: Yup.string(),
                 email: Yup.string().required().email(),
-                password: Yup.string().required(),
-                passwordConfirmation: Yup.string().required(),
+                password: Yup.string(),
+                passwordConfirmation: Yup.string(),
             });
 
             if (!(await schema.isValid(req.body))) {
@@ -31,7 +31,11 @@ class UserController {
                 passwordConfirmation,
             } = req.body;
 
-            if (password !== passwordConfirmation) {
+            if (
+                password &&
+                passwordConfirmation &&
+                password !== passwordConfirmation
+            ) {
                 return res.status(400).json({
                     error: 'Password must be the same of password confirmation',
                 });
@@ -44,7 +48,9 @@ class UserController {
                 return res.status(400).json({ error: 'User already exists' });
             }
 
-            const encryptyedPassword = await bcrypt.hash(password, 8);
+            const encryptyedPassword = null;
+
+            if (password) await bcrypt.hash(password, 8);
 
             const user = new User();
             user.firebaseUid = firebaseUid;
