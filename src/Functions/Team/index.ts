@@ -1,27 +1,8 @@
-import { getRepository } from 'typeorm';
 import { isBefore } from 'date-fns';
-
-import TeamSubscription from '../../App/Models/TeamSubscription';
 
 import { getAllUsersByTeam } from '../Teams';
 
-interface getAllSubscriptionsProps {
-    team_id: string;
-}
-
-export async function getAllSubscriptionsFromTeam({
-    team_id,
-}: getAllSubscriptionsProps): Promise<Array<TeamSubscription>> {
-    const repository = getRepository(TeamSubscription);
-
-    const response = await repository
-        .createQueryBuilder('subs')
-        .leftJoinAndSelect('subs.team', 'team')
-        .where('team.id = :team_id', { team_id })
-        .getMany();
-
-    return response;
-}
+import { getAllSubscriptionsFromTeam } from '../Subscriptions';
 
 interface checkIfTeamIsActiveProps {
     team_id: string;
