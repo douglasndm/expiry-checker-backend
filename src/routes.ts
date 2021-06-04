@@ -30,6 +30,7 @@ routes.put('/products/:product_id', Product.update);
 routes.get('/batches/:id', Batch.index);
 routes.post('/batches', Batch.store);
 routes.put('/batches/:id', Batch.update);
+routes.delete('/batches/:batch_id', Batch.delete);
 
 routes.get('/categories/team/:team_id', Category.index);
 routes.post('/categories', Category.create);
