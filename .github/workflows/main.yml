@@ -60,7 +60,7 @@ jobs:
           source: ".,!node_modules"
           target: "~/app/cv-business-backend"
           
-      - name: Install dependencies on server
+      - name: Run production scripts
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -69,25 +69,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: | 
             cd ~/app/cv-business-backend
-            yarn
-            
-      - name: Run migrations on server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_KEY }}
-          script: | 
-            cd ~/app/cv-business-backend
+            yarn            
             ./node_modules/.bin/typeorm migration:run
+            pm2 restart 0
             
-      - name: Restart node server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_KEY }}
-          script: pm2 restart 0
 
