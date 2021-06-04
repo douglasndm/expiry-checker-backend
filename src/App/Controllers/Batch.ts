@@ -7,6 +7,7 @@ import { Product } from '../Models/Product';
 import { Batch } from '../Models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
+import { getUserRole } from '../../Functions/Users/UserRoles';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -153,6 +154,60 @@ class BatchController {
             const updatedBatch = await batchReposity.save(batch);
 
             return res.status(200).json(updatedBatch);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            batch_id: Yup.string().required().uuid(),
+        });
+
+        if (!(await schema.isValid(req.params))) {
+            return res.status(400).json({ error: 'Validation fails' });
+        }
+
+        try {
+            const { batch_id } = req.params;
+
+            const batchReposity = getRepository(Batch);
+
+            const batch = await batchReposity
+                .createQueryBuilder('batch')
+                .leftJoinAndSelect('batch.product', 'product')
+                .leftJoinAndSelect('product.team', 'prodTeam')
+                .leftJoinAndSelect('prodTeam.team', 'team')
+                .where('batch.id = :batch_id', { batch_id })
+                .getOne();
+
+            if (!batch) {
+                return res.status(400).json({ error: 'Batch was not found' });
+            }
+
+            const userHasAccess = await checkIfUserHasAccessToAProduct({
+                product_id: batch.product.id,
+                user_id: req.userId,
+            });
+            const userRole = await getUserRole({
+                user_id: req.userId,
+                team_id: batch.product.team[0].team.id,
+            });
+
+            if (
+                !userHasAccess ||
+                (userHasAccess &&
+                    userRole !== 'Manager' &&
+                    userRole !== 'Supervisor')
+            ) {
+                return res
+                    .status(401)
+                    .json({ error: "You don't have permission to do this" });
+            }
+
+            await batchReposity.remove(batch);
+
+            return res.json({ success: 'ok' });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
