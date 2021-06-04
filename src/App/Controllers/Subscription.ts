@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import axios from 'axios';
 import * as Yup from 'yup';
 
 import {
+    checkSubscriptionOnRevenueCat,
     checkSubscriptions,
     getAllSubscriptionsFromTeam,
 } from '../../Functions/Subscriptions';
@@ -20,18 +20,11 @@ class SubscriptionController {
         try {
             const { team_id } = req.params;
 
-            const response = await axios.get<IRevenueCatResponse>(
-                `https://api.revenuecat.com/v1/subscribers/${team_id}`,
-                {
-                    headers: {
-                        Authorization: process.env.REVENUECAT_API_KEY,
-                    },
-                },
-            );
+            const response = await checkSubscriptionOnRevenueCat(team_id);
 
             await checkSubscriptions({
                 team_id,
-                revenuecatSubscriptions: response.data,
+                revenuecatSubscriptions: response,
             });
 
             const subs = await getAllSubscriptionsFromTeam({ team_id });

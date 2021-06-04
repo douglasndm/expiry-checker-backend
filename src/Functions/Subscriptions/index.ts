@@ -1,4 +1,5 @@
 import { getRepository } from 'typeorm';
+import axios from 'axios';
 import { startOfDay, parseISO, compareAsc } from 'date-fns';
 
 import { Team } from '../../App/Models/Team';
@@ -209,4 +210,19 @@ export async function checkSubscriptions({
             members_limit: subToCreate.members_limit,
         });
     }
+}
+
+export async function checkSubscriptionOnRevenueCat(
+    team_id: string,
+): Promise<IRevenueCatResponse> {
+    const response = await axios.get<IRevenueCatResponse>(
+        `https://api.revenuecat.com/v1/subscribers/${team_id}`,
+        {
+            headers: {
+                Authorization: process.env.REVENUECAT_API_KEY,
+            },
+        },
+    );
+
+    return response.data;
 }
