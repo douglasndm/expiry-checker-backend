@@ -27,6 +27,7 @@ routes.get('/users/:id', User.index);
 routes.get('/products/:id', Product.show);
 routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
+routes.delete('/products/:product_id', Product.delete);
 
 routes.get('/batches/:id', Batch.index);
 routes.post('/batches', Batch.store);
