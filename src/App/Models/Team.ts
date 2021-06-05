@@ -32,6 +32,9 @@ export class Team {
     @OneToMany(type => TeamSubscription, subscriptions => subscriptions.team)
     subscriptions: Array<TeamSubscription>;
 
+    @Column({ name: 'subs_last_time_checked' })
+    lastTimeChecked: Date;
+
     @CreateDateColumn()
     created_at: Date;
 

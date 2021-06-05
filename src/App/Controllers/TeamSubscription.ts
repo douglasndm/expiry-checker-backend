@@ -1,11 +1,8 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import { checkIfUserHasAccessToTeam } from '../../Functions/Security/UserAccessTeam';
-import { getAllSubscriptionsFromTeam } from '../../Functions/Team';
-
-import TeamSubscription from '../Models/TeamSubscription';
+import { getAllSubscriptionsFromTeam } from '../../Functions/Subscriptions';
 
 class TeamSubscriptionsController {
     async index(req: Request, res: Response): Promise<Response> {

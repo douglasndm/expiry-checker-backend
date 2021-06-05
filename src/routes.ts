@@ -9,6 +9,7 @@ import TeamUsers from './App/Controllers/TeamUsers';
 import UserManager from './App/Controllers/UserManager';
 import ProductCategory from './App/Controllers/ProductCategory';
 import TeamSubscriptions from './App/Controllers/TeamSubscription';
+import Subscription from './App/Controllers/Subscription';
 
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
 import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
@@ -26,6 +27,7 @@ routes.get('/users/:id', User.index);
 routes.get('/products/:id', Product.show);
 routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
+routes.delete('/products/:product_id', Product.delete);
 
 routes.get('/batches/:id', Batch.index);
 routes.post('/batches', Batch.store);
@@ -49,6 +51,7 @@ routes.get('/team/:id/users', TeamUsers.index);
 routes.post('/team/:team_id/join', TeamUsers.store);
 
 routes.get('/team/:team_id/subscriptions', TeamSubscriptions.index);
+routes.get('/team/:team_id/subscriptions/check', Subscription.check);
 
 routes.post(
     '/team/:id/manager/user',
@@ -61,7 +64,7 @@ routes.put(
     UserManager.update,
 );
 routes.delete(
-    '/team/:id/manager/user/:user_id',
+    '/team/:team_id/manager/user/:user_id',
     ManagerCheckerMiddleware,
     UserManager.delete,
 );

@@ -10,7 +10,7 @@ async function CheckIfUserIsManager(
     next: NextFunction,
 ): Promise<void | Response> {
     const schema = Yup.object().shape({
-        id: Yup.string().required().uuid(),
+        team_id: Yup.string().required().uuid(),
     });
 
     if (!(await schema.isValid(req.params))) {
@@ -18,12 +18,12 @@ async function CheckIfUserIsManager(
     }
 
     try {
-        const { id } = req.params;
+        const { team_id } = req.params;
 
         const userRolesRepository = getRepository(UserRoles);
         const user = await userRolesRepository.findOne({
             where: {
-                team: { id },
+                team: { id: team_id },
                 user: { firebaseUid: req.userId },
             },
         });

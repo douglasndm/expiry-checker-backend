@@ -16,6 +16,7 @@ import {
     removeAllCategoriesFromProduct,
 } from '../../Functions/Category/Products';
 import { sortBatchesByExpDate } from '../../Functions/Batches';
+import { getUserRole } from '../../Functions/Users/UserRoles';
 
 class ProductController {
     async show(req: Request, res: Response): Promise<Response> {
@@ -228,6 +229,59 @@ class ProductController {
             }
 
             return res.status(200).json(updatedProduct);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            product_id: Yup.string().required().uuid(),
+        });
+
+        if (!(await schema.isValid(req.params))) {
+            return res.status(400).json({ error: 'Validation fails' });
+        }
+
+        try {
+            const { product_id } = req.params;
+
+            const productRepository = getRepository(Product);
+
+            const prod = await productRepository
+                .createQueryBuilder('prod')
+                .leftJoinAndSelect('prod.team', 'prodTeam')
+                .leftJoinAndSelect('prodTeam.team', 'team')
+                .where('prod.id = :product_id', { product_id })
+                .getOne();
+
+            if (!prod) {
+                return res.status(400).json({ error: 'Product was not found' });
+            }
+
+            const userHasAccess = await checkIfUserHasAccessToAProduct({
+                product_id: prod.id,
+                user_id: req.userId,
+            });
+            const userRole = await getUserRole({
+                user_id: req.userId,
+                team_id: prod.team[0].team.id,
+            });
+
+            if (
+                !userHasAccess ||
+                (userHasAccess &&
+                    userRole !== 'Manager' &&
+                    userRole !== 'Supervisor')
+            ) {
+                return res
+                    .status(401)
+                    .json({ error: "You don't have permission to do this" });
+            }
+
+            await productRepository.remove(prod);
+
+            return res.json({ success: 'ok' });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
