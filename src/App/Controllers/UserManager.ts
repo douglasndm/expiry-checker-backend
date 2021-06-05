@@ -148,7 +148,7 @@ class UserManagerController {
 
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+            team_id: Yup.string().required().uuid(),
             user_id: Yup.string().required(),
         });
 
@@ -157,23 +157,29 @@ class UserManagerController {
         }
 
         try {
-            const { id, user_id } = req.params;
+            const { team_id, user_id } = req.params;
 
-            const userRolesRepository = getRepository(UserRoles);
-            const role = await userRolesRepository.findOne({
-                where: {
-                    team: { id },
-                    user: { firebaseUid: user_id },
-                },
-            });
-
-            if (!role) {
+            if (req.userId === user_id) {
                 return res
                     .status(400)
-                    .json({ error: 'User or team was not found' });
+                    .json({ error: "You can't remove yourself from a team" });
             }
 
-            await userRolesRepository.remove(role);
+            const repository = getRepository(UserRoles);
+
+            const role = await repository
+                .createQueryBuilder('role')
+                .leftJoinAndSelect('role.user', 'user')
+                .leftJoinAndSelect('role.team', 'team')
+                .where('user.firebaseUid = :user_id', { user_id })
+                .andWhere('team.id = :team_id', { team_id })
+                .getOne();
+
+            if (!role) {
+                return res.status(400).json({ error: 'User is not in team' });
+            }
+
+            await repository.remove(role);
 
             return res.status(200).json({ success: true });
         } catch (err) {

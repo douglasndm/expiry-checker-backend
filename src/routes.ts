@@ -64,7 +64,7 @@ routes.put(
     UserManager.update,
 );
 routes.delete(
-    '/team/:id/manager/user/:user_id',
+    '/team/:team_id/manager/user/:user_id',
     ManagerCheckerMiddleware,
     UserManager.delete,
 );
