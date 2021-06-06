@@ -11,7 +11,7 @@ import { checkMembersLimit } from '../../Functions/Team';
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+            team_id: Yup.string().required().uuid(),
         });
 
         const schemaBody = Yup.object().shape({
@@ -26,7 +26,7 @@ class UserManagerController {
         }
 
         try {
-            const { id } = req.params;
+            const { team_id } = req.params;
             const { email } = req.body;
 
             const userRolesRepository = getRepository(UserRoles);
@@ -34,7 +34,7 @@ class UserManagerController {
             const alreadyInARole = await userRolesRepository
                 .createQueryBuilder('userRole')
                 .leftJoinAndSelect('userRole.user', 'user')
-                .where('userRole.team.id = :team_id', { team_id: id })
+                .where('userRole.team.id = :team_id', { team_id })
                 .andWhere('LOWER(user.email) = LOWER(:email)', { email })
                 .getOne();
 
@@ -47,7 +47,7 @@ class UserManagerController {
             const teamRepository = getRepository(Team);
             const userRepository = getRepository(User);
 
-            const team = await teamRepository.findOne(id);
+            const team = await teamRepository.findOne(team_id);
             const user = await userRepository
                 .createQueryBuilder('user')
                 .where('LOWER(user.email) = LOWER(:email)', { email })
@@ -60,7 +60,7 @@ class UserManagerController {
             }
 
             const membersChecker = await checkMembersLimit({
-                team_id: id,
+                team_id,
             });
 
             if (membersChecker.members >= membersChecker.limit) {
