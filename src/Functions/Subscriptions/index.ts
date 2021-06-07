@@ -5,22 +5,22 @@ import { startOfDay, parseISO, compareAsc } from 'date-fns';
 import { Team } from '../../App/Models/Team';
 import TeamSubscription from '../../App/Models/TeamSubscription';
 
-interface getAllSubscriptionsProps {
+interface getTeamSubscriptionProps {
     team_id: string;
 }
 
-export async function getAllSubscriptionsFromTeam({
+export async function getTeamSubscription({
     team_id,
-}: getAllSubscriptionsProps): Promise<Array<TeamSubscription>> {
+}: getTeamSubscriptionProps): Promise<TeamSubscription | null> {
     const repository = getRepository(TeamSubscription);
 
     const response = await repository
         .createQueryBuilder('subs')
         .leftJoinAndSelect('subs.team', 'team')
         .where('team.id = :team_id', { team_id })
-        .getMany();
+        .getOne();
 
-    return response;
+    return response || null;
 }
 
 interface createSubscriptionpProps {
@@ -63,7 +63,7 @@ export async function checkSubscriptions({
 }: checkSubscriptionsProps): Promise<void> {
     const { subscriptions: subs } = revenuecatSubscriptions.subscriber;
 
-    const allSubs = await getAllSubscriptionsFromTeam({ team_id });
+    const subscription = await getTeamSubscription({ team_id });
 
     interface revenueSubscriptionsProps {
         expires_date: Date;
@@ -72,11 +72,6 @@ export async function checkSubscriptions({
     }
 
     const revenueSubscriptions: Array<revenueSubscriptionsProps> = [];
-
-    interface SubProps {
-        exp_date: string;
-        members_limit: number;
-    }
 
     if (subs.expirybusiness_monthly_default_15people) {
         const {
@@ -142,20 +137,19 @@ export async function checkSubscriptions({
     const pendingsSubs = revenueSubscriptions.filter(cat => {
         const cat_exp_date = startOfDay(cat.expires_date);
 
-        const db_exp_date = allSubs.filter(back => {
-            const back_exp_date = startOfDay(back.expireIn);
-
-            if (compareAsc(cat_exp_date, back_exp_date) === 0) {
-                if (cat.membersLimit === back.membersLimit) {
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        if (db_exp_date.length <= 0) {
-            return true;
+        if (!subscription) {
+            return false;
         }
+
+        const back_exp_date = startOfDay(subscription.expireIn);
+
+        if (compareAsc(cat_exp_date, back_exp_date) === 0) {
+            if (cat.membersLimit === subscription.membersLimit) {
+                return true;
+            }
+            return false;
+        }
+
         return false;
     });
 

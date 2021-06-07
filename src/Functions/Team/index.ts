@@ -7,7 +7,7 @@ import { getAllUsersByTeam } from '../Teams';
 import {
     checkSubscriptionOnRevenueCat,
     checkSubscriptions,
-    getAllSubscriptionsFromTeam,
+    getTeamSubscription,
 } from '../Subscriptions';
 
 interface checkIfTeamIsActiveProps {
@@ -41,19 +41,18 @@ export async function checkIfTeamIsActive({
         await teamRepository.save(team);
     }
 
-    const subscriptions = await getAllSubscriptionsFromTeam({ team_id });
+    const subscriptions = await getTeamSubscription({ team_id });
 
-    const activeSubs = subscriptions.filter(sub => {
-        const date = startOfDay(sub.expireIn);
-
-        if (compareAsc(today, date) <= 0) {
-            return true;
-        }
-
+    if (!subscriptions) {
         return false;
-    });
+    }
 
-    if (activeSubs.length > 0) return true;
+    const date = startOfDay(subscriptions.expireIn);
+
+    if (compareAsc(today, date) <= 0) {
+        return true;
+    }
+
     return false;
 }
 
@@ -69,20 +68,20 @@ interface checkMembersLimitResponse {
 export async function checkMembersLimit({
     team_id,
 }: checkMembersLimitProps): Promise<checkMembersLimitResponse> {
-    const subs = await getAllSubscriptionsFromTeam({ team_id });
+    const sub = await getTeamSubscription({ team_id });
 
-    const activeSubs = subs.filter(sub => isBefore(new Date(), sub.expireIn));
+    if (!sub) {
+        throw new Error('Team doesnt have any subscription');
+    }
 
-    let limit = 0;
+    if (isBefore(new Date(), sub.expireIn)) {
+        const users = await getAllUsersByTeam({ team_id });
 
-    activeSubs.forEach(sub => {
-        limit += sub.membersLimit;
-    });
+        return {
+            limit: sub.membersLimit,
+            members: users.length,
+        };
+    }
 
-    const users = await getAllUsersByTeam({ team_id });
-
-    return {
-        limit,
-        members: users.length,
-    };
+    throw new Error('Subscription is expired');
 }
