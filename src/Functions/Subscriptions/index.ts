@@ -27,12 +27,14 @@ interface createSubscriptionpProps {
     team_id: string;
     exp_date: Date;
     members_limit: number;
+    sku: string;
 }
 
 export async function createSubscription({
     team_id,
     exp_date,
     members_limit,
+    sku,
 }: createSubscriptionpProps): Promise<void> {
     const teamSubscriptionRepository = getRepository(TeamSubscription);
     const teamRepository = getRepository(Team);
@@ -48,6 +50,7 @@ export async function createSubscription({
     teamSubscription.expireIn = exp_date;
     teamSubscription.membersLimit = members_limit;
     teamSubscription.isActive = startOfDay(exp_date) >= startOfDay(new Date());
+    teamSubscription.SKU_bought = sku;
 
     await teamSubscriptionRepository.save(teamSubscription);
 }
@@ -69,6 +72,7 @@ export async function checkSubscriptions({
         expires_date: Date;
         purchase_date: Date;
         membersLimit: 1 | 3 | 5 | 10 | 15;
+        sku: string;
     }
 
     const revenueSubscriptions: Array<revenueSubscriptionsProps> = [];
@@ -83,6 +87,7 @@ export async function checkSubscriptions({
             expires_date: parseISO(expires_date),
             purchase_date: parseISO(purchase_date),
             membersLimit: 15,
+            sku: 'expirybusiness_monthly_default_15people',
         });
     }
     if (subs.expirybusiness_monthly_default_10people) {
@@ -95,6 +100,7 @@ export async function checkSubscriptions({
             expires_date: parseISO(expires_date),
             purchase_date: parseISO(purchase_date),
             membersLimit: 10,
+            sku: 'expirybusiness_monthly_default_10people',
         });
     }
     if (subs.expirybusiness_monthly_default_5people) {
@@ -107,6 +113,7 @@ export async function checkSubscriptions({
             expires_date: parseISO(expires_date),
             purchase_date: parseISO(purchase_date),
             membersLimit: 5,
+            sku: 'expirybusiness_monthly_default_5people',
         });
     }
     if (subs.expirybusiness_monthly_default_3people) {
@@ -119,6 +126,7 @@ export async function checkSubscriptions({
             expires_date: parseISO(expires_date),
             purchase_date: parseISO(purchase_date),
             membersLimit: 3,
+            sku: 'expirybusiness_monthly_default_3people',
         });
     }
     if (subs.expirybusiness_monthly_default_1person) {
@@ -131,37 +139,39 @@ export async function checkSubscriptions({
             expires_date: parseISO(expires_date),
             purchase_date: parseISO(purchase_date),
             membersLimit: 1,
+            sku: 'expirybusiness_monthly_default_1person',
         });
     }
 
-    const pendingsSubs = revenueSubscriptions.filter(cat => {
-        const cat_exp_date = startOfDay(cat.expires_date);
-
-        if (!subscription) {
-            return false;
+    const sortedRevenueSubs = revenueSubscriptions.sort((sub1, sub2) => {
+        if (startOfDay(sub1.purchase_date) < startOfDay(sub2.expires_date)) {
+            return 1;
         }
-
-        const back_exp_date = startOfDay(subscription.expireIn);
-
-        if (compareAsc(cat_exp_date, back_exp_date) === 0) {
-            if (cat.membersLimit === subscription.membersLimit) {
-                return true;
-            }
-            return false;
+        if (startOfDay(sub1.expires_date) === startOfDay(sub2.expires_date)) {
+            return 0;
         }
-
-        return false;
+        return -1;
     });
 
-    if (pendingsSubs.length > 0) {
-        const date = startOfDay(pendingsSubs[0].expires_date);
+    if (subscription) {
+        if (subscription.SKU_bought === sortedRevenueSubs[0].sku) {
+            const subsciptionDate = startOfDay(subscription.expireIn);
+            const revenueDate = startOfDay(sortedRevenueSubs[0].expires_date);
 
-        await createSubscription({
-            team_id,
-            exp_date: date,
-            members_limit: pendingsSubs[0].membersLimit,
-        });
+            if (compareAsc(subsciptionDate, revenueDate) === 0) {
+                return;
+            }
+        }
     }
+
+    const date = startOfDay(sortedRevenueSubs[0].expires_date);
+
+    await createSubscription({
+        team_id,
+        exp_date: date,
+        members_limit: sortedRevenueSubs[0].membersLimit,
+        sku: sortedRevenueSubs[0].sku,
+    });
 }
 
 export async function checkSubscriptionOnRevenueCat(
