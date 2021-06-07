@@ -18,6 +18,7 @@ export async function getTeamSubscription({
         .createQueryBuilder('subs')
         .leftJoinAndSelect('subs.team', 'team')
         .where('team.id = :team_id', { team_id })
+        .orderBy('subs.expireIn', 'DESC')
         .getOne();
 
     return response || null;
