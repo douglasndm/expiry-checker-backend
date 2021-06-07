@@ -54,7 +54,7 @@ routes.get('/team/:team_id/subscriptions', TeamSubscriptions.index);
 routes.get('/team/:team_id/subscriptions/check', Subscription.check);
 
 routes.post(
-    '/team/:id/manager/user',
+    '/team/:team_id/manager/user',
     ManagerCheckerMiddleware,
     UserManager.create,
 );

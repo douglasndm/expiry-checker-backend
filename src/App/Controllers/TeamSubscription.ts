@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
 import { checkIfUserHasAccessToTeam } from '../../Functions/Security/UserAccessTeam';
-import { getAllSubscriptionsFromTeam } from '../../Functions/Subscriptions';
+import { getTeamSubscription } from '../../Functions/Subscriptions';
 
 class TeamSubscriptionsController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -28,7 +28,7 @@ class TeamSubscriptionsController {
                     .json({ error: 'You dont have access to do that' });
             }
 
-            const response = await getAllSubscriptionsFromTeam({ team_id });
+            const response = await getTeamSubscription({ team_id });
 
             return res.json(response);
         } catch (err) {

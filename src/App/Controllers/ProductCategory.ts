@@ -35,8 +35,8 @@ class ProductCategoryController {
 
             if (productsInCategory.length <= 0) {
                 return res
-                    .status(400)
-                    .json({ error: 'Category was not found' });
+                    .status(200)
+                    .json({ category_name: '', products: [] });
             }
 
             const userHasAccess = await checkIfUserHasAccessToTeam({
@@ -52,13 +52,19 @@ class ProductCategoryController {
 
             let categoryName;
 
-            const products: Array<Product> = productsInCategory.map(p => ({
-                id: p.product.id,
-                name: p.product.name,
-                code: p.product.code,
-                team: p.product.team,
-                batches: p.product.batches,
-            }));
+            const products: Array<
+                Omit<Product, 'created_at' | 'updated_at' | 'categories'>
+            > = [];
+
+            productsInCategory.forEach(p =>
+                products.push({
+                    id: p.product.id,
+                    name: p.product.name,
+                    code: p.product.code,
+                    team: p.product.team,
+                    batches: p.product.batches,
+                }),
+            );
 
             if (productsInCategory.length > 0) {
                 categoryName = productsInCategory[0].category.name;
@@ -79,7 +85,7 @@ class ProductCategoryController {
                 }
             }
 
-            return res.json({ category: categoryName, products });
+            return res.json({ category_name: categoryName, products });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }

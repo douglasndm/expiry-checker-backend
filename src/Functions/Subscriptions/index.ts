@@ -5,34 +5,36 @@ import { startOfDay, parseISO, compareAsc } from 'date-fns';
 import { Team } from '../../App/Models/Team';
 import TeamSubscription from '../../App/Models/TeamSubscription';
 
-interface getAllSubscriptionsProps {
+interface getTeamSubscriptionProps {
     team_id: string;
 }
 
-export async function getAllSubscriptionsFromTeam({
+export async function getTeamSubscription({
     team_id,
-}: getAllSubscriptionsProps): Promise<Array<TeamSubscription>> {
+}: getTeamSubscriptionProps): Promise<TeamSubscription | null> {
     const repository = getRepository(TeamSubscription);
 
     const response = await repository
         .createQueryBuilder('subs')
         .leftJoinAndSelect('subs.team', 'team')
         .where('team.id = :team_id', { team_id })
-        .getMany();
+        .getOne();
 
-    return response;
+    return response || null;
 }
 
 interface createSubscriptionpProps {
     team_id: string;
     exp_date: Date;
     members_limit: number;
+    sku: string;
 }
 
 export async function createSubscription({
     team_id,
     exp_date,
     members_limit,
+    sku,
 }: createSubscriptionpProps): Promise<void> {
     const teamSubscriptionRepository = getRepository(TeamSubscription);
     const teamRepository = getRepository(Team);
@@ -48,6 +50,7 @@ export async function createSubscription({
     teamSubscription.expireIn = exp_date;
     teamSubscription.membersLimit = members_limit;
     teamSubscription.isActive = startOfDay(exp_date) >= startOfDay(new Date());
+    teamSubscription.SKU_bought = sku;
 
     await teamSubscriptionRepository.save(teamSubscription);
 }
@@ -63,13 +66,16 @@ export async function checkSubscriptions({
 }: checkSubscriptionsProps): Promise<void> {
     const { subscriptions: subs } = revenuecatSubscriptions.subscriber;
 
-    const allSubs = await getAllSubscriptionsFromTeam({ team_id });
+    const subscription = await getTeamSubscription({ team_id });
 
-    interface SubProps {
-        exp_date: string;
-        members_limit: number;
+    interface revenueSubscriptionsProps {
+        expires_date: Date;
+        purchase_date: Date;
+        membersLimit: 1 | 3 | 5 | 10 | 15;
+        sku: string;
     }
-    let subToCreate: SubProps | null = null;
+
+    const revenueSubscriptions: Array<revenueSubscriptionsProps> = [];
 
     if (subs.expirybusiness_monthly_default_15people) {
         const {
@@ -77,139 +83,95 @@ export async function checkSubscriptions({
             purchase_date,
         } = subs.expirybusiness_monthly_default_15people;
 
-        const alreadySub = allSubs.find(sub => {
-            if (sub.membersLimit === 15) {
-                if (
-                    compareAsc(
-                        startOfDay(sub.expireIn),
-                        startOfDay(parseISO(expires_date)),
-                    ) === 0
-                ) {
-                    return true;
-                }
-            }
-            return false;
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 15,
+            sku: 'expirybusiness_monthly_default_15people',
         });
-
-        if (!alreadySub) {
-            subToCreate = {
-                exp_date: expires_date,
-                members_limit: 15,
-            };
-        }
-    } else if (subs.expirybusiness_monthly_default_10people) {
+    }
+    if (subs.expirybusiness_monthly_default_10people) {
         const {
             expires_date,
             purchase_date,
         } = subs.expirybusiness_monthly_default_10people;
 
-        const alreadySub = allSubs.find(sub => {
-            if (sub.membersLimit === 10) {
-                if (
-                    compareAsc(
-                        startOfDay(sub.expireIn),
-                        startOfDay(parseISO(expires_date)),
-                    ) === 0
-                ) {
-                    return true;
-                }
-            }
-            return false;
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 10,
+            sku: 'expirybusiness_monthly_default_10people',
         });
-
-        if (!alreadySub) {
-            subToCreate = {
-                exp_date: expires_date,
-                members_limit: 10,
-            };
-        }
-    } else if (subs.expirybusiness_monthly_default_5people) {
+    }
+    if (subs.expirybusiness_monthly_default_5people) {
         const {
             expires_date,
             purchase_date,
         } = subs.expirybusiness_monthly_default_5people;
 
-        const alreadySub = allSubs.find(sub => {
-            if (sub.membersLimit === 5) {
-                if (
-                    compareAsc(
-                        startOfDay(sub.expireIn),
-                        startOfDay(parseISO(expires_date)),
-                    ) === 0
-                ) {
-                    return true;
-                }
-            }
-            return false;
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 5,
+            sku: 'expirybusiness_monthly_default_5people',
         });
-
-        if (!alreadySub) {
-            subToCreate = {
-                exp_date: expires_date,
-                members_limit: 5,
-            };
-        }
-    } else if (subs.expirybusiness_monthly_default_3people) {
+    }
+    if (subs.expirybusiness_monthly_default_3people) {
         const {
             expires_date,
             purchase_date,
         } = subs.expirybusiness_monthly_default_3people;
 
-        const alreadySub = allSubs.find(sub => {
-            if (sub.membersLimit === 3) {
-                if (
-                    compareAsc(
-                        startOfDay(sub.expireIn),
-                        startOfDay(parseISO(expires_date)),
-                    ) === 0
-                ) {
-                    return true;
-                }
-            }
-            return false;
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 3,
+            sku: 'expirybusiness_monthly_default_3people',
         });
-
-        if (!alreadySub) {
-            subToCreate = {
-                exp_date: expires_date,
-                members_limit: 3,
-            };
-        }
-    } else if (subs.expirybusiness_monthly_default_1person) {
+    }
+    if (subs.expirybusiness_monthly_default_1person) {
         const {
             expires_date,
             purchase_date,
         } = subs.expirybusiness_monthly_default_1person;
 
-        const alreadySub = allSubs.find(sub => {
-            if (sub.membersLimit === 1) {
-                if (
-                    compareAsc(
-                        startOfDay(sub.expireIn),
-                        startOfDay(parseISO(expires_date)),
-                    ) === 0
-                ) {
-                    return true;
-                }
-            }
-            return false;
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 1,
+            sku: 'expirybusiness_monthly_default_1person',
         });
+    }
 
-        if (!alreadySub) {
-            subToCreate = {
-                exp_date: expires_date,
-                members_limit: 1,
-            };
+    const sortedRevenueSubs = revenueSubscriptions.sort((sub1, sub2) => {
+        if (startOfDay(sub1.purchase_date) < startOfDay(sub2.expires_date)) {
+            return 1;
+        }
+        if (startOfDay(sub1.expires_date) === startOfDay(sub2.expires_date)) {
+            return 0;
+        }
+        return -1;
+    });
+
+    if (subscription) {
+        if (subscription.SKU_bought === sortedRevenueSubs[0].sku) {
+            const subsciptionDate = startOfDay(subscription.expireIn);
+            const revenueDate = startOfDay(sortedRevenueSubs[0].expires_date);
+
+            if (compareAsc(subsciptionDate, revenueDate) === 0) {
+                return;
+            }
         }
     }
 
-    if (subToCreate) {
-        await createSubscription({
-            team_id,
-            exp_date: parseISO(subToCreate.exp_date),
-            members_limit: subToCreate.members_limit,
-        });
-    }
+    const date = startOfDay(sortedRevenueSubs[0].expires_date);
+
+    await createSubscription({
+        team_id,
+        exp_date: date,
+        members_limit: sortedRevenueSubs[0].membersLimit,
+        sku: sortedRevenueSubs[0].sku,
+    });
 }
 
 export async function checkSubscriptionOnRevenueCat(

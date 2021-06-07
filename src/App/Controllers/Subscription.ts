@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import {
     checkSubscriptionOnRevenueCat,
     checkSubscriptions,
-    getAllSubscriptionsFromTeam,
+    getTeamSubscription,
 } from '../../Functions/Subscriptions';
 
 class SubscriptionController {
@@ -27,7 +27,7 @@ class SubscriptionController {
                 revenuecatSubscriptions: response,
             });
 
-            const subs = await getAllSubscriptionsFromTeam({ team_id });
+            const subs = await getTeamSubscription({ team_id });
 
             return res.status(200).json(subs);
         } catch (err) {
