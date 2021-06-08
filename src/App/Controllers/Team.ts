@@ -46,6 +46,7 @@ class TeamController {
                 .where('product_teams.team_id = :id', { id: team_id })
                 .leftJoinAndSelect('product_teams.product', 'product')
                 .leftJoinAndSelect('product.batches', 'batches')
+                .orderBy('batches.exp_date', 'ASC')
                 .getMany();
 
             const productsWithoutId = products.map(p => p.product);

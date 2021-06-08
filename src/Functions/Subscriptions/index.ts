@@ -18,6 +18,7 @@ export async function getTeamSubscription({
         .createQueryBuilder('subs')
         .leftJoinAndSelect('subs.team', 'team')
         .where('team.id = :team_id', { team_id })
+        .orderBy('subs.expireIn', 'DESC')
         .getOne();
 
     return response || null;
@@ -144,10 +145,10 @@ export async function checkSubscriptions({
     }
 
     const sortedRevenueSubs = revenueSubscriptions.sort((sub1, sub2) => {
-        if (startOfDay(sub1.purchase_date) < startOfDay(sub2.expires_date)) {
+        if (compareAsc(sub1.purchase_date, sub2.purchase_date) < 0) {
             return 1;
         }
-        if (startOfDay(sub1.expires_date) === startOfDay(sub2.expires_date)) {
+        if (compareAsc(sub1.purchase_date, sub2.purchase_date) === 0) {
             return 0;
         }
         return -1;
