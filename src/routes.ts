@@ -14,7 +14,11 @@ import Subscription from './App/Controllers/Subscription';
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
 import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
 
+import filesRoutes from './Routes/files';
+
 const routes = Router();
+
+routes.use(filesRoutes);
 
 routes.post('/users', User.store);
 

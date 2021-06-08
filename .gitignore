@@ -1,5 +1,8 @@
 /node_modules/
 /dist/
+/temp/*
+
+!/**/.gitkeep
 
 yarn-error.log
 
