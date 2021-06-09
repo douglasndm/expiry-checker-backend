@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import { isBefore } from 'date-fns';
+import { compareAsc, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
 import { User } from '../Models/User';
@@ -94,8 +94,12 @@ class UserController {
                 email: user.email,
 
                 roles: user.roles.map(r => {
-                    const subscriptions = r.team.subscriptions.filter(sub =>
-                        isBefore(new Date(), sub.expireIn),
+                    const subscriptions = r.team.subscriptions.filter(
+                        sub =>
+                            compareAsc(
+                                startOfDay(new Date()),
+                                startOfDay(sub.expireIn),
+                            ) <= 0,
                     );
 
                     return {

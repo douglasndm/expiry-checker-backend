@@ -74,7 +74,7 @@ export async function checkMembersLimit({
         throw new Error('Team doesnt have any subscription');
     }
 
-    if (isBefore(new Date(), sub.expireIn)) {
+    if (compareAsc(startOfDay(new Date()), startOfDay(sub.expireIn)) <= 0) {
         const users = await getAllUsersByTeam({ team_id });
 
         return {
