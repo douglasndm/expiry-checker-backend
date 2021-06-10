@@ -19,7 +19,6 @@ class TeamController {
             const productTeamsRepository = getRepository(ProductTeams);
 
             const subscription = await checkIfTeamIsActive({ team_id });
-
             if (!subscription) {
                 return res.status(401).json({
                     error: "Team doesn't have an active subscription",
