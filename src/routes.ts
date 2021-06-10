@@ -18,8 +18,6 @@ import filesRoutes from './Routes/files';
 
 const routes = Router();
 
-routes.use(filesRoutes);
-
 routes.post('/users', User.store);
 
 // from now on all routes need authentication
@@ -57,20 +55,13 @@ routes.post('/team/:team_id/join', TeamUsers.store);
 routes.get('/team/:team_id/subscriptions', TeamSubscriptions.index);
 routes.get('/team/:team_id/subscriptions/check', Subscription.check);
 
-routes.post(
-    '/team/:team_id/manager/user',
-    ManagerCheckerMiddleware,
-    UserManager.create,
-);
-routes.put(
-    '/team/:id/manager/user/:user_id',
-    ManagerCheckerMiddleware,
-    UserManager.update,
-);
-routes.delete(
-    '/team/:team_id/manager/user/:user_id',
-    ManagerCheckerMiddleware,
-    UserManager.delete,
-);
+routes.use(filesRoutes);
+
+// From now one all routes will check if user is a manager
+routes.use(ManagerCheckerMiddleware);
+
+routes.post('/team/:team_id/manager/user', UserManager.create);
+routes.put('/team/:id/manager/user/:user_id', UserManager.update);
+routes.delete('/team/:team_id/manager/user/:user_id', UserManager.delete);
 
 export default routes;

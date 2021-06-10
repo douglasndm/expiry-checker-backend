@@ -1,0 +1,18 @@
+interface CVLote {
+    id: number;
+    lote: string;
+    exp_date: string;
+    amount: number;
+    price: number;
+    status: 'Tratado' | 'Não tratado';
+}
+
+interface CVProduct {
+    id: number;
+    name: string;
+    code?: string;
+    photo?: string;
+    store?: string;
+    categories: Array<string>;
+    lotes: Array<CVLote>;
+}
