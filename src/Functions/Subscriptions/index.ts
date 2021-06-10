@@ -164,15 +164,16 @@ export async function checkSubscriptions({
             }
         }
     }
+    if (sortedRevenueSubs.length > 0) {
+        const date = startOfDay(sortedRevenueSubs[0].expires_date);
 
-    const date = startOfDay(sortedRevenueSubs[0].expires_date);
-
-    await createSubscription({
-        team_id,
-        exp_date: date,
-        members_limit: sortedRevenueSubs[0].membersLimit,
-        sku: sortedRevenueSubs[0].sku,
-    });
+        await createSubscription({
+            team_id,
+            exp_date: date,
+            members_limit: sortedRevenueSubs[0].membersLimit,
+            sku: sortedRevenueSubs[0].sku,
+        });
+    }
 }
 
 export async function checkSubscriptionOnRevenueCat(
