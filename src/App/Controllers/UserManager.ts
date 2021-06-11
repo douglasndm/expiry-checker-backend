@@ -108,6 +108,16 @@ class UserManagerController {
             const { team_id } = req.params;
             const { user_id, role, name, lastName, email } = req.body;
 
+            if (role.toLowerCase() !== 'manager') {
+                if (role.toLowerCase() !== 'supervisor') {
+                    if (role.toLowerCase() !== 'repositor') {
+                        return res
+                            .status(400)
+                            .json({ error: 'Role setted is invalid' });
+                    }
+                }
+            }
+
             const userRolesRepository = getRepository(UserRoles);
 
             const userRoles = await userRolesRepository.findOne({
@@ -117,7 +127,7 @@ class UserManagerController {
                 },
             });
 
-            if (userRoles?.role.toLocaleLowerCase() !== 'manager') {
+            if (userRoles?.role.toLowerCase() !== 'manager') {
                 return res
                     .status(401)
                     .json({ error: 'You dont have authorization to do that' });
@@ -137,7 +147,7 @@ class UserManagerController {
                     .json({ error: 'User in team was not found' });
             }
 
-            userRole.role = role;
+            userRole.role = role.toLowerCase();
 
             const updateRole = await userRolesRepository.save(userRole);
 
