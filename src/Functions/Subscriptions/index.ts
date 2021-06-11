@@ -19,9 +19,23 @@ export async function getTeamSubscription({
         .leftJoinAndSelect('subs.team', 'team')
         .where('team.id = :team_id', { team_id })
         .orderBy('subs.expireIn', 'DESC')
-        .getOne();
+        .getMany();
 
-    return response || null;
+    const sortedSubs = response.sort((sub1, sub2) => {
+        if (sub1.membersLimit > sub2.membersLimit) {
+            return -1;
+        }
+        if (sub1.membersLimit === sub2.membersLimit) {
+            return 0;
+        }
+        return 1;
+    });
+
+    if (sortedSubs.length > 0) {
+        return sortedSubs[0];
+    }
+
+    return null;
 }
 
 interface createSubscriptionpProps {

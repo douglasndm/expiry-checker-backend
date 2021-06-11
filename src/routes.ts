@@ -12,7 +12,7 @@ import TeamSubscriptions from './App/Controllers/TeamSubscription';
 import Subscription from './App/Controllers/Subscription';
 
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
-import ManagerCheckerMiddleware from './App/Middlewares/ManagerChecker';
+import ManagerChecker from './App/Middlewares/ManagerChecker';
 
 import filesRoutes from './Routes/files';
 
@@ -58,10 +58,13 @@ routes.get('/team/:team_id/subscriptions/check', Subscription.check);
 routes.use(filesRoutes);
 
 // From now one all routes will check if user is a manager
-routes.use(ManagerCheckerMiddleware);
 
-routes.post('/team/:team_id/manager/user', UserManager.create);
-routes.put('/team/:id/manager/user/:user_id', UserManager.update);
-routes.delete('/team/:team_id/manager/user/:user_id', UserManager.delete);
+routes.post('/team/:team_id/manager/user', ManagerChecker, UserManager.create);
+routes.put('/team/:team_id/manager/user', ManagerChecker, UserManager.update);
+routes.delete(
+    '/team/:team_id/manager/user/:user_id',
+    ManagerChecker,
+    UserManager.delete,
+);
 
 export default routes;

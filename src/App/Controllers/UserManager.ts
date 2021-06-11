@@ -86,11 +86,11 @@ class UserManagerController {
 
     async update(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
-            user_id: Yup.string().required().uuid(),
+            team_id: Yup.string().required().uuid(),
         });
 
         const schemaBody = Yup.object().shape({
+            user_id: Yup.string().required(),
             role: Yup.string(),
             name: Yup.string(),
             lastName: Yup.string(),
@@ -105,23 +105,39 @@ class UserManagerController {
         }
 
         try {
-            const { id, user_id } = req.params;
-            const { role, name, lastName, email } = req.body;
+            const { team_id } = req.params;
+            const { user_id, role, name, lastName, email } = req.body;
+
+            if (role.toLowerCase() !== 'manager') {
+                if (role.toLowerCase() !== 'supervisor') {
+                    if (role.toLowerCase() !== 'repositor') {
+                        return res
+                            .status(400)
+                            .json({ error: 'Role setted is invalid' });
+                    }
+                }
+            }
 
             const userRolesRepository = getRepository(UserRoles);
 
             const userRoles = await userRolesRepository.findOne({
-                where: { user: { id: req.userId }, team: { id } },
+                where: {
+                    user: { firebaseUid: req.userId },
+                    team: { id: team_id },
+                },
             });
 
-            if (userRoles?.role.toLocaleLowerCase() !== 'manager') {
+            if (userRoles?.role.toLowerCase() !== 'manager') {
                 return res
                     .status(401)
                     .json({ error: 'You dont have authorization to do that' });
             }
 
             const userRole = await userRolesRepository.findOne({
-                where: { user: { id: user_id }, team: { id } },
+                where: {
+                    user: { firebaseUid: user_id },
+                    team: { id: team_id },
+                },
                 relations: ['user'],
             });
 
@@ -131,7 +147,7 @@ class UserManagerController {
                     .json({ error: 'User in team was not found' });
             }
 
-            userRole.role = role;
+            userRole.role = role.toLowerCase();
 
             const updateRole = await userRolesRepository.save(userRole);
 
