@@ -90,7 +90,7 @@ class UserManagerController {
         });
 
         const schemaBody = Yup.object().shape({
-            user_id: Yup.string().required().uuid(),
+            user_id: Yup.string().required(),
             role: Yup.string(),
             name: Yup.string(),
             lastName: Yup.string(),
@@ -111,7 +111,10 @@ class UserManagerController {
             const userRolesRepository = getRepository(UserRoles);
 
             const userRoles = await userRolesRepository.findOne({
-                where: { user: { id: req.userId }, team: { id: team_id } },
+                where: {
+                    user: { firebaseUid: req.userId },
+                    team: { id: team_id },
+                },
             });
 
             if (userRoles?.role.toLocaleLowerCase() !== 'manager') {
@@ -121,7 +124,10 @@ class UserManagerController {
             }
 
             const userRole = await userRolesRepository.findOne({
-                where: { user: { id: user_id }, team: { id: team_id } },
+                where: {
+                    user: { firebaseUid: user_id },
+                    team: { id: team_id },
+                },
                 relations: ['user'],
             });
 
