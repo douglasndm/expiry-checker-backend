@@ -86,11 +86,11 @@ class UserManagerController {
 
     async update(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
-            user_id: Yup.string().required().uuid(),
+            team_id: Yup.string().required().uuid(),
         });
 
         const schemaBody = Yup.object().shape({
+            user_id: Yup.string().required().uuid(),
             role: Yup.string(),
             name: Yup.string(),
             lastName: Yup.string(),
@@ -105,13 +105,13 @@ class UserManagerController {
         }
 
         try {
-            const { id, user_id } = req.params;
-            const { role, name, lastName, email } = req.body;
+            const { team_id } = req.params;
+            const { user_id, role, name, lastName, email } = req.body;
 
             const userRolesRepository = getRepository(UserRoles);
 
             const userRoles = await userRolesRepository.findOne({
-                where: { user: { id: req.userId }, team: { id } },
+                where: { user: { id: req.userId }, team: { id: team_id } },
             });
 
             if (userRoles?.role.toLocaleLowerCase() !== 'manager') {
@@ -121,7 +121,7 @@ class UserManagerController {
             }
 
             const userRole = await userRolesRepository.findOne({
-                where: { user: { id: user_id }, team: { id } },
+                where: { user: { id: user_id }, team: { id: team_id } },
                 relations: ['user'],
             });
 
