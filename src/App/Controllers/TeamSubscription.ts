@@ -18,7 +18,7 @@ class TeamSubscriptionsController {
             const { team_id } = req.params;
 
             const userHasAccess = await checkIfUserHasAccessToTeam({
-                user_id: req.userId,
+                user_id: req.userId || '',
                 team_id,
             });
 
