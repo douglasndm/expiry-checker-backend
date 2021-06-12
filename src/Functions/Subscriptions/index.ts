@@ -21,14 +21,24 @@ export async function getTeamSubscription({
         .orderBy('subs.expireIn', 'DESC')
         .getMany();
 
-    const sortedSubs = response.sort((sub1, sub2) => {
+    const activeSubs = response.filter(sub => {
+        const today = startOfDay(new Date());
+        const date = startOfDay(sub.expireIn);
+
+        if (compareAsc(today, date) > 0) {
+            return false;
+        }
+        return true;
+    });
+
+    const sortedSubs = activeSubs.sort((sub1, sub2) => {
         if (sub1.membersLimit > sub2.membersLimit) {
             return -1;
         }
-        if (sub1.membersLimit === sub2.membersLimit) {
-            return 0;
+        if (sub1.membersLimit < sub2.membersLimit) {
+            return 1;
         }
-        return 1;
+        return 0;
     });
 
     if (sortedSubs.length > 0) {
