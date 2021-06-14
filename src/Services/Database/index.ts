@@ -1,14 +1,15 @@
 import { createConnection, getConnectionOptions } from 'typeorm';
 
-import { Batch } from '../../App/Models/Batch';
-import { Category } from '../../App/Models/Category';
-import { Product } from '../../App/Models/Product';
-import { Team } from '../../App/Models/Team';
-import { User } from '../../App/Models/User';
-import UserRoles from '../../App/Models/UserRoles';
-import ProductTeams from '../../App/Models/ProductTeams';
-import ProductCategory from '../../App/Models/ProductCategory';
-import TeamSubscriptions from '../../App/Models/TeamSubscription';
+import { Batch } from '@models/Batch';
+import { Category } from '@models/Category';
+import { Product } from '@models/Product';
+import { Team } from '@models/Team';
+import User from '@models/User';
+import UserRoles from '@models/UserRoles';
+import ProductTeams from '@models/ProductTeams';
+import ProductCategory from '@models/ProductCategory';
+import TeamSubscriptions from '@models/TeamSubscription';
+import UserDevice from '@models/UserDevice';
 
 async function setConnection(): Promise<void> {
     const defaultOptions = await getConnectionOptions();
@@ -25,6 +26,7 @@ async function setConnection(): Promise<void> {
                 ProductTeams,
                 ProductCategory,
                 TeamSubscriptions,
+                UserDevice,
             ],
         }),
     );

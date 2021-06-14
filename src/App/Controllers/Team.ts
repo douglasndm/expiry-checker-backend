@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
 import ProductTeams from '../Models/ProductTeams';
 import UserRoles from '../Models/UserRoles';
-import { User } from '../Models/User';
+import User from '../Models/User';
 import { Team } from '../Models/Team';
 
 import { getAllUsersByTeam } from '../../Functions/Teams';

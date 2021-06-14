@@ -3,14 +3,16 @@ import {
     CreateDateColumn,
     Entity,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Team } from './Team';
+
 import UserRoles from './UserRoles';
+import UserDevice from './UserDevice';
 
 @Entity({ name: 'users' })
-export class User {
+export default class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -31,6 +33,9 @@ export class User {
 
     @OneToMany(type => UserRoles, userRoles => userRoles.user)
     roles: Array<UserRoles>;
+
+    @OneToOne(() => UserDevice)
+    device: string;
 
     @CreateDateColumn()
     created_at: Date;
