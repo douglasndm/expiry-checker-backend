@@ -1,15 +1,16 @@
 import { Router } from 'express';
 
-import User from './App/Controllers/User';
-import Product from './App/Controllers/Product';
-import Batch from './App/Controllers/Batch';
-import Team from './App/Controllers/Team';
-import Category from './App/Controllers/Category';
-import TeamUsers from './App/Controllers/TeamUsers';
-import UserManager from './App/Controllers/UserManager';
-import ProductCategory from './App/Controllers/ProductCategory';
-import TeamSubscriptions from './App/Controllers/TeamSubscription';
-import Subscription from './App/Controllers/Subscription';
+import User from '@controllers/User';
+import Product from '@controllers/Product';
+import Batch from '@controllers/Batch';
+import Team from '@controllers/Team';
+import Category from '@controllers/Category';
+import TeamUsers from '@controllers/TeamUsers';
+import UserManager from '@controllers/UserManager';
+import ProductCategory from '@controllers/ProductCategory';
+import TeamSubscriptions from '@controllers/TeamSubscription';
+import Subscription from '@controllers/Subscription';
+import SessionController from '@controllers/Session';
 
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
 import ManagerChecker from './App/Middlewares/ManagerChecker';
@@ -19,6 +20,7 @@ import filesRoutes from './Routes/files';
 const routes = Router();
 
 routes.post('/users', User.store);
+routes.post('/sessions', SessionController.store);
 
 // from now on all routes need authentication
 // routes.use(AuthMiddleware);
