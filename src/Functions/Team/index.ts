@@ -1,8 +1,9 @@
 import { getRepository } from 'typeorm';
-import { isBefore, compareAsc, startOfDay } from 'date-fns';
+import { compareAsc, startOfDay } from 'date-fns';
 
-import { Team } from '../../App/Models/Team';
+import { Team } from '@models/Team';
 
+import { isUserManager } from '@utils/Users/UserRoles';
 import { getAllUsersByTeam } from '../Teams';
 import {
     checkSubscriptionOnRevenueCat,
@@ -84,4 +85,29 @@ export async function checkMembersLimit({
     }
 
     throw new Error('Subscription is expired');
+}
+
+interface deleteTeamProps {
+    team_id: string;
+    user_id: string;
+}
+
+export async function deleteTeam({
+    team_id,
+    user_id,
+}: deleteTeamProps): Promise<void> {
+    const isManager = await isUserManager({ user_id, team_id });
+
+    if (!isManager) {
+        throw new Error("You don't have permission to do that");
+    }
+
+    const teamRepository = getRepository(Team);
+    const team = await teamRepository.findOne(team_id);
+
+    if (!team) {
+        throw new Error('Team was not found');
+    }
+
+    await teamRepository.remove(team);
 }
