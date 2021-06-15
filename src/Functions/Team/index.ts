@@ -5,6 +5,7 @@ import { Team } from '@models/Team';
 
 import { isUserManager } from '@utils/Users/UserRoles';
 import { getAllUsersByTeam } from '../Teams';
+import { deleteAllProducts } from './Products';
 import {
     checkSubscriptionOnRevenueCat,
     checkSubscriptions,
@@ -108,6 +109,8 @@ export async function deleteTeam({
     if (!team) {
         throw new Error('Team was not found');
     }
+
+    await deleteAllProducts({ team_id });
 
     await teamRepository.remove(team);
 }
