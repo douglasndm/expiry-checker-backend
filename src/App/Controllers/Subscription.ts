@@ -26,7 +26,6 @@ class SubscriptionController {
                 team_id,
                 revenuecatSubscriptions: response,
             });
-
             const subs = await getTeamSubscription({ team_id });
 
             return res.status(200).json(subs);

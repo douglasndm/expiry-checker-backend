@@ -172,7 +172,7 @@ export async function checkSubscriptions({
         return -1;
     });
 
-    if (subscription) {
+    if (subscription && sortedRevenueSubs.length > 0) {
         if (subscription.membersLimit === sortedRevenueSubs[0].membersLimit) {
             const subsciptionDate = startOfDay(subscription.expireIn);
             const revenueDate = startOfDay(sortedRevenueSubs[0].expires_date);
@@ -182,6 +182,7 @@ export async function checkSubscriptions({
             }
         }
     }
+
     if (sortedRevenueSubs.length > 0) {
         const date = startOfDay(sortedRevenueSubs[0].expires_date);
 
