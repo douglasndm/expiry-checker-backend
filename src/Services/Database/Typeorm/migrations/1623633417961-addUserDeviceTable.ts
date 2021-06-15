@@ -1,11 +1,15 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+    MigrationInterface,
+    QueryRunner,
+    Table,
+    TableForeignKey,
+} from 'typeorm';
 
-export class createProductsTable1609809254038 implements MigrationInterface {
+export class addUserDeviceTable1623633417961 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
         await queryRunner.createTable(
             new Table({
-                name: 'products',
+                name: 'users_device',
                 columns: [
                     {
                         name: 'id',
@@ -15,13 +19,16 @@ export class createProductsTable1609809254038 implements MigrationInterface {
                         default: 'uuid_generate_v4()',
                     },
                     {
-                        name: 'name',
+                        name: 'user_id',
                         type: 'varchar',
+                        isUnique: true,
+                        isNullable: false,
                     },
                     {
-                        name: 'code',
+                        name: 'device_id',
                         type: 'varchar',
-                        isNullable: true,
+                        isUnique: true,
+                        isNullable: false,
                     },
                     {
                         name: 'created_at',
@@ -36,9 +43,22 @@ export class createProductsTable1609809254038 implements MigrationInterface {
                 ],
             }),
         );
+
+        await queryRunner.createForeignKey(
+            'users_device',
+            new TableForeignKey({
+                name: 'user_id',
+                columnNames: ['user_id'],
+                referencedTableName: 'users',
+                referencedColumnNames: ['firebase_uid'],
+                onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
+            }),
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('products');
+        await queryRunner.dropTable('users_device');
+        await queryRunner.dropForeignKey('users_device', 'user_id');
     }
 }

@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
 import ProductTeams from '../Models/ProductTeams';
 import UserRoles from '../Models/UserRoles';
-import { User } from '../Models/User';
+import User from '../Models/User';
 import { Team } from '../Models/Team';
 
 import { getAllUsersByTeam } from '../../Functions/Teams';
-import { checkIfTeamIsActive } from '../../Functions/Team';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -186,6 +186,34 @@ class TeamController {
             const updatedTeam = await teamRepository.save(team);
 
             return res.json(updatedTeam);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            team_id: Yup.string()
+                .required('Team ID is required')
+                .uuid('Team ID is not valid'),
+        });
+
+        try {
+            await schema.validate(req.params);
+        } catch (err) {
+            return res.status(400).json({ error: err.message });
+        }
+
+        try {
+            if (!req.userId) {
+                return res.status(400).json({ error: 'Not authorized' });
+            }
+
+            const { team_id } = req.params;
+
+            await deleteTeam({ team_id, user_id: req.userId });
+
+            return res.status(204).send();
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }

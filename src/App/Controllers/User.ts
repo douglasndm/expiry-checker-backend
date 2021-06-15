@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { compareAsc, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
-import { User } from '../Models/User';
+import User from '../Models/User';
 
 class UserController {
     async store(req: Request, res: Response): Promise<Response> {

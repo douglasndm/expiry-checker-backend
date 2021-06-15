@@ -27,9 +27,6 @@ class TeamSubscription {
     @Column({ name: 'is_active' })
     isActive: boolean;
 
-    @Column({ name: 'sku_bought' })
-    SKU_bought: string;
-
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

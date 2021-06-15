@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import UserRoles from '../Models/UserRoles';
 import { Team } from '../Models/Team';
-import { User } from '../Models/User';
+import User from '../Models/User';
 
 import { checkMembersLimit } from '../../Functions/Team';
 
