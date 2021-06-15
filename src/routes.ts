@@ -13,6 +13,7 @@ import Subscription from '@controllers/Subscription';
 import SessionController from '@controllers/Session';
 
 import FirebaseAuth from './App/Middlewares/FirebaseAuth';
+import DeviceChecker from './App/Middlewares/DeviceChecker';
 import ManagerChecker from './App/Middlewares/ManagerChecker';
 
 import filesRoutes from './Routes/files';
@@ -27,6 +28,8 @@ routes.post('/sessions', SessionController.store);
 routes.use(FirebaseAuth);
 
 routes.get('/users/:id', User.index);
+
+routes.use(DeviceChecker);
 
 routes.get('/products/:id', Product.show);
 routes.post('/products', Product.create);
