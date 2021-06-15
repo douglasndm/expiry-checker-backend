@@ -51,6 +51,7 @@ export async function addUserDevice({
         .createQueryBuilder('device')
         .leftJoinAndSelect('device.user', 'user')
         .where('user.firebaseUid = :user_id', { user_id })
+        .orWhere('device.device_id = :device_id', { device_id })
         .getOne();
 
     if (deviceExist) {
