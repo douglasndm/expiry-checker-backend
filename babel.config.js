@@ -9,7 +9,8 @@ module.exports = {
                 "@controllers": "./src/App/Controllers",
                 "@models": "./src/App/Models",
                 "@utils": "./src/Functions",
-                "@config": "./src/Config"
+                "@config": "./src/Config",
+                "@errors": "./src/Errors"
             }
         }],
         "babel-plugin-transform-typescript-metadata",
