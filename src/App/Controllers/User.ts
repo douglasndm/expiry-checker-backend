@@ -8,7 +8,7 @@ import AppError from '@errors/AppError';
 
 import User from '@models/User';
 
-import { updateUser } from '@utils/Users';
+import { deleteUser, updateUser } from '@utils/Users';
 
 class UserController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -142,7 +142,7 @@ class UserController {
             await schema.validate(req.body);
             await schemaParams.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 401);
+            throw new AppError(err.message, 400);
         }
 
         const { user_id } = req.params;
@@ -155,6 +155,16 @@ class UserController {
         });
 
         return res.status(200).json(updatedUser);
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        if (!req.userId) {
+            throw new AppError('Provider the user id', 401);
+        }
+
+        await deleteUser({ user_id: req.userId });
+
+        return res.status(204).send();
     }
 }
 
