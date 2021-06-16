@@ -32,8 +32,8 @@ export async function updateUser({
             throw new AppError('User not found', 400);
         }
 
-        if (name) user.name = name;
-        if (lastName) user.lastName = lastName;
+        user.name = name || null;
+        user.lastName = lastName || null;
 
         const updatedUser = await userRepository.save(user);
 
