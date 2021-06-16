@@ -31,6 +31,8 @@ routes.get('/users/:id', User.index);
 
 routes.use(DeviceChecker);
 
+routes.put('/users/:user_id', User.update);
+
 routes.get('/products/:id', Product.show);
 routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);

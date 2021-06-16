@@ -4,7 +4,11 @@ import bcrypt from 'bcryptjs';
 import { compareAsc, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
-import User from '../Models/User';
+import AppError from '@errors/AppError';
+
+import User from '@models/User';
+
+import { updateUser } from '@utils/Users';
 
 class UserController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -15,7 +19,10 @@ class UserController {
                 lastName: Yup.string(),
                 email: Yup.string().required().email(),
                 password: Yup.string(),
-                passwordConfirmation: Yup.string(),
+                passwordConfirmation: Yup.string().oneOf(
+                    [Yup.ref('password'), null],
+                    'Confirmação da senha não corresponde a senha',
+                ),
             });
 
             if (!(await schema.isValid(req.body))) {
@@ -70,54 +77,84 @@ class UserController {
     }
 
     async index(req: Request, res: Response): Promise<Response> {
-        try {
-            const { id } = req.params;
+        const { id } = req.params;
 
-            const repository = getRepository(User);
+        const repository = getRepository(User);
 
-            const user = await repository
-                .createQueryBuilder('user')
-                .where('user.firebaseUid = :id', { id })
-                .leftJoinAndSelect('user.roles', 'roles')
-                .leftJoinAndSelect('roles.team', 'team')
-                .leftJoinAndSelect('team.subscriptions', 'subscriptions')
-                .getOne();
+        const user = await repository
+            .createQueryBuilder('user')
+            .where('user.firebaseUid = :id', { id })
+            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('roles.team', 'team')
+            .leftJoinAndSelect('team.subscriptions', 'subscriptions')
+            .getOne();
 
-            if (!user) {
-                return res.status(400).json({ error: 'User was not found' });
-            }
-
-            const organizedUser = {
-                id: user.firebaseUid,
-                name: user.name,
-                lastName: user.lastName,
-                email: user.email,
-
-                roles: user.roles.map(r => {
-                    const subscriptions = r.team.subscriptions.filter(
-                        sub =>
-                            compareAsc(
-                                startOfDay(new Date()),
-                                startOfDay(sub.expireIn),
-                            ) <= 0,
-                    );
-
-                    return {
-                        role: r.role,
-                        status: r.status,
-                        team: {
-                            id: r.team.id,
-                            name: r.team.name,
-                            isActive: subscriptions.length > 0,
-                        },
-                    };
-                }),
-            };
-
-            return res.status(200).json(organizedUser);
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
+        if (!user) {
+            return res.status(400).json({ error: 'User was not found' });
         }
+
+        const organizedUser = {
+            id: user.firebaseUid,
+            name: user.name,
+            lastName: user.lastName,
+            email: user.email,
+
+            roles: user.roles.map(r => {
+                const subscriptions = r.team.subscriptions.filter(
+                    sub =>
+                        compareAsc(
+                            startOfDay(new Date()),
+                            startOfDay(sub.expireIn),
+                        ) <= 0,
+                );
+
+                return {
+                    role: r.role,
+                    status: r.status,
+                    team: {
+                        id: r.team.id,
+                        name: r.team.name,
+                        isActive: subscriptions.length > 0,
+                    },
+                };
+            }),
+        };
+
+        return res.status(200).json(organizedUser);
+    }
+
+    async update(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            name: Yup.string(),
+            lastName: Yup.string(),
+            email: Yup.string().email('E-mail is not valid'),
+            password: Yup.string(),
+            passwordConfirmation: Yup.string().oneOf(
+                [Yup.ref('password'), null],
+                'Confirmação da senha não corresponde a senha',
+            ),
+        });
+        const schemaParams = Yup.object().shape({
+            user_id: Yup.string().required('Provider the user id'),
+        });
+
+        try {
+            await schema.validate(req.body);
+            await schemaParams.validate(req.params);
+        } catch (err) {
+            throw new AppError(err.message, 401);
+        }
+
+        const { user_id } = req.params;
+        const { name, lastName } = req.body;
+
+        const updatedUser = await updateUser({
+            firebaseUid: user_id,
+            name,
+            lastName,
+        });
+
+        return res.status(200).json(updatedUser);
     }
 }
 
