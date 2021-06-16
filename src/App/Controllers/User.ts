@@ -124,6 +124,10 @@ class UserController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
+        if (!req.userId) {
+            throw new AppError('Provider the user id', 401);
+        }
+
         const schema = Yup.object().shape({
             name: Yup.string(),
             lastName: Yup.string(),
@@ -134,22 +138,17 @@ class UserController {
                 'Confirmação da senha não corresponde a senha',
             ),
         });
-        const schemaParams = Yup.object().shape({
-            user_id: Yup.string().required('Provider the user id'),
-        });
 
         try {
             await schema.validate(req.body);
-            await schemaParams.validate(req.params);
         } catch (err) {
             throw new AppError(err.message, 400);
         }
 
-        const { user_id } = req.params;
         const { name, lastName } = req.body;
 
         const updatedUser = await updateUser({
-            firebaseUid: user_id,
+            firebaseUid: req.userId,
             name,
             lastName,
         });
