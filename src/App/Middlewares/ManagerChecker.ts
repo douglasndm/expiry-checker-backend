@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import AppError from '@errors/AppError';
+
 import UserRoles from '../Models/UserRoles';
 
 async function CheckIfUserIsManager(
@@ -14,30 +16,26 @@ async function CheckIfUserIsManager(
     });
 
     if (!(await schema.isValid(req.params))) {
-        return res.status(400).json({ error: 'Provider the team id' });
+        throw new AppError('Provider the team id', 401);
     }
 
-    try {
-        const { team_id } = req.params;
+    const { team_id } = req.params;
 
-        const userRolesRepository = getRepository(UserRoles);
-        const user = await userRolesRepository.findOne({
-            where: {
-                team: { id: team_id },
-                user: { firebaseUid: req.userId },
-            },
-        });
+    const userRolesRepository = getRepository(UserRoles);
+    const user = await userRolesRepository.findOne({
+        where: {
+            team: { id: team_id },
+            user: { firebaseUid: req.userId },
+        },
+    });
 
-        if (user?.role.toLocaleLowerCase() !== 'manager') {
-            return res
-                .status(401)
-                .json({ error: 'You dont have permission to be here' });
-        }
-
-        return next();
-    } catch (err) {
-        return res.status(500).json({ error: err.message });
+    if (user?.role.toLocaleLowerCase() !== 'manager') {
+        return res
+            .status(401)
+            .json({ error: 'You dont have permission to be here' });
     }
+
+    return next();
 }
 
 export default CheckIfUserIsManager;
