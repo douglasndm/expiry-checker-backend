@@ -29,7 +29,7 @@ export default class User {
     email: string;
 
     @Column('varchar')
-    password: string;
+    password: string | null;
 
     @OneToMany(type => UserRoles, userRoles => userRoles.user)
     roles: Array<UserRoles>;

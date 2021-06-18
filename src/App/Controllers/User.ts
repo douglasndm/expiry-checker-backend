@@ -11,71 +11,6 @@ import User from '@models/User';
 import { deleteUser, updateUser } from '@utils/Users';
 
 class UserController {
-    async store(req: Request, res: Response): Promise<Response> {
-        try {
-            const schema = Yup.object().shape({
-                firebaseUid: Yup.string().required(),
-                name: Yup.string(),
-                lastName: Yup.string(),
-                email: Yup.string().required().email(),
-                password: Yup.string(),
-                passwordConfirmation: Yup.string().oneOf(
-                    [Yup.ref('password'), null],
-                    'Confirmação da senha não corresponde a senha',
-                ),
-            });
-
-            if (!(await schema.isValid(req.body))) {
-                return res.status(400).json({ error: 'Validation fails' });
-            }
-
-            const {
-                firebaseUid,
-                name,
-                lastName,
-                email,
-                password,
-                passwordConfirmation,
-            } = req.body;
-
-            if (
-                password &&
-                passwordConfirmation &&
-                password !== passwordConfirmation
-            ) {
-                return res.status(400).json({
-                    error: 'Password must be the same of password confirmation',
-                });
-            }
-
-            const repository = getRepository(User);
-            const existsUser = await repository.findOne({ where: { email } });
-
-            if (existsUser) {
-                return res.status(400).json({ error: 'User already exists' });
-            }
-
-            const encryptyedPassword = null;
-
-            if (password) await bcrypt.hash(password, 8);
-
-            const user = new User();
-            user.firebaseUid = firebaseUid;
-            user.name = name;
-            user.lastName = lastName;
-            user.email = email;
-            user.password = encryptyedPassword;
-
-            const savedUser = await repository.save(user);
-
-            delete savedUser.password;
-
-            return res.status(201).json(savedUser);
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
-        }
-    }
-
     async index(req: Request, res: Response): Promise<Response> {
         const { id } = req.params;
 
@@ -90,7 +25,7 @@ class UserController {
             .getOne();
 
         if (!user) {
-            return res.status(400).json({ error: 'User was not found' });
+            throw new AppError('User not found', 401);
         }
 
         const organizedUser = {
@@ -121,6 +56,61 @@ class UserController {
         };
 
         return res.status(200).json(organizedUser);
+    }
+
+    async store(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            firebaseUid: Yup.string(),
+            name: Yup.string(),
+            lastName: Yup.string(),
+            email: Yup.string().required().email(),
+            password: Yup.string(),
+            passwordConfirmation: Yup.string().oneOf(
+                [Yup.ref('password'), null],
+                'Confirmação da senha não corresponde a senha',
+            ),
+        });
+
+        try {
+            await schema.validate(req.body);
+        } catch (err) {
+            throw new AppError(err.message, 400);
+        }
+
+        const { firebaseUid, name, lastName, email, password } = req.body;
+
+        let userId = firebaseUid;
+
+        if (req.userId) {
+            userId = req.userId;
+        }
+        if (!userId) {
+            throw new AppError('Provider the user id', 401);
+        }
+
+        const repository = getRepository(User);
+        const existsUser = await repository.findOne({ where: { email } });
+
+        if (existsUser) {
+            throw new AppError('User already exists', 400);
+        }
+
+        const encryptyedPassword = null;
+
+        if (password) await bcrypt.hash(password, 8);
+
+        const user = new User();
+        user.firebaseUid = userId;
+        user.name = name;
+        user.lastName = lastName;
+        user.email = email;
+        user.password = encryptyedPassword;
+
+        const savedUser = await repository.save(user);
+
+        delete savedUser.password;
+
+        return res.status(201).json(savedUser);
     }
 
     async update(req: Request, res: Response): Promise<Response> {

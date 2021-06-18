@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import AppError from '@errors/AppError';
+
 import UserRoles from '../Models/UserRoles';
 import { Team } from '../Models/Team';
 import User from '../Models/User';
@@ -18,70 +20,60 @@ class UserManagerController {
             email: Yup.string().required().email(),
         });
 
-        if (
-            !(await schema.isValid(req.params)) ||
-            !(await schemaBody.isValid(req.body))
-        ) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { team_id } = req.params;
-            const { email } = req.body;
-
-            const userRolesRepository = getRepository(UserRoles);
-
-            const alreadyInARole = await userRolesRepository
-                .createQueryBuilder('userRole')
-                .leftJoinAndSelect('userRole.user', 'user')
-                .where('userRole.team.id = :team_id', { team_id })
-                .andWhere('LOWER(user.email) = LOWER(:email)', { email })
-                .getOne();
-
-            if (alreadyInARole) {
-                return res
-                    .status(400)
-                    .json({ error: 'User is already into team' });
-            }
-
-            const teamRepository = getRepository(Team);
-            const userRepository = getRepository(User);
-
-            const team = await teamRepository.findOne(team_id);
-            const user = await userRepository
-                .createQueryBuilder('user')
-                .where('LOWER(user.email) = LOWER(:email)', { email })
-                .getOne();
-
-            if (!team || !user) {
-                return res
-                    .status(400)
-                    .json({ error: 'User or team was not found' });
-            }
-
-            const membersChecker = await checkMembersLimit({
-                team_id,
-            });
-
-            if (membersChecker.members >= membersChecker.limit) {
-                return res
-                    .status(401)
-                    .json({ error: 'Team has reach the limit of members' });
-            }
-
-            const teamUser = new UserRoles();
-            teamUser.user = user;
-            teamUser.team = team;
-            teamUser.role = 'Repositor';
-            teamUser.code = Math.random().toString(36).substring(7);
-            teamUser.status = 'Pending';
-
-            const savedRole = await userRolesRepository.save(teamUser);
-
-            return res.json(savedRole);
+            await schema.validate(req.params);
+            await schemaBody.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        const { team_id } = req.params;
+        const { email } = req.body;
+
+        const userRolesRepository = getRepository(UserRoles);
+
+        const alreadyInARole = await userRolesRepository
+            .createQueryBuilder('userRole')
+            .leftJoinAndSelect('userRole.user', 'user')
+            .where('userRole.team.id = :team_id', { team_id })
+            .andWhere('LOWER(user.email) = LOWER(:email)', { email })
+            .getOne();
+
+        if (alreadyInARole) {
+            throw new AppError('User is already into team', 400);
+        }
+
+        const teamRepository = getRepository(Team);
+        const userRepository = getRepository(User);
+
+        const team = await teamRepository.findOne(team_id);
+        const user = await userRepository
+            .createQueryBuilder('user')
+            .where('LOWER(user.email) = LOWER(:email)', { email })
+            .getOne();
+
+        if (!team || !user) {
+            throw new AppError('User or team was not found', 400);
+        }
+
+        const membersChecker = await checkMembersLimit({
+            team_id,
+        });
+
+        if (membersChecker.members >= membersChecker.limit) {
+            throw new AppError('Team has reach the limit of members', 401);
+        }
+
+        const teamUser = new UserRoles();
+        teamUser.user = user;
+        teamUser.team = team;
+        teamUser.role = 'Repositor';
+        teamUser.code = Math.random().toString(36).substring(7);
+        teamUser.status = 'Pending';
+
+        const savedRole = await userRolesRepository.save(teamUser);
+
+        return res.json(savedRole);
     }
 
     async update(req: Request, res: Response): Promise<Response> {
@@ -92,115 +84,95 @@ class UserManagerController {
         const schemaBody = Yup.object().shape({
             user_id: Yup.string().required(),
             role: Yup.string(),
-            name: Yup.string(),
-            lastName: Yup.string(),
-            email: Yup.string().email(),
         });
 
-        if (
-            !(await schema.isValid(req.params)) ||
-            !(await schemaBody.isValid(req.body))
-        ) {
-            return res.status(400).json({ error: 'Validation fails' });
+        try {
+            await schema.validate(req.params);
+            await schemaBody.validate(req.body);
+        } catch (err) {
+            throw new AppError(err.message, 400);
         }
 
-        try {
-            const { team_id } = req.params;
-            const { user_id, role, name, lastName, email } = req.body;
+        const { team_id } = req.params;
+        const { user_id, role } = req.body;
 
-            if (role.toLowerCase() !== 'manager') {
-                if (role.toLowerCase() !== 'supervisor') {
-                    if (role.toLowerCase() !== 'repositor') {
-                        return res
-                            .status(400)
-                            .json({ error: 'Role setted is invalid' });
-                    }
+        if (role.toLowerCase() !== 'manager') {
+            if (role.toLowerCase() !== 'supervisor') {
+                if (role.toLowerCase() !== 'repositor') {
+                    throw new AppError('Role is invalid', 400);
                 }
             }
-
-            const userRolesRepository = getRepository(UserRoles);
-
-            const userRoles = await userRolesRepository.findOne({
-                where: {
-                    user: { firebaseUid: req.userId },
-                    team: { id: team_id },
-                },
-            });
-
-            if (userRoles?.role.toLowerCase() !== 'manager') {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to do that' });
-            }
-
-            const userRole = await userRolesRepository.findOne({
-                where: {
-                    user: { firebaseUid: user_id },
-                    team: { id: team_id },
-                },
-                relations: ['user'],
-            });
-
-            if (!userRole) {
-                return res
-                    .status(400)
-                    .json({ error: 'User in team was not found' });
-            }
-
-            userRole.role = role.toLowerCase();
-
-            const updateRole = await userRolesRepository.save(userRole);
-
-            /*
-                In the future perhaps managers will be able to change users info
-                like name, lastname and email
-            */
-
-            return res.json(updateRole);
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
         }
+
+        const userRolesRepository = getRepository(UserRoles);
+
+        const userRoles = await userRolesRepository.findOne({
+            where: {
+                user: { firebaseUid: req.userId },
+                team: { id: team_id },
+            },
+        });
+
+        if (userRoles?.role.toLowerCase() !== 'manager') {
+            throw new AppError('You dont have authorization to do that', 401);
+        }
+
+        const userRole = await userRolesRepository.findOne({
+            where: {
+                user: { firebaseUid: user_id },
+                team: { id: team_id },
+            },
+            relations: ['user'],
+        });
+
+        if (!userRole) {
+            throw new AppError('User in team was not found', 400);
+        }
+
+        userRole.role = role.toLowerCase();
+
+        const updateRole = await userRolesRepository.save(userRole);
+
+        return res.json(updateRole);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-            user_id: Yup.string().required(),
+            team_id: Yup.string()
+                .required('Provide the team id')
+                .uuid('Team ID is not valid'),
+            user_id: Yup.string().required('Provide the user id'),
         });
 
-        if (!(await schema.isValid(req.params))) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { team_id, user_id } = req.params;
-
-            if (req.userId === user_id) {
-                return res
-                    .status(400)
-                    .json({ error: "You can't remove yourself from a team" });
-            }
-
-            const repository = getRepository(UserRoles);
-
-            const role = await repository
-                .createQueryBuilder('role')
-                .leftJoinAndSelect('role.user', 'user')
-                .leftJoinAndSelect('role.team', 'team')
-                .where('user.firebaseUid = :user_id', { user_id })
-                .andWhere('team.id = :team_id', { team_id })
-                .getOne();
-
-            if (!role) {
-                return res.status(400).json({ error: 'User is not in team' });
-            }
-
-            await repository.remove(role);
-
-            return res.status(200).json({ success: true });
+            await schema.validate(req.params);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        const { team_id, user_id } = req.params;
+
+        if (req.userId === user_id) {
+            throw new AppError("You can't remove yourself from a team", 401);
+        }
+
+        const repository = getRepository(UserRoles);
+
+        const role = await repository
+            .createQueryBuilder('role')
+            .leftJoinAndSelect('role.user', 'user')
+            .leftJoinAndSelect('role.team', 'team')
+            .where('user.firebaseUid = :user_id', { user_id })
+            .andWhere('team.id = :team_id', { team_id })
+            .getOne();
+
+        if (!role) {
+            throw new AppError('User is not in team', 400);
+        }
+
+        await repository.remove(role);
+
+        return res.status(200).json({ success: true });
     }
 }
 
