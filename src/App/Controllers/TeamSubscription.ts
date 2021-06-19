@@ -33,9 +33,13 @@ class TeamSubscriptionsController {
             throw new AppError("You don't have access to do that", 401);
         }
 
-        const response = await getTeamSubscription({ team_id });
+        const subscription = await getTeamSubscription({ team_id });
 
-        return res.json(response);
+        if (subscription) {
+            return res.status(200).json(subscription);
+        }
+
+        return res.status(204).send();
     }
 }
 
