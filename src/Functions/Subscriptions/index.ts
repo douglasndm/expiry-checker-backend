@@ -2,8 +2,10 @@ import { getRepository } from 'typeorm';
 import axios from 'axios';
 import { startOfDay, parseISO, compareAsc } from 'date-fns';
 
-import { Team } from '../../App/Models/Team';
-import TeamSubscription from '../../App/Models/TeamSubscription';
+import AppError from '@errors/AppError';
+
+import { Team } from '@models/Team';
+import TeamSubscription from '@models/TeamSubscription';
 
 interface getTeamSubscriptionProps {
     team_id: string;
@@ -65,7 +67,7 @@ export async function createSubscription({
     const team = await teamRepository.findOne(team_id);
 
     if (!team) {
-        throw new Error('Team was not found');
+        throw new AppError('Team was not found', 400);
     }
 
     const teamSubscription = new TeamSubscription();

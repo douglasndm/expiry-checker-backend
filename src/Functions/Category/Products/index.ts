@@ -1,8 +1,10 @@
 import { getRepository } from 'typeorm';
 
-import { Category } from '../../../App/Models/Category';
-import { Product } from '../../../App/Models/Product';
-import ProductCategory from '../../../App/Models/ProductCategory';
+import AppError from '@errors/AppError';
+
+import { Category } from '@models/Category';
+import { Product } from '@models/Product';
+import ProductCategory from '@models/ProductCategory';
 
 interface addProductToCategoryProps {
     category: Category;
@@ -22,7 +24,7 @@ export async function addProductToCategory({
     });
 
     if (!product || !category) {
-        throw new Error('Category or Product was not found');
+        throw new AppError('Category or Product was not found', 400);
     }
 
     const alreadyExists = await repository.findOne({
@@ -35,7 +37,7 @@ export async function addProductToCategory({
     });
 
     if (alreadyExists) {
-        throw new Error('Product is already in category');
+        throw new AppError('Product is already in category', 400);
     }
 
     const productCategory = new ProductCategory();

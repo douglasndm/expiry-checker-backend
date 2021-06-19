@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
+import AppError from '@errors/AppError';
+
 import { checkIfUserHasAccessToTeam } from '../../Functions/Security/UserAccessTeam';
 import { getTeamSubscription } from '../../Functions/Subscriptions';
 
@@ -10,30 +12,34 @@ class TeamSubscriptionsController {
             team_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.params))) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { team_id } = req.params;
-
-            const userHasAccess = await checkIfUserHasAccessToTeam({
-                user_id: req.userId || '',
-                team_id,
-            });
-
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have access to do that' });
-            }
-
-            const response = await getTeamSubscription({ team_id });
-
-            return res.json(response);
+            await schema.validate(req.params);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError("You don't have access to do that", 401);
+        }
+
+        const { team_id } = req.params;
+
+        const userHasAccess = await checkIfUserHasAccessToTeam({
+            user_id: req.userId,
+            team_id,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have access to do that", 401);
+        }
+
+        const subscription = await getTeamSubscription({ team_id });
+
+        if (subscription) {
+            return res.status(200).json(subscription);
+        }
+
+        return res.status(204).send();
     }
 }
 

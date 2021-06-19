@@ -1,3 +1,4 @@
+import AppError from '@errors/AppError';
 import { Request, Response, NextFunction } from 'express';
 import * as admin from 'firebase-admin';
 
@@ -17,8 +18,9 @@ export default async function checkFirebaseAuth(
 
             return next();
         } catch (err) {
-            return res.status(403).json({ error: 'Unauthorized' });
+            throw new AppError('Unauthorized', 403);
         }
     }
-    return res.status(403).json({ error: 'Unauthorized' });
+
+    throw new AppError('Unauthorized', 403);
 }

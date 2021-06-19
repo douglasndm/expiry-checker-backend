@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
+import AppError from '@errors/AppError';
+
 import { getUserDeviceId } from '@utils/Users/Device';
 
 export default async function deviceChecker(
@@ -10,19 +12,20 @@ export default async function deviceChecker(
     const device_id = req.headers.deviceid;
 
     if (!device_id) {
-        return res.status(403).json({ error: 'Provide the device id' });
+        throw new AppError('Provide the device id', 401);
     }
 
     if (!req.userId) {
-        return res.status(403).json({ error: 'Provide the user id' });
+        throw new AppError('Provide the user id', 401);
     }
 
     const userDevice = await getUserDeviceId({ user_id: req.userId });
 
     if (!userDevice || userDevice !== device_id) {
-        return res.status(403).json({
-            error: 'Device is not allowed, please make login again',
-        });
+        throw new AppError(
+            'Device is not allowed, please make login again',
+            403,
+        );
     }
 
     return next();

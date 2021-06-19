@@ -1,10 +1,12 @@
 import { getRepository } from 'typeorm';
 import { startOfDay, parseISO } from 'date-fns';
 
-import { Product } from '../../App/Models/Product';
-import { Batch } from '../../App/Models/Batch';
-import { Team } from '../../App/Models/Team';
-import ProductTeams from '../../App/Models/ProductTeams';
+import AppError from '@errors/AppError';
+
+import { Product } from '@models/Product';
+import { Batch } from '@models/Batch';
+import { Team } from '@models/Team';
+import ProductTeams from '@models/ProductTeams';
 
 interface convertExportFileProps {
     oldProducts: Array<CVProduct>;
@@ -23,7 +25,7 @@ export async function convertExportFile({
     const team = await teamRepository.findOne(team_id);
 
     if (!team) {
-        throw new Error('Team was not found');
+        throw new AppError('Team was not found', 400);
     }
 
     const products: Array<Product> = [];

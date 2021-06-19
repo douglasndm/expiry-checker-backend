@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import AppError from '@errors/AppError';
 import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
+
 import ProductTeams from '../Models/ProductTeams';
 import UserRoles from '../Models/UserRoles';
 import User from '../Models/User';
@@ -12,48 +14,38 @@ import { getAllUsersByTeam } from '../../Functions/Teams';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
-        try {
-            const { team_id } = req.params;
+        const { team_id } = req.params;
 
-            const teamRepository = getRepository(Team);
-            const productTeamsRepository = getRepository(ProductTeams);
+        const teamRepository = getRepository(Team);
+        const productTeamsRepository = getRepository(ProductTeams);
 
-            const subscription = await checkIfTeamIsActive({ team_id });
-            if (!subscription) {
-                return res.status(401).json({
-                    error: "Team doesn't have an active subscription",
-                });
-            }
-
-            const usersInTeam = await getAllUsersByTeam({ team_id });
-
-            const isUserInTeam = usersInTeam.filter(
-                user => user.id === req.userId,
-            );
-
-            if (isUserInTeam.length <= 0) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have permission to be here' });
-            }
-
-            const team = await teamRepository.findOne(team_id);
-
-            const products = await productTeamsRepository
-                .createQueryBuilder('product_teams')
-                .select('product_teams.id')
-                .where('product_teams.team_id = :id', { id: team_id })
-                .leftJoinAndSelect('product_teams.product', 'product')
-                .leftJoinAndSelect('product.batches', 'batches')
-                .orderBy('batches.exp_date', 'ASC')
-                .getMany();
-
-            const productsWithoutId = products.map(p => p.product);
-
-            return res.status(200).json({ team, products: productsWithoutId });
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
+        const subscription = await checkIfTeamIsActive({ team_id });
+        if (!subscription) {
+            throw new AppError("Team doesn't have an active subscription", 401);
         }
+
+        const usersInTeam = await getAllUsersByTeam({ team_id });
+
+        const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
+
+        if (isUserInTeam.length <= 0) {
+            throw new AppError('You dont have permission to be here', 401);
+        }
+
+        const team = await teamRepository.findOne(team_id);
+
+        const products = await productTeamsRepository
+            .createQueryBuilder('product_teams')
+            .select('product_teams.id')
+            .where('product_teams.team_id = :id', { id: team_id })
+            .leftJoinAndSelect('product_teams.product', 'product')
+            .leftJoinAndSelect('product.batches', 'batches')
+            .orderBy('batches.exp_date', 'ASC')
+            .getMany();
+
+        const productsWithoutId = products.map(p => p.product);
+
+        return res.status(200).json({ team, products: productsWithoutId });
     }
 
     async store(req: Request, res: Response): Promise<Response> {

@@ -20,16 +20,16 @@ export default class User {
     firebaseUid: string;
 
     @Column('varchar')
-    name: string;
+    name: string | null;
 
     @Column('varchar', { name: 'last_name' })
-    lastName: string;
+    lastName: string | null;
 
     @Column('varchar')
     email: string;
 
     @Column('varchar')
-    password: string;
+    password: string | null;
 
     @OneToMany(type => UserRoles, userRoles => userRoles.user)
     roles: Array<UserRoles>;

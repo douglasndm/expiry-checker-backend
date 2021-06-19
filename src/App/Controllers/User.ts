@@ -4,120 +4,156 @@ import bcrypt from 'bcryptjs';
 import { compareAsc, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
-import User from '../Models/User';
+import AppError from '@errors/AppError';
+
+import User from '@models/User';
+
+import { deleteUser, updateUser } from '@utils/Users';
 
 class UserController {
-    async store(req: Request, res: Response): Promise<Response> {
-        try {
-            const schema = Yup.object().shape({
-                firebaseUid: Yup.string().required(),
-                name: Yup.string(),
-                lastName: Yup.string(),
-                email: Yup.string().required().email(),
-                password: Yup.string(),
-                passwordConfirmation: Yup.string(),
-            });
+    async index(req: Request, res: Response): Promise<Response> {
+        const { id } = req.params;
 
-            if (!(await schema.isValid(req.body))) {
-                return res.status(400).json({ error: 'Validation fails' });
-            }
+        const repository = getRepository(User);
 
-            const {
-                firebaseUid,
-                name,
-                lastName,
-                email,
-                password,
-                passwordConfirmation,
-            } = req.body;
+        const user = await repository
+            .createQueryBuilder('user')
+            .where('user.firebaseUid = :id', { id })
+            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('roles.team', 'team')
+            .leftJoinAndSelect('team.subscriptions', 'subscriptions')
+            .getOne();
 
-            if (
-                password &&
-                passwordConfirmation &&
-                password !== passwordConfirmation
-            ) {
-                return res.status(400).json({
-                    error: 'Password must be the same of password confirmation',
-                });
-            }
-
-            const repository = getRepository(User);
-            const existsUser = await repository.findOne({ where: { email } });
-
-            if (existsUser) {
-                return res.status(400).json({ error: 'User already exists' });
-            }
-
-            const encryptyedPassword = null;
-
-            if (password) await bcrypt.hash(password, 8);
-
-            const user = new User();
-            user.firebaseUid = firebaseUid;
-            user.name = name;
-            user.lastName = lastName;
-            user.email = email;
-            user.password = encryptyedPassword;
-
-            const savedUser = await repository.save(user);
-
-            delete savedUser.password;
-
-            return res.status(201).json(savedUser);
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
+        if (!user) {
+            throw new AppError('User not found', 401);
         }
+
+        const organizedUser = {
+            id: user.firebaseUid,
+            name: user.name,
+            lastName: user.lastName,
+            email: user.email,
+
+            roles: user.roles.map(r => {
+                const subscriptions = r.team.subscriptions.filter(
+                    sub =>
+                        compareAsc(
+                            startOfDay(new Date()),
+                            startOfDay(sub.expireIn),
+                        ) <= 0,
+                );
+
+                return {
+                    role: r.role,
+                    status: r.status,
+                    team: {
+                        id: r.team.id,
+                        name: r.team.name,
+                        isActive: subscriptions.length > 0,
+                    },
+                };
+            }),
+        };
+
+        return res.status(200).json(organizedUser);
     }
 
-    async index(req: Request, res: Response): Promise<Response> {
+    async store(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            firebaseUid: Yup.string(),
+            name: Yup.string(),
+            lastName: Yup.string(),
+            email: Yup.string().required().email(),
+            password: Yup.string(),
+            passwordConfirmation: Yup.string().oneOf(
+                [Yup.ref('password'), null],
+                'Confirmação da senha não corresponde a senha',
+            ),
+        });
+
         try {
-            const { id } = req.params;
-
-            const repository = getRepository(User);
-
-            const user = await repository
-                .createQueryBuilder('user')
-                .where('user.firebaseUid = :id', { id })
-                .leftJoinAndSelect('user.roles', 'roles')
-                .leftJoinAndSelect('roles.team', 'team')
-                .leftJoinAndSelect('team.subscriptions', 'subscriptions')
-                .getOne();
-
-            if (!user) {
-                return res.status(400).json({ error: 'User was not found' });
-            }
-
-            const organizedUser = {
-                id: user.firebaseUid,
-                name: user.name,
-                lastName: user.lastName,
-                email: user.email,
-
-                roles: user.roles.map(r => {
-                    const subscriptions = r.team.subscriptions.filter(
-                        sub =>
-                            compareAsc(
-                                startOfDay(new Date()),
-                                startOfDay(sub.expireIn),
-                            ) <= 0,
-                    );
-
-                    return {
-                        role: r.role,
-                        status: r.status,
-                        team: {
-                            id: r.team.id,
-                            name: r.team.name,
-                            isActive: subscriptions.length > 0,
-                        },
-                    };
-                }),
-            };
-
-            return res.status(200).json(organizedUser);
+            await schema.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        const { firebaseUid, name, lastName, email, password } = req.body;
+
+        let userId = firebaseUid;
+
+        if (req.userId) {
+            userId = req.userId;
+        }
+        if (!userId) {
+            throw new AppError('Provider the user id', 401);
+        }
+
+        const repository = getRepository(User);
+        const existsUser = await repository.findOne({ where: { email } });
+
+        if (existsUser) {
+            throw new AppError('User already exists', 400);
+        }
+
+        const encryptyedPassword = null;
+
+        if (password) await bcrypt.hash(password, 8);
+
+        const user = new User();
+        user.firebaseUid = userId;
+        user.name = name;
+        user.lastName = lastName;
+        user.email = email;
+        user.password = encryptyedPassword;
+
+        const savedUser = await repository.save(user);
+
+        delete savedUser.password;
+
+        return res.status(201).json(savedUser);
+    }
+
+    async update(req: Request, res: Response): Promise<Response> {
+        if (!req.userId) {
+            throw new AppError('Provider the user id', 401);
+        }
+
+        const schema = Yup.object().shape({
+            name: Yup.string(),
+            lastName: Yup.string(),
+            email: Yup.string().email('E-mail is not valid'),
+            password: Yup.string(),
+            passwordConfirmation: Yup.string().oneOf(
+                [Yup.ref('password'), null],
+                'Confirmação da senha não corresponde a senha',
+            ),
+        });
+
+        try {
+            await schema.validate(req.body);
+        } catch (err) {
+            throw new AppError(err.message, 400);
+        }
+
+        const { name, lastName } = req.body;
+
+        const updatedUser = await updateUser({
+            firebaseUid: req.userId,
+            name,
+            lastName,
+        });
+
+        return res.status(200).json(updatedUser);
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        if (!req.userId) {
+            throw new AppError('Provider the user id', 401);
+        }
+
+        await deleteUser({ user_id: req.userId });
+
+        return res.status(204).send();
     }
 }
 

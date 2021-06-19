@@ -1,7 +1,9 @@
 import { getRepository } from 'typeorm';
 
-import { Category } from '../../App/Models/Category';
-import { Team } from '../../App/Models/Team';
+import AppError from '@errors/AppError';
+
+import { Category } from '@models/Category';
+import { Team } from '@models/Team';
 
 interface createCategoryProps {
     name: string;
@@ -20,7 +22,7 @@ export async function createCategory({
         .getOne();
 
     if (alreadyExists) {
-        throw new Error('Category already exists on team');
+        throw new AppError('Category already exists on team', 400);
     }
 
     const teamRepository = getRepository(Team);
@@ -31,7 +33,7 @@ export async function createCategory({
     });
 
     if (!team) {
-        throw new Error('Team was not found');
+        throw new AppError('Team was not found', 400);
     }
 
     const category = new Category();
