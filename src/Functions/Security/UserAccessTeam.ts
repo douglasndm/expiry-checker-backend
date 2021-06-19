@@ -1,8 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '../../App/Models/UserRoles';
-
-import { checkIfTeamIsActive } from '../Team';
+import UserRoles from '@models/UserRoles';
 
 interface checkIfUserHasAccessToTeamProps {
     user_id: string;
@@ -12,11 +10,6 @@ export async function checkIfUserHasAccessToTeam({
     user_id,
     team_id,
 }: checkIfUserHasAccessToTeamProps): Promise<boolean> {
-    const teamActive = await checkIfTeamIsActive({ team_id });
-    if (!teamActive) {
-        throw new Error("Team doesn't have an active subscription");
-    }
-
     const userRolesRepository = getRepository(UserRoles);
 
     try {
