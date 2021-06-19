@@ -3,6 +3,8 @@ import { compareAsc, startOfDay } from 'date-fns';
 
 import { Team } from '@models/Team';
 
+import AppError from '@errors/AppError';
+
 import { isUserManager } from '@utils/Users/UserRoles';
 import { getAllUsersByTeam } from '../Teams';
 import { deleteAllProducts } from './Products';
@@ -23,7 +25,7 @@ export async function checkIfTeamIsActive({
     const team = await teamRepository.findOne(team_id);
 
     if (!team) {
-        throw new Error('Team was not found');
+        throw new AppError('Team was not found', 400);
     }
 
     const today = startOfDay(new Date());
@@ -73,7 +75,7 @@ export async function checkMembersLimit({
     const sub = await getTeamSubscription({ team_id });
 
     if (!sub) {
-        throw new Error('Team doesnt have any subscription');
+        throw new AppError("Team doesn't have any subscription", 400);
     }
 
     if (compareAsc(startOfDay(new Date()), startOfDay(sub.expireIn)) <= 0) {
@@ -85,7 +87,7 @@ export async function checkMembersLimit({
         };
     }
 
-    throw new Error('Subscription is expired');
+    throw new AppError('Subscription is expired', 400);
 }
 
 interface deleteTeamProps {
@@ -100,14 +102,14 @@ export async function deleteTeam({
     const isManager = await isUserManager({ user_id, team_id });
 
     if (!isManager) {
-        throw new Error("You don't have permission to do that");
+        throw new AppError("You don't have permission to do that", 401);
     }
 
     const teamRepository = getRepository(Team);
     const team = await teamRepository.findOne(team_id);
 
     if (!team) {
-        throw new Error('Team was not found');
+        throw new AppError('Team was not found', 400);
     }
 
     await deleteAllProducts({ team_id });
