@@ -12,7 +12,7 @@ class SessionController {
 
         if (req.headers.authorization) {
             try {
-                const device_id = req.headers.deviceid[0];
+                const device_id = req.headers.deviceid;
                 const [, token] = req.headers.authorization.split(' ');
 
                 const auth = admin.auth();
@@ -22,7 +22,7 @@ class SessionController {
 
                 await addUserDevice({
                     user_id: verifyToken.uid,
-                    device_id,
+                    device_id: String(device_id),
                 });
 
                 return res.status(201).send();
