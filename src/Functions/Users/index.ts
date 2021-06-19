@@ -19,28 +19,24 @@ export async function updateUser({
     name,
     lastName,
 }: updateUserProps): Promise<User> {
-    try {
-        const userRepository = getRepository(User);
+    const userRepository = getRepository(User);
 
-        const user = await userRepository.findOne({
-            where: {
-                firebaseUid,
-            },
-        });
+    const user = await userRepository.findOne({
+        where: {
+            firebaseUid,
+        },
+    });
 
-        if (!user) {
-            throw new AppError('User not found', 400);
-        }
-
-        user.name = name || null;
-        user.lastName = lastName || null;
-
-        const updatedUser = await userRepository.save(user);
-
-        return updatedUser;
-    } catch (err) {
-        throw new AppError(err.message, 400);
+    if (!user) {
+        throw new AppError('User not found', 400);
     }
+
+    user.name = name || null;
+    user.lastName = lastName || null;
+
+    const updatedUser = await userRepository.save(user);
+
+    return updatedUser;
 }
 // #endregion
 
@@ -49,24 +45,20 @@ interface deleteUserProps {
     user_id: string;
 }
 export async function deleteUser({ user_id }: deleteUserProps): Promise<void> {
-    try {
-        const userRepository = getRepository(User);
+    const userRepository = getRepository(User);
 
-        await removeUserFromAllTeams({ user_id });
+    await removeUserFromAllTeams({ user_id });
 
-        const user = await userRepository.findOne({
-            where: {
-                firebaseUid: user_id,
-            },
-        });
+    const user = await userRepository.findOne({
+        where: {
+            firebaseUid: user_id,
+        },
+    });
 
-        if (!user) {
-            throw new AppError('User not found', 400);
-        }
-
-        await userRepository.remove(user);
-    } catch (err) {
-        throw new AppError(err.message, 400);
+    if (!user) {
+        throw new AppError('User not found', 400);
     }
+
+    await userRepository.remove(user);
 }
 // #endregion

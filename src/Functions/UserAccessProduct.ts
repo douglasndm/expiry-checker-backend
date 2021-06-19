@@ -1,7 +1,9 @@
 import { getRepository } from 'typeorm';
 
-import UserTeam from '../App/Models/UserRoles';
-import ProductTeam from '../App/Models/ProductTeams';
+import AppError from '@errors/AppError';
+
+import UserTeam from '@models/UserRoles';
+import ProductTeam from '@models/ProductTeams';
 
 import { checkIfUserHasAccessToTeam } from './Security/UserAccessTeam';
 
@@ -34,7 +36,7 @@ export async function checkIfUserHasAccessToAProduct({
         .getOne();
 
     if (!productTeam) {
-        throw new Error('Product and Team relatioship was not found');
+        throw new AppError('Product and Team relatioship was not found', 400);
     }
 
     const checkTeamAccess = await checkIfUserHasAccessToTeam({
@@ -43,7 +45,7 @@ export async function checkIfUserHasAccessToAProduct({
     });
 
     if (!checkTeamAccess) {
-        throw new Error("User doesn't have access to the team");
+        throw new AppError("User doesn't have access to the team", 401);
     }
 
     const hasAccessToProduct = userTeams.filter(

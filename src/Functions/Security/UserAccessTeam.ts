@@ -12,24 +12,20 @@ export async function checkIfUserHasAccessToTeam({
 }: checkIfUserHasAccessToTeamProps): Promise<boolean> {
     const userRolesRepository = getRepository(UserRoles);
 
-    try {
-        const result = await userRolesRepository.findOne({
-            where: {
-                user: {
-                    firebaseUid: user_id,
-                },
-                team: {
-                    id: team_id,
-                },
+    const result = await userRolesRepository.findOne({
+        where: {
+            user: {
+                firebaseUid: user_id,
             },
-        });
+            team: {
+                id: team_id,
+            },
+        },
+    });
 
-        if (!result || (!!result && result.status === 'Pending')) {
-            return false;
-        }
-
-        return true;
-    } catch (err) {
-        throw new Error(err.message);
+    if (!result || (!!result && result.status === 'Pending')) {
+        return false;
     }
+
+    return true;
 }

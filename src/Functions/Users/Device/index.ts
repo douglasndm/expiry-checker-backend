@@ -1,5 +1,7 @@
 import { getRepository } from 'typeorm';
 
+import AppError from '@errors/AppError';
+
 import User from '@models/User';
 import UserDevice from '@models/UserDevice';
 
@@ -44,7 +46,7 @@ export async function addUserDevice({
     });
 
     if (!user) {
-        throw new Error('User not found');
+        throw new AppError('User not found', 400);
     }
 
     const deviceExist = await deviceRepository
