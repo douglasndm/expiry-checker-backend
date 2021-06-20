@@ -7,20 +7,28 @@ import { Product } from '@models/Product';
 import { Batch } from '@models/Batch';
 import { Team } from '@models/Team';
 import ProductTeams from '@models/ProductTeams';
+import { Category } from '@models/Category';
+import ProductCategory from '@models/ProductCategory';
+
+import { OldToNewCategories } from './Categories';
 
 interface convertExportFileProps {
     oldProducts: Array<CVProduct>;
     team_id: string;
+    categories?: Array<OldToNewCategories>;
 }
 
 export async function convertExportFile({
     oldProducts,
     team_id,
+    categories,
 }: convertExportFileProps): Promise<Array<Product>> {
     const teamRepository = getRepository(Team);
     const productRepository = getRepository(Product);
     const batchRepository = getRepository(Batch);
     const prodTeamRepository = getRepository(ProductTeams);
+    const categoryRepository = getRepository(Category);
+    const productCategoryRepo = getRepository(ProductCategory);
 
     const team = await teamRepository.findOne(team_id);
 
@@ -28,9 +36,20 @@ export async function convertExportFile({
         throw new AppError('Team was not found', 400);
     }
 
+    const newCategoriesUUID: Array<string> = [];
+
+    categories?.forEach(cat => newCategoriesUUID.push(cat.newId));
+
+    const categoriesInTeam = await categoryRepository
+        .createQueryBuilder('cate')
+        .where('cate.id IN(:...cats)', { cats: newCategoriesUUID })
+        .getMany();
+
     const products: Array<Product> = [];
     const prodTeam: Array<ProductTeams> = [];
     const batc: Array<Batch> = [];
+
+    const prodInCats: Array<ProductCategory> = [];
 
     oldProducts.forEach(prod => {
         const product = productRepository.create();
@@ -52,6 +71,30 @@ export async function convertExportFile({
             batc.push(batch);
         });
 
+        const prodCategories: Array<Category> = [];
+
+        prod.categories.forEach(oldCat => {
+            const categoryReference = categories?.find(
+                cat => cat.oldId === oldCat,
+            );
+
+            const categoryToAddProduct = categoriesInTeam.find(
+                cat => cat.id === categoryReference?.newId,
+            );
+
+            if (categoryToAddProduct) {
+                prodCategories.push(categoryToAddProduct);
+            }
+        });
+
+        prodCategories.forEach(prodCat => {
+            const productInCategory = new ProductCategory();
+            productInCategory.product = product;
+            productInCategory.category = prodCat;
+
+            prodInCats.push(productInCategory);
+        });
+
         const productInTeam = prodTeamRepository.create();
         productInTeam.product = product;
         productInTeam.team = team;
@@ -62,6 +105,7 @@ export async function convertExportFile({
 
     const savedProducts = await productRepository.save(products);
     await prodTeamRepository.save(prodTeam);
+    await productCategoryRepo.save(prodInCats);
     await batchRepository.save(batc);
 
     return savedProducts;
