@@ -34,7 +34,7 @@ routes.use(DeviceChecker);
 routes.put('/users', User.update);
 routes.delete('/users', User.delete);
 
-routes.get('/products/:id', Product.show);
+routes.get('/products/:product_id', Product.index);
 routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
