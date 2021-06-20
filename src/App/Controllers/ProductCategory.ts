@@ -22,6 +22,7 @@ class ProductCategoryController {
         } catch (err) {
             throw new AppError(err.message, 400);
         }
+
         if (!req.userId) {
             throw new AppError('Provide the user id', 401);
         }
@@ -97,50 +98,46 @@ class ProductCategoryController {
             product_id: Yup.string().required().uuid(),
         });
 
-        if (
-            !(await schema.isValid(req.params)) ||
-            !(await schemaBody.isValid(req.body))
-        ) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { id } = req.params;
-            const { product_id } = req.body;
-
-            const categoryRepository = getRepository(Category);
-
-            const category = await categoryRepository.findOne({
-                where: { id },
-                relations: ['team'],
-            });
-
-            if (!category) {
-                return res
-                    .status(400)
-                    .json({ error: 'Category was not found' });
-            }
-
-            const userHasAccess = await checkIfUserHasAccessToTeam({
-                team_id: category.team.id,
-                user_id: req.userId,
-            });
-
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to do this' });
-            }
-
-            const savedProductCategory = await addProductToCategory({
-                category,
-                product_id,
-            });
-
-            return res.status(200).json(savedProductCategory);
+            await schema.validate(req.params);
+            await schemaBody.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
+        }
+
+        const { id } = req.params;
+        const { product_id } = req.body;
+
+        const categoryRepository = getRepository(Category);
+
+        const category = await categoryRepository.findOne({
+            where: { id },
+            relations: ['team'],
+        });
+
+        if (!category) {
+            throw new AppError('Category was not found', 400);
+        }
+
+        const userHasAccess = await checkIfUserHasAccessToTeam({
+            team_id: category.team.id,
+            user_id: req.userId,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have authorization to do this", 401);
+        }
+
+        const savedProductCategory = await addProductToCategory({
+            category,
+            product_id,
+        });
+
+        return res.status(200).json(savedProductCategory);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
@@ -151,53 +148,49 @@ class ProductCategoryController {
             product_id: Yup.string().required().uuid(),
         });
 
-        if (
-            !(await schema.isValid(req.params)) ||
-            !(await schemaBody.isValid(req.body))
-        ) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { id } = req.params;
-            const { product_id } = req.body;
-
-            const repository = getRepository(ProductCategory);
-
-            const exists = await repository
-                .createQueryBuilder('prod_cat')
-                .leftJoinAndSelect('prod_cat.category', 'category')
-                .leftJoinAndSelect('prod_cat.product', 'product')
-                .leftJoinAndSelect('product.team', 'team')
-                .leftJoinAndSelect('team.team', 'temObj')
-                .where('product.id = :product_id', { product_id })
-                .andWhere('category.id = :category_id', { category_id: id })
-                .getOne();
-
-            if (!exists) {
-                return res
-                    .status(400)
-                    .json({ error: 'Product was not in category' });
-            }
-            const userHasAccess = await checkIfUserHasAccessToTeam({
-                team_id: exists.product.team[0].team.id,
-                user_id: req.userId,
-            });
-
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to do this' });
-            }
-
-            await repository.remove(exists);
-
-            return res
-                .status(200)
-                .json({ success: 'Product was removed from category' });
+            await schema.validate(req.params);
+            await schemaBody.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
+        }
+
+        const { id } = req.params;
+        const { product_id } = req.body;
+
+        const repository = getRepository(ProductCategory);
+
+        const exists = await repository
+            .createQueryBuilder('prod_cat')
+            .leftJoinAndSelect('prod_cat.category', 'category')
+            .leftJoinAndSelect('prod_cat.product', 'product')
+            .leftJoinAndSelect('product.team', 'team')
+            .leftJoinAndSelect('team.team', 'temObj')
+            .where('product.id = :product_id', { product_id })
+            .andWhere('category.id = :category_id', { category_id: id })
+            .getOne();
+
+        if (!exists) {
+            throw new AppError('Product was not in category', 400);
+        }
+        const userHasAccess = await checkIfUserHasAccessToTeam({
+            team_id: exists.product.team[0].team.id,
+            user_id: req.userId,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have authorization to do this", 401);
+        }
+
+        await repository.remove(exists);
+
+        return res
+            .status(200)
+            .json({ success: 'Product was removed from category' });
     }
 }
 

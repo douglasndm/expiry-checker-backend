@@ -7,11 +7,11 @@ interface getAllUsersByTeamProps {
     team_id: string;
 }
 
-interface UserResponse {
+export interface UserResponse {
     id: string;
-    name: string;
     email: string;
     role: string;
+    status: string;
 }
 
 export async function getAllUsersByTeam({
@@ -35,8 +35,6 @@ export async function getAllUsersByTeam({
 
     const users: Array<UserResponse> = userTeams.map(u => ({
         id: u.user.firebaseUid,
-        name: u.user.name,
-        lastName: u.user.lastName,
         email: u.user.email,
         role: u.role,
         status: u.status,

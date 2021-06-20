@@ -2,43 +2,49 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import { getAllUsersByTeam } from '../../Functions/Teams';
+import AppError from '@errors/AppError';
 
-import UserRoles from '../Models/UserRoles';
+import { getAllUsersByTeam, UserResponse } from '@utils/Teams';
+
+import UserRoles from '@models/UserRoles';
 
 class TeamUsersController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+            team_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.params))) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { id } = req.params;
-
-            const usersInTeam = await getAllUsersByTeam({ team_id: id });
-
-            const isUserInTeam = usersInTeam.find(
-                user => user.id === req.userId,
-            );
-
-            if (!isUserInTeam) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have permission to be here' });
-            }
-
-            if (isUserInTeam.role.toLowerCase() !== 'manager') {
-                delete isUserInTeam.code;
-            }
-
-            return res.status(200).json(usersInTeam);
+            await schema.validate(req.params);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        const { team_id } = req.params;
+
+        const usersInTeam = await getAllUsersByTeam({ team_id });
+
+        const isUserInTeam = usersInTeam.find(user => user.id === req.userId);
+
+        if (!isUserInTeam) {
+            throw new AppError("You don't have permission to be here", 401);
+        }
+
+        const usersResponse: Array<UserResponse> = [];
+
+        if (isUserInTeam.role.toLowerCase() !== 'manager') {
+            usersInTeam.forEach(user => {
+                usersResponse.push({
+                    id: user.id,
+                    email: user.email,
+                    role: user.role,
+                    status: user.status,
+                });
+            });
+
+            return res.status(200).json(usersResponse);
+        }
+        return res.status(200).json(usersInTeam);
     }
 
     async store(req: Request, res: Response): Promise<Response> {
