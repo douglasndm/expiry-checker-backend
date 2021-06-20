@@ -2,93 +2,91 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import { checkIfUserHasAccessToTeam } from '../../Functions/Security/UserAccessTeam';
-import { addProductToCategory } from '../../Functions/Category/Products';
+import AppError from '@errors/AppError';
 
-import { Category } from '../Models/Category';
-import { Product } from '../Models/Product';
-import ProductCategory from '../Models/ProductCategory';
+import { checkIfUserHasAccessToTeam } from '@utils/Security/UserAccessTeam';
+import { addProductToCategory } from '@utils/Category/Products';
+
+import { Category } from '@models/Category';
+import { Product } from '@models/Product';
+import ProductCategory from '@models/ProductCategory';
 
 class ProductCategoryController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+            category_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.params))) {
-            return res.status(400).json({ error: 'Validation fails' });
+        try {
+            await schema.validate(req.params);
+        } catch (err) {
+            throw new AppError(err.message, 400);
+        }
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
         }
 
-        try {
-            const { id } = req.params;
+        const { category_id } = req.params;
 
-            const productCategoryRepository = getRepository(ProductCategory);
-            const productsInCategory = await productCategoryRepository
-                .createQueryBuilder('prod_cat')
-                .leftJoinAndSelect('prod_cat.product', 'product')
-                .leftJoinAndSelect('product.batches', 'batches')
-                .leftJoinAndSelect('product.team', 'team')
-                .leftJoinAndSelect('team.team', 'teamObj')
-                .leftJoinAndSelect('prod_cat.category', 'category')
-                .where('category.id = :id', { id })
-                .getMany();
+        const productCategoryRepository = getRepository(ProductCategory);
+        const productsInCategory = await productCategoryRepository
+            .createQueryBuilder('prod_cat')
+            .leftJoinAndSelect('prod_cat.product', 'product')
+            .leftJoinAndSelect('product.batches', 'batches')
+            .leftJoinAndSelect('product.team', 'team')
+            .leftJoinAndSelect('team.team', 'teamObj')
+            .leftJoinAndSelect('prod_cat.category', 'category')
+            .where('category.id = :id', { id: category_id })
+            .orderBy('batches.exp_date', 'ASC')
+            .getMany();
 
-            if (productsInCategory.length <= 0) {
-                return res
-                    .status(200)
-                    .json({ category_name: '', products: [] });
-            }
+        if (productsInCategory.length <= 0) {
+            return res.status(200).json({ category_name: '', products: [] });
+        }
 
-            const userHasAccess = await checkIfUserHasAccessToTeam({
-                team_id: productsInCategory[0].product.team[0].team.id,
-                user_id: req.userId,
+        const userHasAccess = await checkIfUserHasAccessToTeam({
+            team_id: productsInCategory[0].product.team[0].team.id,
+            user_id: req.userId,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have authorization to do this", 401);
+        }
+
+        let categoryName;
+
+        const products: Array<
+            Omit<Product, 'created_at' | 'updated_at' | 'categories'>
+        > = [];
+
+        productsInCategory.forEach(p =>
+            products.push({
+                id: p.product.id,
+                name: p.product.name,
+                code: p.product.code,
+                team: p.product.team,
+                batches: p.product.batches,
+            }),
+        );
+
+        if (productsInCategory.length > 0) {
+            categoryName = productsInCategory[0].category.name;
+        } else {
+            // This will return the category name even if no results where found
+            const categoryRepository = getRepository(Category);
+            const cate = await categoryRepository.findOne({
+                where: {
+                    id: category_id,
+                },
             });
 
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to do this' });
+            categoryName = cate?.name;
+            if (!cate) {
+                throw new AppError('Category was not found', 400);
             }
-
-            let categoryName;
-
-            const products: Array<
-                Omit<Product, 'created_at' | 'updated_at' | 'categories'>
-            > = [];
-
-            productsInCategory.forEach(p =>
-                products.push({
-                    id: p.product.id,
-                    name: p.product.name,
-                    code: p.product.code,
-                    team: p.product.team,
-                    batches: p.product.batches,
-                }),
-            );
-
-            if (productsInCategory.length > 0) {
-                categoryName = productsInCategory[0].category.name;
-            } else {
-                // This will return the category name even if no results where found
-                const categoryRepository = getRepository(Category);
-                const cate = await categoryRepository.findOne({
-                    where: {
-                        id,
-                    },
-                });
-
-                categoryName = cate?.name;
-                if (!cate) {
-                    return res
-                        .status(400)
-                        .json({ error: 'Category was not found' });
-                }
-            }
-
-            return res.json({ category_name: categoryName, products });
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
         }
+
+        return res.json({ category_name: categoryName, products });
     }
 
     async create(req: Request, res: Response): Promise<Response> {
