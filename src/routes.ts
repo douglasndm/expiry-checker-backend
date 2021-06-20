@@ -39,9 +39,9 @@ routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
 
-routes.get('/batches/:id', Batch.index);
+routes.get('/batches/:batch_id', Batch.index);
 routes.post('/batches', Batch.store);
-routes.put('/batches/:id', Batch.update);
+routes.put('/batches/:batch_id', Batch.update);
 routes.delete('/batches/:batch_id', Batch.delete);
 
 routes.get('/categories/team/:team_id', Category.index);

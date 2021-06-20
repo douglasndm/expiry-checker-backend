@@ -1,49 +1,55 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import * as Yup from 'yup';
 import { parseISO, startOfDay } from 'date-fns';
+import * as Yup from 'yup';
 
-import { Product } from '../Models/Product';
-import { Batch } from '../Models/Batch';
+import AppError from '@errors/AppError';
 
-import { checkIfUserHasAccessToAProduct } from '../../Functions/UserAccessProduct';
-import { getUserRole } from '../../Functions/Users/UserRoles';
+import { Product } from '@models/Product';
+import { Batch } from '@models/Batch';
+
+import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
+import { getUserRole } from '@utils/Users/UserRoles';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
-        const { id } = req.params;
-
-        if (!id) {
-            return res.status(400).json({ error: 'Provider the batch id' });
-        }
+        const schema = Yup.object().shape({
+            batch_id: Yup.string().required().uuid(),
+        });
 
         try {
-            const batchReposity = getRepository(Batch);
-
-            const batch = await batchReposity.findOne({
-                where: { id },
-                relations: ['product'],
-            });
-
-            if (!batch) {
-                return res.status(400).json({ error: 'Batch not found' });
-            }
-
-            const userHasAccess = await checkIfUserHasAccessToAProduct({
-                product_id: batch.product.id,
-                user_id: req.userId,
-            });
-
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to be here' });
-            }
-
-            return res.status(200).json(batch);
+            await schema.validate(req.params);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
+        }
+
+        const { batch_id } = req.params;
+
+        const batchReposity = getRepository(Batch);
+
+        const batch = await batchReposity.findOne({
+            where: { id: batch_id },
+            relations: ['product'],
+        });
+
+        if (!batch) {
+            throw new AppError('Batch was not found', 400);
+        }
+
+        const userHasAccess = await checkIfUserHasAccessToAProduct({
+            product_id: batch.product.id,
+            user_id: req.userId,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have permission to be here", 401);
+        }
+
+        return res.status(200).json(batch);
     }
 
     async store(req: Request, res: Response): Promise<Response> {
@@ -55,49 +61,49 @@ class BatchController {
             price: Yup.number(),
         });
 
-        if (!(await schema.isValid(req.body))) {
-            return res.status(400).json({ error: 'Validation falis' });
-        }
-
         try {
-            const { product_id, name, exp_date, amount, price } = req.body;
-
-            const userHasAccess = await checkIfUserHasAccessToAProduct({
-                product_id,
-                user_id: req.userId,
-            });
-
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to be here' });
-            }
-
-            const productRepository = getRepository(Product);
-            const batchReposity = getRepository(Batch);
-
-            const product = await productRepository.findOne(product_id);
-
-            if (!product) {
-                return res.status(400).json({ error: 'Product not found' });
-            }
-
-            const date = startOfDay(parseISO(exp_date));
-
-            const batch = new Batch();
-            batch.name = name;
-            batch.exp_date = date;
-            batch.amount = amount;
-            batch.price = price;
-            batch.status = 'unchecked';
-            batch.product = product;
-
-            const savedBatch = await batchReposity.save(batch);
-
-            return res.status(200).json(savedBatch);
+            await schema.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
+        }
+
+        const { product_id, name, exp_date, amount, price } = req.body;
+
+        const userHasAccess = await checkIfUserHasAccessToAProduct({
+            product_id,
+            user_id: req.userId,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have permission to be here", 401);
+        }
+
+        const productRepository = getRepository(Product);
+        const batchReposity = getRepository(Batch);
+
+        const product = await productRepository.findOne(product_id);
+
+        if (!product) {
+            throw new AppError('Product not found', 400);
+        }
+
+        const date = startOfDay(parseISO(exp_date));
+
+        const batch = new Batch();
+        batch.name = name;
+        batch.exp_date = date;
+        batch.amount = amount;
+        batch.price = price;
+        batch.status = 'unchecked';
+        batch.product = product;
+
+        const savedBatch = await batchReposity.save(batch);
+
+        return res.status(200).json(savedBatch);
     }
 
     async update(req: Request, res: Response): Promise<Response> {
@@ -109,54 +115,52 @@ class BatchController {
             status: Yup.string(),
         });
 
-        const schemaBatchId = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+        const schemaParams = Yup.object().shape({
+            batch_id: Yup.string().required().uuid(),
         });
 
-        if (
-            !(await schema.isValid(req.body)) ||
-            !(await schemaBatchId.isValid(req.params))
-        ) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { id } = req.params;
-            const { name, exp_date, amount, price, status } = req.body;
-
-            const batchReposity = getRepository(Batch);
-            const batch = await batchReposity.findOne({
-                where: { id },
-                relations: ['product'],
-            });
-
-            if (!batch) {
-                return res.status(400).json({ error: 'Batch not found' });
-            }
-
-            const userHasAccess = await checkIfUserHasAccessToAProduct({
-                product_id: batch.product.id,
-                user_id: req.userId,
-            });
-
-            if (!userHasAccess) {
-                return res
-                    .status(401)
-                    .json({ error: 'You dont have authorization to be here' });
-            }
-
-            batch.name = name;
-            batch.exp_date = exp_date;
-            batch.amount = amount;
-            batch.price = price;
-            batch.status = String(status).toLowerCase();
-
-            const updatedBatch = await batchReposity.save(batch);
-
-            return res.status(200).json(updatedBatch);
+            await schemaParams.validate(req.params);
+            await schema.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
+        }
+
+        const { batch_id } = req.params;
+        const { name, exp_date, amount, price, status } = req.body;
+
+        const batchReposity = getRepository(Batch);
+        const batch = await batchReposity.findOne({
+            where: { id: batch_id },
+            relations: ['product'],
+        });
+
+        if (!batch) {
+            throw new AppError('Batch was not found', 400);
+        }
+
+        const userHasAccess = await checkIfUserHasAccessToAProduct({
+            product_id: batch.product.id,
+            user_id: req.userId,
+        });
+
+        if (!userHasAccess) {
+            throw new AppError("You don't have permission to be here", 401);
+        }
+
+        batch.name = name;
+        batch.exp_date = exp_date;
+        batch.amount = amount;
+        batch.price = price;
+        batch.status = String(status).toLowerCase();
+
+        const updatedBatch = await batchReposity.save(batch);
+
+        return res.status(200).json(updatedBatch);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
@@ -164,53 +168,53 @@ class BatchController {
             batch_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.params))) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { batch_id } = req.params;
-
-            const batchReposity = getRepository(Batch);
-
-            const batch = await batchReposity
-                .createQueryBuilder('batch')
-                .leftJoinAndSelect('batch.product', 'product')
-                .leftJoinAndSelect('product.team', 'prodTeam')
-                .leftJoinAndSelect('prodTeam.team', 'team')
-                .where('batch.id = :batch_id', { batch_id })
-                .getOne();
-
-            if (!batch) {
-                return res.status(400).json({ error: 'Batch was not found' });
-            }
-
-            const userHasAccess = await checkIfUserHasAccessToAProduct({
-                product_id: batch.product.id,
-                user_id: req.userId,
-            });
-            const userRole = await getUserRole({
-                user_id: req.userId,
-                team_id: batch.product.team[0].team.id,
-            });
-
-            if (
-                !userHasAccess ||
-                (userHasAccess &&
-                    userRole !== 'Manager' &&
-                    userRole !== 'Supervisor')
-            ) {
-                return res
-                    .status(401)
-                    .json({ error: "You don't have permission to do this" });
-            }
-
-            await batchReposity.remove(batch);
-
-            return res.json({ success: 'ok' });
+            await schema.validate(req.params);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError(err.message, 400);
         }
+
+        if (!req.userId) {
+            throw new AppError('Provide the user id', 401);
+        }
+
+        const { batch_id } = req.params;
+
+        const batchReposity = getRepository(Batch);
+
+        const batch = await batchReposity
+            .createQueryBuilder('batch')
+            .leftJoinAndSelect('batch.product', 'product')
+            .leftJoinAndSelect('product.team', 'prodTeam')
+            .leftJoinAndSelect('prodTeam.team', 'team')
+            .where('batch.id = :batch_id', { batch_id })
+            .getOne();
+
+        if (!batch) {
+            throw new AppError('Batch was not found', 400);
+        }
+
+        const userHasAccess = await checkIfUserHasAccessToAProduct({
+            product_id: batch.product.id,
+            user_id: req.userId,
+        });
+        const userRole = await getUserRole({
+            user_id: req.userId,
+            team_id: batch.product.team[0].team.id,
+        });
+
+        if (
+            !userHasAccess ||
+            (userHasAccess &&
+                userRole !== 'Manager' &&
+                userRole !== 'Supervisor')
+        ) {
+            throw new AppError("You don't have permission to be here", 401);
+        }
+
+        await batchReposity.remove(batch);
+
+        return res.status(204).send();
     }
 }
 
