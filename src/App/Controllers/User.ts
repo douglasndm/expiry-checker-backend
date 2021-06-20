@@ -8,7 +8,7 @@ import AppError from '@errors/AppError';
 
 import User from '@models/User';
 
-import { deleteUser, updateUser } from '@utils/Users';
+import { deleteUser } from '@utils/Users';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -30,8 +30,6 @@ class UserController {
 
         const organizedUser = {
             id: user.firebaseUid,
-            name: user.name,
-            lastName: user.lastName,
             email: user.email,
 
             roles: user.roles.map(r => {
@@ -60,15 +58,8 @@ class UserController {
 
     async store(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            firebaseUid: Yup.string(),
-            name: Yup.string(),
-            lastName: Yup.string(),
+            firebaseUid: Yup.string().required(),
             email: Yup.string().required().email(),
-            password: Yup.string(),
-            passwordConfirmation: Yup.string().oneOf(
-                [Yup.ref('password'), null],
-                'Confirmação da senha não corresponde a senha',
-            ),
         });
 
         try {
@@ -77,7 +68,7 @@ class UserController {
             throw new AppError(err.message, 400);
         }
 
-        const { firebaseUid, name, lastName, email, password } = req.body;
+        const { firebaseUid, email } = req.body;
 
         let userId = firebaseUid;
 
@@ -95,55 +86,13 @@ class UserController {
             throw new AppError('User already exists', 400);
         }
 
-        const encryptyedPassword = null;
-
-        if (password) await bcrypt.hash(password, 8);
-
         const user = new User();
         user.firebaseUid = userId;
-        user.name = name;
-        user.lastName = lastName;
         user.email = email;
-        user.password = encryptyedPassword;
 
         const savedUser = await repository.save(user);
 
-        delete savedUser.password;
-
         return res.status(201).json(savedUser);
-    }
-
-    async update(req: Request, res: Response): Promise<Response> {
-        if (!req.userId) {
-            throw new AppError('Provider the user id', 401);
-        }
-
-        const schema = Yup.object().shape({
-            name: Yup.string(),
-            lastName: Yup.string(),
-            email: Yup.string().email('E-mail is not valid'),
-            password: Yup.string(),
-            passwordConfirmation: Yup.string().oneOf(
-                [Yup.ref('password'), null],
-                'Confirmação da senha não corresponde a senha',
-            ),
-        });
-
-        try {
-            await schema.validate(req.body);
-        } catch (err) {
-            throw new AppError(err.message, 400);
-        }
-
-        const { name, lastName } = req.body;
-
-        const updatedUser = await updateUser({
-            firebaseUid: req.userId,
-            name,
-            lastName,
-        });
-
-        return res.status(200).json(updatedUser);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {

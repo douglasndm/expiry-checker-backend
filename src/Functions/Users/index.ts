@@ -7,40 +7,6 @@ import { removeUserFromAllTeams } from '@utils/Users/Teams';
 import AppError from '@errors/AppError';
 
 // #region
-interface updateUserProps {
-    firebaseUid: string;
-    name?: string;
-    lastName?: string;
-    email?: string;
-}
-
-export async function updateUser({
-    firebaseUid,
-    name,
-    lastName,
-}: updateUserProps): Promise<User> {
-    const userRepository = getRepository(User);
-
-    const user = await userRepository.findOne({
-        where: {
-            firebaseUid,
-        },
-    });
-
-    if (!user) {
-        throw new AppError('User not found', 400);
-    }
-
-    user.name = name || null;
-    user.lastName = lastName || null;
-
-    const updatedUser = await userRepository.save(user);
-
-    return updatedUser;
-}
-// #endregion
-
-// #region
 interface deleteUserProps {
     user_id: string;
 }
