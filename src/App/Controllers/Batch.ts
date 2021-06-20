@@ -156,7 +156,10 @@ class BatchController {
         batch.exp_date = exp_date;
         batch.amount = amount;
         batch.price = price;
-        batch.status = String(status).toLowerCase();
+        batch.status =
+            String(status).toLowerCase() === 'checked'
+                ? 'checked'
+                : 'unchecked';
 
         const updatedBatch = await batchReposity.save(batch);
 

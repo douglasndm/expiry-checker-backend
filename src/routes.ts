@@ -56,7 +56,7 @@ routes.post('/team', Team.store);
 routes.put('/team/:team_id', Team.update);
 routes.delete('/team/:team_id', Team.delete);
 routes.get('/team/:team_id/products', Team.index);
-routes.get('/team/:id/users', TeamUsers.index);
+routes.get('/team/:team_id/users', TeamUsers.index);
 
 routes.post('/team/:team_id/join', TeamUsers.store);
 

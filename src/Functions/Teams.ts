@@ -7,10 +7,11 @@ interface getAllUsersByTeamProps {
     team_id: string;
 }
 
-interface UserResponse {
+export interface UserResponse {
     id: string;
     email: string;
     role: string;
+    status: string;
 }
 
 export async function getAllUsersByTeam({
