@@ -54,7 +54,7 @@ routes.post('/categories/:id', ProductCategory.create);
 routes.delete('/categories/product/:id', ProductCategory.delete);
 
 routes.post('/team', Team.store);
-routes.put('/team/:id', Team.update);
+routes.put('/team/:team_id', Team.update);
 routes.delete('/team/:team_id', Team.delete);
 routes.get('/team/:team_id/products', Team.index);
 routes.get('/team/:id/users', TeamUsers.index);
