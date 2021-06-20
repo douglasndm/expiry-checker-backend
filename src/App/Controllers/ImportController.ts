@@ -3,7 +3,10 @@ import { Request, Response } from 'express';
 import CryptoJS from 'crypto-js';
 import * as Yup from 'yup';
 
-import { convertExportFile } from '../../Functions/Controledevalidade/ConvertExportFile';
+import AppError from '@errors/AppError';
+
+import { convertExportFile } from '@utils/Controledevalidade/ConvertExportFile';
+import { saveManyCategories } from '@utils/Controledevalidade/Categories';
 
 class ImportController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -11,39 +14,70 @@ class ImportController {
             team_id: Yup.string().required().uuid(),
         });
 
-        if (!(await schema.isValid(req.params))) {
-            return res.status(400).json({ error: 'Validation fails' });
+        try {
+            await schema.validate(req.params);
+        } catch (err) {
+            throw new AppError(err.message, 400);
         }
 
-        try {
-            const { team_id } = req.params;
+        if (!process.env.APPLICATION_SECRET_BACKUP_CRYPT) {
+            throw new AppError('Server is missing decrypt key', 500);
+        }
 
-            const [_, ext] = req.file.filename.split('.');
+        const { team_id } = req.params;
 
-            if (ext !== 'cvbf') {
-                fs.rmSync(req.file.path);
-                return res.status(400).json({ error: 'File is not valid' });
-            }
+        const [_, ext] = req.file.filename.split('.');
 
-            const fileContent = fs.readFileSync(req.file.path, 'utf8');
+        if (ext !== 'cvbf') {
             fs.rmSync(req.file.path);
+            throw new AppError('File is not valid', 400);
+        }
 
-            const decodedFile = CryptoJS.AES.decrypt(
-                fileContent,
-                process.env.APPLICATION_SECRET_BACKUP_CRYPT || '',
-            );
-            const originalFile = decodedFile.toString(CryptoJS.enc.Utf8);
-            const productsApp = JSON.parse(originalFile);
+        const fileContent = fs.readFileSync(req.file.path, 'utf8');
+        fs.rmSync(req.file.path);
 
-            const products = await convertExportFile({
-                oldProducts: productsApp,
+        const decodedFile = CryptoJS.AES.decrypt(
+            fileContent,
+            process.env.APPLICATION_SECRET_BACKUP_CRYPT,
+        );
+        const originalFile = decodedFile.toString(CryptoJS.enc.Utf8);
+        const parsedFile = JSON.parse(originalFile);
+
+        if (parsedFile.categories) {
+            const { categories } = parsedFile;
+
+            const savedCategories = await saveManyCategories({
+                categories,
                 team_id,
             });
 
-            return res.json(products);
-        } catch (err) {
-            return res.status(500).json(err);
+            if (parsedFile.products) {
+                const productsSaved = await convertExportFile({
+                    oldProducts: parsedFile.products,
+                    team_id,
+                    categories: savedCategories,
+                });
+
+                return res.json(productsSaved);
+            }
         }
+
+        if (parsedFile.products) {
+            const { products } = parsedFile;
+
+            const productsSaved = await convertExportFile({
+                oldProducts: products,
+                team_id,
+            });
+
+            return res.json(productsSaved);
+        }
+        const productsSaved = await convertExportFile({
+            oldProducts: parsedFile,
+            team_id,
+        });
+
+        return res.json(productsSaved);
     }
 }
 

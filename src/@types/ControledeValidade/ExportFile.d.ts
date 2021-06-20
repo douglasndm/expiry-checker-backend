@@ -16,3 +16,8 @@ interface CVProduct {
     categories: Array<string>;
     lotes: Array<CVLote>;
 }
+
+interface CVCategory {
+    id: string;
+    name: string;
+}
