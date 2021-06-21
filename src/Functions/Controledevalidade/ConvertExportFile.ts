@@ -38,12 +38,16 @@ export async function convertExportFile({
 
     const newCategoriesUUID: Array<string> = [];
 
-    categories?.forEach(cat => newCategoriesUUID.push(cat.newId));
+    let categoriesInTeam: Array<Category> = [];
 
-    const categoriesInTeam = await categoryRepository
-        .createQueryBuilder('cate')
-        .where('cate.id IN(:...cats)', { cats: newCategoriesUUID })
-        .getMany();
+    if (categories && categories.length > 0) {
+        categories.forEach(cat => newCategoriesUUID.push(cat.newId));
+
+        categoriesInTeam = await categoryRepository
+            .createQueryBuilder('cate')
+            .where('cate.id IN(:...cats)', { cats: newCategoriesUUID })
+            .getMany();
+    }
 
     const products: Array<Product> = [];
     const prodTeam: Array<ProductTeams> = [];
