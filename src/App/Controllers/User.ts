@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import bcrypt from 'bcryptjs';
 import { compareAsc, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
@@ -8,7 +7,7 @@ import AppError from '@errors/AppError';
 
 import User from '@models/User';
 
-import { deleteUser } from '@utils/Users';
+import { createUser, deleteUser } from '@utils/Users';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -86,11 +85,7 @@ class UserController {
             throw new AppError('User already exists', 400);
         }
 
-        const user = new User();
-        user.firebaseUid = userId;
-        user.email = email;
-
-        const savedUser = await repository.save(user);
+        const savedUser = await createUser({ firebaseUid, email });
 
         return res.status(201).json(savedUser);
     }
