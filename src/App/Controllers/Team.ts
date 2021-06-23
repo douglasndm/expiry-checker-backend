@@ -21,7 +21,11 @@ class TeamController {
 
         const subscription = await checkIfTeamIsActive({ team_id });
         if (!subscription) {
-            throw new AppError("Team doesn't have an active subscription", 401);
+            throw new AppError(
+                "Team doesn't have an active subscription",
+                401,
+                5,
+            );
         }
 
         const usersInTeam = await getAllUsersByTeam({ team_id });
@@ -29,7 +33,7 @@ class TeamController {
         const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
 
         if (isUserInTeam.length <= 0) {
-            throw new AppError('You dont have permission to be here', 401);
+            throw new AppError('You dont have permission to be here', 401, 2);
         }
 
         const team = await teamRepository.findOne(team_id);
