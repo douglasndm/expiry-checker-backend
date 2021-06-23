@@ -12,14 +12,19 @@ import UserRoles from '@models/UserRoles';
 import User from '@models/User';
 import { Team } from '@models/Team';
 
+import Cache from '../../Services/Cache';
+
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
+        const cache = new Cache();
+
         const { team_id } = req.params;
 
         const teamRepository = getRepository(Team);
         const productTeamsRepository = getRepository(ProductTeams);
 
         const subscription = await checkIfTeamIsActive({ team_id });
+
         if (!subscription) {
             throw new AppError(
                 "Team doesn't have an active subscription",
@@ -36,20 +41,33 @@ class TeamController {
             throw new AppError('You dont have permission to be here', 401, 2);
         }
 
-        const team = await teamRepository.findOne(team_id);
+        const cachedProds = await cache.get<Array<ProductTeams>>(
+            `products-from-teams:${team_id}`,
+        );
 
-        const products = await productTeamsRepository
-            .createQueryBuilder('product_teams')
-            .select('product_teams.id')
-            .where('product_teams.team_id = :id', { id: team_id })
-            .leftJoinAndSelect('product_teams.product', 'product')
-            .leftJoinAndSelect('product.batches', 'batches')
-            .orderBy('batches.exp_date', 'ASC')
-            .getMany();
+        if (!cachedProds) {
+            const team = await teamRepository.findOne(team_id);
 
-        const productsWithoutId = products.map(p => p.product);
+            const products = await productTeamsRepository
+                .createQueryBuilder('product_teams')
+                .select('product_teams.id')
+                .where('product_teams.team_id = :id', { id: team_id })
+                .leftJoinAndSelect('product_teams.product', 'product')
+                .leftJoinAndSelect('product.batches', 'batches')
+                .orderBy('batches.exp_date', 'ASC')
+                .getMany();
 
-        return res.status(200).json({ team, products: productsWithoutId });
+            const productsWithoutId = products.map(p => p.product);
+
+            await cache.save(`products-from-teams:${team_id}`, {
+                team,
+                products: productsWithoutId,
+            });
+
+            return res.status(200).json({ team, products: productsWithoutId });
+        }
+
+        return res.status(200).json(cachedProds);
     }
 
     async store(req: Request, res: Response): Promise<Response> {

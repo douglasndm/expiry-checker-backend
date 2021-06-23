@@ -20,6 +20,8 @@ import {
 import { sortBatchesByExpDate } from '@utils/Batches';
 import { getUserRole } from '@utils/Users/UserRoles';
 
+import Cache from '../../Services/Cache';
+
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -95,6 +97,8 @@ class ProductController {
             throw new AppError('Provide the user id', 401);
         }
 
+        const cache = new Cache();
+
         const { name, code, categories, team_id } = req.body;
 
         const usersInTeam = await getAllUsersByTeam({ team_id });
@@ -158,6 +162,8 @@ class ProductController {
             });
         }
 
+        await cache.invalidade(`products-from-teams:${team_id}`);
+
         return res.status(201).json(savedProd);
     }
 
@@ -182,6 +188,8 @@ class ProductController {
         if (!req.userId) {
             throw new AppError('Provide the user id', 401);
         }
+
+        const cache = new Cache();
 
         const { product_id } = req.params;
         const { name, code, categories } = req.body;
@@ -230,6 +238,8 @@ class ProductController {
             });
         }
 
+        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
+
         return res.status(200).json(updatedProduct);
     }
 
@@ -247,6 +257,8 @@ class ProductController {
         if (!req.userId) {
             throw new AppError('Provide the user id', 401);
         }
+
+        const cache = new Cache();
 
         const { product_id } = req.params;
 
@@ -282,6 +294,8 @@ class ProductController {
         }
 
         await productRepository.remove(prod);
+
+        await cache.invalidade(`products-from-teams:${prod.team[0].id}`);
 
         return res.status(204).send();
     }

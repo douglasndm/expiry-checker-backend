@@ -11,6 +11,8 @@ import { Batch } from '@models/Batch';
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getUserRole } from '@utils/Users/UserRoles';
 
+import Cache from '../../Services/Cache';
+
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -71,6 +73,8 @@ class BatchController {
             throw new AppError('Provide the user id', 401);
         }
 
+        const cache = new Cache();
+
         const { product_id, name, exp_date, amount, price } = req.body;
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
@@ -103,6 +107,8 @@ class BatchController {
 
         const savedBatch = await batchReposity.save(batch);
 
+        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
+
         return res.status(200).json(savedBatch);
     }
 
@@ -129,6 +135,8 @@ class BatchController {
         if (!req.userId) {
             throw new AppError('Provide the user id', 401);
         }
+
+        const cache = new Cache();
 
         const { batch_id } = req.params;
         const { name, exp_date, amount, price, status } = req.body;
@@ -163,6 +171,10 @@ class BatchController {
 
         const updatedBatch = await batchReposity.save(batch);
 
+        await cache.invalidade(
+            `products-from-teams:${batch.product.team[0].id}`,
+        );
+
         return res.status(200).json(updatedBatch);
     }
 
@@ -180,6 +192,8 @@ class BatchController {
         if (!req.userId) {
             throw new AppError('Provide the user id', 401);
         }
+
+        const cache = new Cache();
 
         const { batch_id } = req.params;
 
@@ -216,6 +230,10 @@ class BatchController {
         }
 
         await batchReposity.remove(batch);
+
+        await cache.invalidade(
+            `products-from-teams:${batch.product.team[0].id}`,
+        );
 
         return res.status(204).send();
     }
