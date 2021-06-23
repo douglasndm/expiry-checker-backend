@@ -4,14 +4,10 @@ import 'express-async-errors';
 import AppError from '@errors/AppError';
 import App from './app';
 
-import rateLimiter from './App/Middlewares/RateLimiter';
-
 import './Services/Database';
 
 const { PORT } = process.env;
 const { HOST } = process.env;
-
-App.use(rateLimiter);
 
 App.use((err: Error, request: Request, response: Response, _: NextFunction) => {
     if (err instanceof AppError) {
