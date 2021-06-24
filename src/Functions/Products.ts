@@ -19,7 +19,9 @@ export async function checkIfProductAlreadyExists({
         .createQueryBuilder('prods')
         .leftJoinAndSelect('prods.product', 'product')
         .leftJoinAndSelect('prods.team', 'team')
-        .where('product.name = :product_name', { product_name: name })
+        .where('LOWER(product.name) = LOWER(:product_name)', {
+            product_name: name.trim(),
+        })
         .andWhere('team.id = :team_id', { team_id })
         .getMany();
 
