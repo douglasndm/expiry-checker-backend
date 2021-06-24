@@ -10,7 +10,6 @@ export default class RedisCache {
     }
 
     public async get<T>(key: any): Promise<T | null> {
-        console.log('Restaurado do cache');
         const response = await this.client.get(key);
 
         if (!response) {
@@ -23,12 +22,10 @@ export default class RedisCache {
     }
 
     public async save(key: string, value: any): Promise<void> {
-        console.log('Salvo em cache');
         await this.client.set(key, JSON.stringify(value));
     }
 
     public async invalidade(key: string): Promise<void> {
-        console.log('Cache invalidado');
         await this.client.del(key);
     }
 
