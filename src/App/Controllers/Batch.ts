@@ -117,7 +117,11 @@ class BatchController {
         const productRepository = getRepository(Product);
         const batchReposity = getRepository(Batch);
 
-        const product = await productRepository.findOne(product_id);
+        const product = await productRepository
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.team', 'team')
+            .where('product.id = :product_id', { product_id })
+            .getOne();
 
         if (!product) {
             throw new AppError({
