@@ -32,7 +32,7 @@ export class Product {
     batches: Array<Batch>;
 
     @OneToMany(type => ProductTeams, productTeams => productTeams.product)
-    team: Array<ProductTeams>;
+    team: ProductTeams;
 
     @CreateDateColumn()
     created_at: Date;

@@ -117,7 +117,11 @@ class BatchController {
         const productRepository = getRepository(Product);
         const batchReposity = getRepository(Batch);
 
-        const product = await productRepository.findOne(product_id);
+        const product = await productRepository
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.team', 'team')
+            .where('product.id = :product_id', { product_id })
+            .getOne();
 
         if (!product) {
             throw new AppError({
@@ -139,7 +143,7 @@ class BatchController {
 
         const savedBatch = await batchReposity.save(batch);
 
-        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
+        await cache.invalidade(`products-from-teams:${product.team.id}`);
 
         return res.status(200).json(savedBatch);
     }
@@ -219,9 +223,7 @@ class BatchController {
 
         const updatedBatch = await batchReposity.save(batch);
 
-        await cache.invalidade(
-            `products-from-teams:${batch.product.team[0].id}`,
-        );
+        await cache.invalidade(`products-from-teams:${batch.product.team.id}`);
 
         return res.status(200).json(updatedBatch);
     }
@@ -277,7 +279,7 @@ class BatchController {
         });
         const userRole = await getUserRole({
             user_id: req.userId,
-            team_id: batch.product.team[0].team.id,
+            team_id: batch.product.team.team.id,
         });
 
         if (
@@ -295,9 +297,7 @@ class BatchController {
 
         await batchReposity.remove(batch);
 
-        await cache.invalidade(
-            `products-from-teams:${batch.product.team[0].id}`,
-        );
+        await cache.invalidade(`products-from-teams:${batch.product.team.id}`);
 
         return res.status(204).send();
     }
