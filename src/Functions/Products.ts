@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import ProductTeams from '../App/Models/ProductTeams';
+import ProductTeams from '@models/ProductTeams';
 
 interface checkIfProductAlreadyExistsProps {
     name: string;
@@ -15,30 +15,24 @@ export async function checkIfProductAlreadyExists({
 }: checkIfProductAlreadyExistsProps): Promise<boolean> {
     const productTeamRepository = getRepository(ProductTeams);
 
-    const teamProducts = await productTeamRepository.find({
-        where: {
-            team: { id: team_id },
-        },
-        relations: ['team', 'product'],
-    });
+    const products = await productTeamRepository
+        .createQueryBuilder('prods')
+        .leftJoinAndSelect('prods.product', 'product')
+        .leftJoinAndSelect('prods.team', 'team')
+        .where('product.name = :product_name', { product_name: name })
+        .andWhere('team.id = :team_id', { team_id })
+        .getMany();
 
-    const productExists = teamProducts.filter(p => {
+    const productExists = products.filter(p => {
         if (code) {
-            if (p.product.code === code) {
-                return true;
+            if (p.product.code !== code) {
+                return false;
             }
-            return false;
-        }
-
-        if (p.product.name === name) {
             return true;
         }
 
-        return false;
+        return true;
     });
 
-    if (productExists.length > 0) {
-        return true;
-    }
-    return false;
+    return productExists.length > 0;
 }
