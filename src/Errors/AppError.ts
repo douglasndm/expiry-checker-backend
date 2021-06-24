@@ -1,3 +1,9 @@
+interface IAppError {
+    message: string;
+    statusCode?: number;
+    internalErrorCode?: number;
+}
+
 class AppError {
     public readonly message: string;
 
@@ -5,10 +11,10 @@ class AppError {
 
     public readonly errorCode: number | undefined;
 
-    constructor(message: string, statusCode = 400, errorCode?: number) {
+    constructor({ message, statusCode = 400, internalErrorCode }: IAppError) {
         this.message = message;
         this.statusCode = statusCode;
-        this.errorCode = errorCode;
+        this.errorCode = internalErrorCode;
     }
 }
 

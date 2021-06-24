@@ -24,7 +24,10 @@ export async function addProductToCategory({
     });
 
     if (!product || !category) {
-        throw new AppError('Category or Product was not found', 400);
+        throw new AppError({
+            message: 'Category or Product was not found',
+            statusCode: 400,
+        });
     }
 
     const alreadyExists = await repository.findOne({
@@ -37,7 +40,10 @@ export async function addProductToCategory({
     });
 
     if (alreadyExists) {
-        throw new AppError('Product is already in category', 400);
+        throw new AppError({
+            message: 'Product is already in category',
+            statusCode: 400,
+        });
     }
 
     const productCategory = new ProductCategory();

@@ -36,7 +36,10 @@ export async function checkIfUserHasAccessToAProduct({
         .getOne();
 
     if (!productTeam) {
-        throw new AppError('Product and Team relatioship was not found', 400);
+        throw new AppError({
+            message: 'Product and Team relatioship was not found',
+            statusCode: 400,
+        });
     }
 
     const checkTeamAccess = await checkIfUserHasAccessToTeam({
@@ -45,7 +48,10 @@ export async function checkIfUserHasAccessToAProduct({
     });
 
     if (!checkTeamAccess) {
-        throw new AppError("User doesn't have access to the team", 401);
+        throw new AppError({
+            message: "User doesn't have access to the team",
+            statusCode: 401,
+        });
     }
 
     const hasAccessToProduct = userTeams.filter(

@@ -20,7 +20,11 @@ class CategoryController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         const { team_id } = req.params;
@@ -28,7 +32,11 @@ class CategoryController {
         const subscription = await checkIfTeamIsActive({ team_id });
 
         if (!subscription) {
-            throw new AppError("Team doesn't have an active subscription", 402);
+            throw new AppError({
+                message: "Team doesn't have an active subscription",
+                statusCode: 402,
+                internalErrorCode: 5,
+            });
         }
 
         const usersInTeam = await getAllUsersByTeam({ team_id });
@@ -36,7 +44,11 @@ class CategoryController {
         const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
 
         if (isUserInTeam.length <= 0) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const categoryRepository = getRepository(Category);
@@ -58,11 +70,19 @@ class CategoryController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { name, team_id } = req.body;
@@ -74,7 +94,11 @@ class CategoryController {
         });
 
         if (!isManager) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const savedCategory = await createCategory({
@@ -98,11 +122,19 @@ class CategoryController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { id } = req.params;
@@ -114,7 +146,11 @@ class CategoryController {
         });
 
         if (!category) {
-            throw new AppError('Category was not found', 400);
+            throw new AppError({
+                message: 'Category was not found',
+                statusCode: 400,
+                internalErrorCode: 10,
+            });
         }
         // Check if user has access and it is a manager on team
         const isManager = await isUserManager({
@@ -123,7 +159,11 @@ class CategoryController {
         });
 
         if (!isManager) {
-            throw new AppError("You don't have authorization to do that", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         category.name = name;
@@ -140,11 +180,19 @@ class CategoryController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { id } = req.params;
@@ -155,7 +203,11 @@ class CategoryController {
         });
 
         if (!category) {
-            throw new AppError('Category was not found', 400);
+            throw new AppError({
+                message: 'Category was not found',
+                statusCode: 400,
+                internalErrorCode: 10,
+            });
         }
         // Check if user has access and it is a manager on team
         const isManager = await isUserManager({
@@ -164,7 +216,11 @@ class CategoryController {
         });
 
         if (!isManager) {
-            throw new AppError("You don't have authorization to do that", 401);
+            throw new AppError({
+                message: "You don't have authorization to do that",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         await categoryRepository.remove(category);

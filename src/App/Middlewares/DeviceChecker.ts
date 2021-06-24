@@ -12,20 +12,23 @@ export default async function deviceChecker(
     const device_id = req.headers.deviceid;
 
     if (!device_id) {
-        throw new AppError('Provide the device id', 401);
+        throw new AppError({
+            message: 'Provide the device id',
+            statusCode: 401,
+        });
     }
 
     if (!req.userId) {
-        throw new AppError('Provide the user id', 401);
+        throw new AppError({ message: 'Provide the user id', statusCode: 401 });
     }
 
     const userDevice = await getUserDeviceId({ user_id: req.userId });
 
     if (!userDevice || userDevice !== device_id) {
-        throw new AppError(
-            'Device is not allowed, please make login again',
-            403,
-        );
+        throw new AppError({
+            message: 'Device is not allowed, please make login again',
+            statusCode: 403,
+        });
     }
 
     return next();

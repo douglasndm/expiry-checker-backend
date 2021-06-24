@@ -16,7 +16,10 @@ async function CheckIfUserIsManager(
     });
 
     if (!(await schema.isValid(req.params))) {
-        throw new AppError('Provider the team id', 401);
+        throw new AppError({
+            message: 'Provider the team id',
+            statusCode: 401,
+        });
     }
 
     const { team_id } = req.params;

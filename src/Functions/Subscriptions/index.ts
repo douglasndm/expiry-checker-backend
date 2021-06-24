@@ -67,7 +67,11 @@ export async function createSubscription({
     const team = await teamRepository.findOne(team_id);
 
     if (!team) {
-        throw new AppError('Team was not found', 400);
+        throw new AppError({
+            message: 'Team was not found',
+            statusCode: 400,
+            internalErrorCode: 6,
+        });
     }
 
     const teamSubscription = new TeamSubscription();

@@ -20,7 +20,10 @@ export default async function checkFirebaseAuth(
             req.userId = verifyToken.uid;
 
             if (!verifyToken.email) {
-                throw new AppError('User does not have email registred');
+                throw new AppError({
+                    message: 'User does not have email registred',
+                    statusCode: 400,
+                });
             }
 
             const user = await getUser(verifyToken.uid);
@@ -34,9 +37,17 @@ export default async function checkFirebaseAuth(
 
             return next();
         } catch (err) {
-            throw new AppError('Unauthorized', 403);
+            throw new AppError({
+                message: 'Unauthorized',
+                statusCode: 403,
+                internalErrorCode: 3,
+            });
         }
     }
 
-    throw new AppError('Unauthorized', 403);
+    throw new AppError({
+        message: 'Unauthorized',
+        statusCode: 403,
+        internalErrorCode: 3,
+    });
 }

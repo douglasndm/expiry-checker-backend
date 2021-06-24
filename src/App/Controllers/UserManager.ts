@@ -24,7 +24,7 @@ class UserManagerController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         const { team_id } = req.params;
@@ -40,7 +40,10 @@ class UserManagerController {
             .getOne();
 
         if (alreadyInARole) {
-            throw new AppError('User is already into team', 400);
+            throw new AppError({
+                message: 'User is already into team',
+                statusCode: 400,
+            });
         }
 
         const teamRepository = getRepository(Team);
@@ -53,7 +56,10 @@ class UserManagerController {
             .getOne();
 
         if (!team || !user) {
-            throw new AppError('User or team was not found', 400);
+            throw new AppError({
+                message: 'User or team was not found',
+                statusCode: 400,
+            });
         }
 
         const membersChecker = await checkMembersLimit({
@@ -61,7 +67,10 @@ class UserManagerController {
         });
 
         if (membersChecker.members >= membersChecker.limit) {
-            throw new AppError('Team has reach the limit of members', 401);
+            throw new AppError({
+                message: 'Team has reach the limit of members',
+                statusCode: 401,
+            });
         }
 
         const teamUser = new UserRoles();
@@ -90,7 +99,7 @@ class UserManagerController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         const { team_id } = req.params;
@@ -99,7 +108,7 @@ class UserManagerController {
         if (role.toLowerCase() !== 'manager') {
             if (role.toLowerCase() !== 'supervisor') {
                 if (role.toLowerCase() !== 'repositor') {
-                    throw new AppError('Role is invalid', 400);
+                    throw new AppError({ message: 'Role is invalid' });
                 }
             }
         }
@@ -114,7 +123,10 @@ class UserManagerController {
         });
 
         if (userRoles?.role.toLowerCase() !== 'manager') {
-            throw new AppError('You dont have authorization to do that', 401);
+            throw new AppError({
+                message: 'You dont have authorization to do that',
+                statusCode: 401,
+            });
         }
 
         const userRole = await userRolesRepository.findOne({
@@ -126,7 +138,10 @@ class UserManagerController {
         });
 
         if (!userRole) {
-            throw new AppError('User in team was not found', 400);
+            throw new AppError({
+                message: 'User in team was not found',
+                statusCode: 400,
+            });
         }
 
         userRole.role = role.toLowerCase();
@@ -147,13 +162,16 @@ class UserManagerController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         const { team_id, user_id } = req.params;
 
         if (req.userId === user_id) {
-            throw new AppError("You can't remove yourself from a team", 401);
+            throw new AppError({
+                message: "You can't remove yourself from a team",
+                statusCode: 401,
+            });
         }
 
         const repository = getRepository(UserRoles);
@@ -167,7 +185,10 @@ class UserManagerController {
             .getOne();
 
         if (!role) {
-            throw new AppError('User is not in team', 400);
+            throw new AppError({
+                message: 'User is not in team',
+                statusCode: 400,
+            });
         }
 
         await repository.remove(role);
