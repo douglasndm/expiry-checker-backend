@@ -15,11 +15,15 @@ class TeamSubscriptionsController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         if (!req.userId) {
-            throw new AppError("You don't have access to do that", 401);
+            throw new AppError({
+                message: "You don't have access to do that",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { team_id } = req.params;
@@ -30,7 +34,11 @@ class TeamSubscriptionsController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have access to do that", 401);
+            throw new AppError({
+                message: "You don't have access to do that",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const subscription = await getTeamSubscription({ team_id });

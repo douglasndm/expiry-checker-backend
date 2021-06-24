@@ -24,7 +24,11 @@ class UserController {
             .getOne();
 
         if (!user) {
-            throw new AppError('User not found', 401);
+            throw new AppError({
+                message: 'User not found',
+                statusCode: 401,
+                internalErrorCode: 7,
+            });
         }
 
         const organizedUser = {
@@ -64,7 +68,7 @@ class UserController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         const { firebaseUid, email } = req.body;
@@ -75,14 +79,17 @@ class UserController {
             userId = req.userId;
         }
         if (!userId) {
-            throw new AppError('Provider the user id', 401);
+            throw new AppError({
+                message: 'Provider the user id',
+                statusCode: 401,
+            });
         }
 
         const repository = getRepository(User);
         const existsUser = await repository.findOne({ where: { email } });
 
         if (existsUser) {
-            throw new AppError('User already exists', 400);
+            throw new AppError({ message: 'User already exists' });
         }
 
         const savedUser = await createUser({ firebaseUid, email });
@@ -92,7 +99,10 @@ class UserController {
 
     async delete(req: Request, res: Response): Promise<Response> {
         if (!req.userId) {
-            throw new AppError('Provider the user id', 401);
+            throw new AppError({
+                message: 'Provider the user id',
+                statusCode: 401,
+            });
         }
 
         await deleteUser({ user_id: req.userId });

@@ -17,11 +17,18 @@ class ImportController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!process.env.APPLICATION_SECRET_BACKUP_CRYPT) {
-            throw new AppError('Server is missing decrypt key', 500);
+            throw new AppError({
+                message: 'Server is missing decrypt key',
+                statusCode: 500,
+            });
         }
 
         const { team_id } = req.params;
@@ -30,7 +37,10 @@ class ImportController {
 
         if (ext !== 'cvbf') {
             fs.rmSync(req.file.path);
-            throw new AppError('File is not valid', 400);
+            throw new AppError({
+                message: 'File is not valid',
+                statusCode: 400,
+            });
         }
 
         const fileContent = fs.readFileSync(req.file.path, 'utf8');

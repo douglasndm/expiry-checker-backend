@@ -20,11 +20,19 @@ class ProductCategoryController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { category_id } = req.params;
@@ -51,7 +59,11 @@ class ProductCategoryController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have authorization to do this", 401);
+            throw new AppError({
+                message: "You don't have authorization to do this",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         let categoryName;
@@ -83,7 +95,11 @@ class ProductCategoryController {
 
             categoryName = cate?.name;
             if (!cate) {
-                throw new AppError('Category was not found', 400);
+                throw new AppError({
+                    message: 'Category was not found',
+                    statusCode: 400,
+                    internalErrorCode: 10,
+                });
             }
         }
 
@@ -102,11 +118,19 @@ class ProductCategoryController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { id } = req.params;
@@ -120,7 +144,11 @@ class ProductCategoryController {
         });
 
         if (!category) {
-            throw new AppError('Category was not found', 400);
+            throw new AppError({
+                message: 'Category was not found',
+                statusCode: 400,
+                internalErrorCode: 10,
+            });
         }
 
         const userHasAccess = await checkIfUserHasAccessToTeam({
@@ -129,7 +157,11 @@ class ProductCategoryController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have authorization to do this", 401);
+            throw new AppError({
+                message: "You don't have authorization to do this",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const savedProductCategory = await addProductToCategory({
@@ -152,11 +184,19 @@ class ProductCategoryController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { id } = req.params;
@@ -175,7 +215,11 @@ class ProductCategoryController {
             .getOne();
 
         if (!exists) {
-            throw new AppError('Product was not in category', 400);
+            throw new AppError({
+                message: 'Product was not in category',
+                statusCode: 400,
+                internalErrorCode: 15,
+            });
         }
         const userHasAccess = await checkIfUserHasAccessToTeam({
             team_id: exists.product.team[0].team.id,
@@ -183,7 +227,11 @@ class ProductCategoryController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have authorization to do this", 401);
+            throw new AppError({
+                message: "You don't have authorization to do this",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         await repository.remove(exists);

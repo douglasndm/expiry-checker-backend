@@ -17,7 +17,7 @@ class TeamUsersController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         const { team_id } = req.params;
@@ -27,7 +27,11 @@ class TeamUsersController {
         const isUserInTeam = usersInTeam.find(user => user.id === req.userId);
 
         if (!isUserInTeam) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have permission to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const usersResponse: Array<UserResponse> = [];

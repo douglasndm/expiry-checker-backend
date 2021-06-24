@@ -46,7 +46,11 @@ export async function addUserDevice({
     });
 
     if (!user) {
-        throw new AppError('User not found', 400);
+        throw new AppError({
+            message: 'User not found',
+            statusCode: 400,
+            internalErrorCode: 7,
+        });
     }
 
     const deviceExist = await deviceRepository

@@ -22,7 +22,11 @@ export async function createCategory({
         .getOne();
 
     if (alreadyExists) {
-        throw new AppError('Category already exists on team', 400);
+        throw new AppError({
+            message: 'Category already exists on team',
+            statusCode: 400,
+            internalErrorCode: 13,
+        });
     }
 
     const teamRepository = getRepository(Team);
@@ -33,7 +37,11 @@ export async function createCategory({
     });
 
     if (!team) {
-        throw new AppError('Team was not found', 400);
+        throw new AppError({
+            message: 'Team was not found',
+            statusCode: 400,
+            internalErrorCode: 6,
+        });
     }
 
     const category = new Category();

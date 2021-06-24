@@ -20,6 +20,8 @@ import {
 import { sortBatchesByExpDate } from '@utils/Batches';
 import { getUserRole } from '@utils/Users/UserRoles';
 
+import Cache from '../../Services/Cache';
+
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -29,11 +31,19 @@ class ProductController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { product_id } = req.params;
@@ -44,7 +54,11 @@ class ProductController {
         });
 
         if (!userHasAccessToProduct) {
-            throw new AppError("You don't have authorization to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const reposity = getRepository(Product);
@@ -88,12 +102,22 @@ class ProductController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
+
+        const cache = new Cache();
 
         const { name, code, categories, team_id } = req.body;
 
@@ -102,7 +126,11 @@ class ProductController {
         const isUserInTeam = usersInTeam.filter(ut => ut.id === req.userId);
 
         if (isUserInTeam.length <= 0) {
-            throw new AppError("You don't have authorization to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const productAlreadyExists = await checkIfProductAlreadyExists({
@@ -112,10 +140,11 @@ class ProductController {
         });
 
         if (productAlreadyExists) {
-            throw new AppError(
-                'This product already exists. Try add a new batch',
-                400,
-            );
+            throw new AppError({
+                message: 'This product already exists. Try add a new batch',
+                statusCode: 400,
+                internalErrorCode: 11,
+            });
         }
 
         const repository = getRepository(Product);
@@ -125,7 +154,11 @@ class ProductController {
         const team = await teamRepository.findOne(team_id);
 
         if (!team) {
-            throw new AppError('Team was not found', 400);
+            throw new AppError({
+                message: 'Team was not found',
+                statusCode: 400,
+                internalErrorCode: 6,
+            });
         }
 
         const prod: Product = new Product();
@@ -149,7 +182,11 @@ class ProductController {
             });
 
             if (!category) {
-                throw new AppError('Category was not found', 400);
+                throw new AppError({
+                    message: 'Category was not found',
+                    statusCode: 400,
+                    internalErrorCode: 10,
+                });
             }
 
             await addProductToCategory({
@@ -157,6 +194,8 @@ class ProductController {
                 category,
             });
         }
+
+        await cache.invalidade(`products-from-teams:${team_id}`);
 
         return res.status(201).json(savedProd);
     }
@@ -176,12 +215,22 @@ class ProductController {
             await schema.validate(req.body);
             await schemaParams.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
+
+        const cache = new Cache();
 
         const { product_id } = req.params;
         const { name, code, categories } = req.body;
@@ -192,7 +241,11 @@ class ProductController {
         });
 
         if (!userHasAccessToProduct) {
-            throw new AppError("You don't have authorization to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const productRepository = getRepository(Product);
@@ -200,7 +253,11 @@ class ProductController {
         const product = await productRepository.findOne(product_id);
 
         if (!product) {
-            throw new AppError('Product was not found', 400);
+            throw new AppError({
+                message: 'Product was not found',
+                statusCode: 400,
+                internalErrorCode: 8,
+            });
         }
 
         product.name = name;
@@ -221,7 +278,11 @@ class ProductController {
             });
 
             if (!category) {
-                throw new AppError('Category was not found', 400);
+                throw new AppError({
+                    message: 'Category was not found',
+                    statusCode: 400,
+                    internalErrorCode: 10,
+                });
             }
 
             await addProductToCategory({
@@ -229,6 +290,8 @@ class ProductController {
                 category,
             });
         }
+
+        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
 
         return res.status(200).json(updatedProduct);
     }
@@ -241,12 +304,22 @@ class ProductController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
+
+        const cache = new Cache();
 
         const { product_id } = req.params;
 
@@ -260,7 +333,11 @@ class ProductController {
             .getOne();
 
         if (!prod) {
-            throw new AppError('Product was not found', 400);
+            throw new AppError({
+                message: 'Product was not found',
+                statusCode: 400,
+                internalErrorCode: 8,
+            });
         }
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
@@ -278,10 +355,16 @@ class ProductController {
                 userRole !== 'Manager' &&
                 userRole !== 'Supervisor')
         ) {
-            throw new AppError("You don't have authorization to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         await productRepository.remove(prod);
+
+        await cache.invalidade(`products-from-teams:${prod.team[0].id}`);
 
         return res.status(204).send();
     }

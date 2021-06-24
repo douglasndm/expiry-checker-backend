@@ -26,7 +26,7 @@ export async function saveManyCategories({
     const team = await teamRepository.findOne(team_id);
 
     if (!team) {
-        throw new AppError('Team was not found', 400);
+        throw new AppError({ message: 'Team was not found', statusCode: 400 });
     }
 
     const categoriesFromTeam = await categoryRepository.find({
@@ -66,10 +66,10 @@ export async function saveManyCategories({
         );
 
         if (!savedRef && !alreadyInTeam) {
-            throw new AppError(
-                'Erro while searching for old category ref',
-                500,
-            );
+            throw new AppError({
+                message: 'Erro while searching for old category ref',
+                statusCode: 500,
+            });
         }
 
         let newId = '';

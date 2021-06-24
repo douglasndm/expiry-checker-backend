@@ -12,16 +12,25 @@ import UserRoles from '@models/UserRoles';
 import User from '@models/User';
 import { Team } from '@models/Team';
 
+import Cache from '../../Services/Cache';
+
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
+        const cache = new Cache();
+
         const { team_id } = req.params;
 
         const teamRepository = getRepository(Team);
         const productTeamsRepository = getRepository(ProductTeams);
 
         const subscription = await checkIfTeamIsActive({ team_id });
+
         if (!subscription) {
-            throw new AppError("Team doesn't have an active subscription", 401);
+            throw new AppError({
+                message: "Team doesn't have an active subscription",
+                statusCode: 401,
+                internalErrorCode: 5,
+            });
         }
 
         const usersInTeam = await getAllUsersByTeam({ team_id });
@@ -29,23 +38,40 @@ class TeamController {
         const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
 
         if (isUserInTeam.length <= 0) {
-            throw new AppError('You dont have permission to be here', 401);
+            throw new AppError({
+                message: 'You dont have permission to be here',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
-        const team = await teamRepository.findOne(team_id);
+        const cachedProds = await cache.get<Array<ProductTeams>>(
+            `products-from-teams:${team_id}`,
+        );
 
-        const products = await productTeamsRepository
-            .createQueryBuilder('product_teams')
-            .select('product_teams.id')
-            .where('product_teams.team_id = :id', { id: team_id })
-            .leftJoinAndSelect('product_teams.product', 'product')
-            .leftJoinAndSelect('product.batches', 'batches')
-            .orderBy('batches.exp_date', 'ASC')
-            .getMany();
+        if (!cachedProds) {
+            const team = await teamRepository.findOne(team_id);
 
-        const productsWithoutId = products.map(p => p.product);
+            const products = await productTeamsRepository
+                .createQueryBuilder('product_teams')
+                .select('product_teams.id')
+                .where('product_teams.team_id = :id', { id: team_id })
+                .leftJoinAndSelect('product_teams.product', 'product')
+                .leftJoinAndSelect('product.batches', 'batches')
+                .orderBy('batches.exp_date', 'ASC')
+                .getMany();
 
-        return res.status(200).json({ team, products: productsWithoutId });
+            const productsWithoutId = products.map(p => p.product);
+
+            await cache.save(`products-from-teams:${team_id}`, {
+                team,
+                products: productsWithoutId,
+            });
+
+            return res.status(200).json({ team, products: productsWithoutId });
+        }
+
+        return res.status(200).json(cachedProds);
     }
 
     async store(req: Request, res: Response): Promise<Response> {
@@ -56,11 +82,19 @@ class TeamController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { name } = req.body;
@@ -76,7 +110,11 @@ class TeamController {
         });
 
         if (!user) {
-            throw new AppError('User was not found', 400);
+            throw new AppError({
+                message: 'User was not found',
+                statusCode: 400,
+                internalErrorCode: 7,
+            });
         }
 
         // Check if user already has a team with the same name
@@ -90,7 +128,11 @@ class TeamController {
         const existsName = userTeams.filter(ur => ur.team.name === name);
 
         if (existsName.length > 0) {
-            throw new AppError('You already have a team with that name', 400);
+            throw new AppError({
+                message: 'You already have a team with that name',
+                statusCode: 400,
+                internalErrorCode: 14,
+            });
         }
 
         const team = new Team();
@@ -124,11 +166,15 @@ class TeamController {
             await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message, internalErrorCode: 1 });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { team_id } = req.params;
@@ -145,14 +191,22 @@ class TeamController {
 
         // this check if person has access and it is a manager to update the team
         if (!userRoles || userRoles.role.toLocaleLowerCase() !== 'manager') {
-            throw new AppError("You don't have authorization to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const teamRepository = getRepository(Team);
         const team = await teamRepository.findOne(team_id);
 
         if (!team) {
-            throw new AppError('Team was not found', 400);
+            throw new AppError({
+                message: 'Team was not found',
+                statusCode: 400,
+                internalErrorCode: 6,
+            });
         }
 
         // Check if user already has a team with the same name
@@ -166,7 +220,9 @@ class TeamController {
         const existsName = userTeams.filter(ur => ur.team.name === name);
 
         if (existsName.length > 0) {
-            throw new AppError('You already have a team with that name', 400);
+            throw new AppError({
+                message: 'You already have a team with that name',
+            });
         }
 
         team.name = name;
@@ -186,11 +242,15 @@ class TeamController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({ message: err.message });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { team_id } = req.params;

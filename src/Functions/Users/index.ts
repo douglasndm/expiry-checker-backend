@@ -57,7 +57,11 @@ export async function deleteUser({ user_id }: deleteUserProps): Promise<void> {
     });
 
     if (!user) {
-        throw new AppError('User not found', 400);
+        throw new AppError({
+            message: 'User not found',
+            statusCode: 400,
+            internalErrorCode: 7,
+        });
     }
 
     await userRepository.remove(user);

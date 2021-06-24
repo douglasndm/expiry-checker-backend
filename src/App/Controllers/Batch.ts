@@ -11,6 +11,8 @@ import { Batch } from '@models/Batch';
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getUserRole } from '@utils/Users/UserRoles';
 
+import Cache from '../../Services/Cache';
+
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -20,11 +22,19 @@ class BatchController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const { batch_id } = req.params;
@@ -37,7 +47,11 @@ class BatchController {
         });
 
         if (!batch) {
-            throw new AppError('Batch was not found', 400);
+            throw new AppError({
+                message: 'Batch was not found',
+                statusCode: 400,
+                internalErrorCode: 9,
+            });
         }
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
@@ -46,7 +60,11 @@ class BatchController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         return res.status(200).json(batch);
@@ -64,12 +82,22 @@ class BatchController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
+
+        const cache = new Cache();
 
         const { product_id, name, exp_date, amount, price } = req.body;
 
@@ -79,7 +107,11 @@ class BatchController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         const productRepository = getRepository(Product);
@@ -88,7 +120,11 @@ class BatchController {
         const product = await productRepository.findOne(product_id);
 
         if (!product) {
-            throw new AppError('Product not found', 400);
+            throw new AppError({
+                message: 'Product not found',
+                statusCode: 400,
+                internalErrorCode: 8,
+            });
         }
 
         const date = startOfDay(parseISO(exp_date));
@@ -102,6 +138,8 @@ class BatchController {
         batch.product = product;
 
         const savedBatch = await batchReposity.save(batch);
+
+        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
 
         return res.status(200).json(savedBatch);
     }
@@ -123,12 +161,22 @@ class BatchController {
             await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
+
+        const cache = new Cache();
 
         const { batch_id } = req.params;
         const { name, exp_date, amount, price, status } = req.body;
@@ -140,7 +188,11 @@ class BatchController {
         });
 
         if (!batch) {
-            throw new AppError('Batch was not found', 400);
+            throw new AppError({
+                message: 'Batch was not found',
+                statusCode: 400,
+                internalErrorCode: 9,
+            });
         }
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
@@ -149,7 +201,11 @@ class BatchController {
         });
 
         if (!userHasAccess) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         batch.name = name;
@@ -163,6 +219,10 @@ class BatchController {
 
         const updatedBatch = await batchReposity.save(batch);
 
+        await cache.invalidade(
+            `products-from-teams:${batch.product.team[0].id}`,
+        );
+
         return res.status(200).json(updatedBatch);
     }
 
@@ -174,12 +234,22 @@ class BatchController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError(err.message, 400);
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
         }
 
         if (!req.userId) {
-            throw new AppError('Provide the user id', 401);
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
+
+        const cache = new Cache();
 
         const { batch_id } = req.params;
 
@@ -194,7 +264,11 @@ class BatchController {
             .getOne();
 
         if (!batch) {
-            throw new AppError('Batch was not found', 400);
+            throw new AppError({
+                message: 'Batch was not found',
+                statusCode: 400,
+                internalErrorCode: 9,
+            });
         }
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
@@ -212,10 +286,18 @@ class BatchController {
                 userRole !== 'Manager' &&
                 userRole !== 'Supervisor')
         ) {
-            throw new AppError("You don't have permission to be here", 401);
+            throw new AppError({
+                message: "You don't have authorization to be here",
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
         }
 
         await batchReposity.remove(batch);
+
+        await cache.invalidade(
+            `products-from-teams:${batch.product.team[0].id}`,
+        );
 
         return res.status(204).send();
     }
