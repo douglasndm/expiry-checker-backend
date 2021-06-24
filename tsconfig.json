@@ -48,6 +48,7 @@
     "baseUrl": "./src",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
         "@controllers/*": ["App/Controllers/*"],
+        "@middlewares/*": ["App/Middlewares/*"],
         "@models/*": ["App/Models/*"],
         "@utils/*": ["Functions/*"],
         "@config/*": ["Config/*"],
