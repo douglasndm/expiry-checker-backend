@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 
@@ -7,6 +8,8 @@ import rateLimiter from './App/Middlewares/RateLimiter';
 import Routes from './routes';
 
 import './Functions/Auth/Firebase';
+
+dotenv.config();
 
 const App = express();
 
