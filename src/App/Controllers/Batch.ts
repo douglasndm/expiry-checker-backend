@@ -139,7 +139,7 @@ class BatchController {
 
         const savedBatch = await batchReposity.save(batch);
 
-        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
+        await cache.invalidade(`products-from-teams:${product.team.id}`);
 
         return res.status(200).json(savedBatch);
     }
@@ -219,9 +219,7 @@ class BatchController {
 
         const updatedBatch = await batchReposity.save(batch);
 
-        await cache.invalidade(
-            `products-from-teams:${batch.product.team[0].id}`,
-        );
+        await cache.invalidade(`products-from-teams:${batch.product.team.id}`);
 
         return res.status(200).json(updatedBatch);
     }
@@ -277,7 +275,7 @@ class BatchController {
         });
         const userRole = await getUserRole({
             user_id: req.userId,
-            team_id: batch.product.team[0].team.id,
+            team_id: batch.product.team.team.id,
         });
 
         if (
@@ -295,9 +293,7 @@ class BatchController {
 
         await batchReposity.remove(batch);
 
-        await cache.invalidade(
-            `products-from-teams:${batch.product.team[0].id}`,
-        );
+        await cache.invalidade(`products-from-teams:${batch.product.team.id}`);
 
         return res.status(204).send();
     }

@@ -291,7 +291,7 @@ class ProductController {
             });
         }
 
-        await cache.invalidade(`products-from-teams:${product.team[0].id}`);
+        await cache.invalidade(`products-from-teams:${product.team.id}`);
 
         return res.status(200).json(updatedProduct);
     }
@@ -346,7 +346,7 @@ class ProductController {
         });
         const userRole = await getUserRole({
             user_id: req.userId,
-            team_id: prod.team[0].team.id,
+            team_id: prod.team.team.id,
         });
 
         if (
@@ -364,7 +364,7 @@ class ProductController {
 
         await productRepository.remove(prod);
 
-        await cache.invalidade(`products-from-teams:${prod.team[0].id}`);
+        await cache.invalidade(`products-from-teams:${prod.team.id}`);
 
         return res.status(204).send();
     }

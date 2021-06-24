@@ -54,7 +54,7 @@ class ProductCategoryController {
         }
 
         const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: productsInCategory[0].product.team[0].team.id,
+            team_id: productsInCategory[0].product.team.team.id,
             user_id: req.userId,
         });
 
@@ -222,7 +222,7 @@ class ProductCategoryController {
             });
         }
         const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: exists.product.team[0].team.id,
+            team_id: exists.product.team.team.id,
             user_id: req.userId,
         });
 
