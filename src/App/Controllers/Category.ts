@@ -6,7 +6,7 @@ import AppError from '@errors/AppError';
 
 import { createCategory } from '@utils/Category';
 import { checkIfTeamIsActive } from '@utils/Team';
-import { getAllUsersByTeam } from '@utils/Teams';
+import { getAllUsersFromTeam } from '@utils/Team/Users';
 import { isUserManager } from '@utils/Users/UserRoles';
 
 import { Category } from '@models/Category';
@@ -39,7 +39,7 @@ class CategoryController {
             });
         }
 
-        const usersInTeam = await getAllUsersByTeam({ team_id });
+        const usersInTeam = await getAllUsersFromTeam({ team_id });
 
         const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
 

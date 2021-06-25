@@ -1,16 +1,36 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import * as Yup from 'yup';
 import admin from 'firebase-admin';
+import { format } from 'date-fns';
+import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
 import { Batch } from '@models/Batch';
-import { Product } from '@models/Product';
-import UserDevice from '@models/UserDevice';
 
 import { getUserRole } from '@utils/Users/UserRoles';
-import { getAllUsersByTeam } from '@utils/Teams';
+import { getProductTeam } from '@utils/Product/Team';
+import { getAllUsersFromTeam } from '@utils/Team/Users';
+
+interface BaseMessage {
+    data?: {
+        [key: string]: string;
+    };
+    notification?: Notification;
+    android?: admin.messaging.AndroidConfig;
+    webpush?: admin.messaging.WebpushConfig;
+    apns?: admin.messaging.ApnsConfig;
+    fcmOptions?: admin.messaging.FcmOptions;
+}
+export interface TokenMessage extends BaseMessage {
+    token: string;
+}
+export interface TopicMessage extends BaseMessage {
+    topic: string;
+}
+export interface ConditionMessage extends BaseMessage {
+    condition: string;
+}
 
 class BatchNotificationController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -39,14 +59,11 @@ class BatchNotificationController {
         const { batch_id } = req.params;
 
         const batchRepository = getRepository(Batch);
-        const prodRepository = getRepository(Product);
-        const usersDevicesRepo = getRepository(UserDevice);
 
         const batch = await batchRepository
             .createQueryBuilder('batch')
             .leftJoinAndSelect('batch.product', 'product')
             .leftJoinAndSelect('product.team', 'prodTeams')
-            .leftJoinAndSelect('prodTeams.team', 'team')
             .where('batch.id = :batch_id', { batch_id })
             .getOne();
 
@@ -58,12 +75,11 @@ class BatchNotificationController {
             });
         }
 
-        // temp
-        const team_id = batch.product.team[0].team.id;
+        const team = await getProductTeam(batch.product);
 
         const userRole = await getUserRole({
             user_id: req.userId,
-            team_id,
+            team_id: team.id,
         });
 
         if (userRole !== 'Manager' && userRole !== 'Supervisor') {
@@ -74,28 +90,37 @@ class BatchNotificationController {
             });
         }
 
-        const usersInTeam = await getAllUsersByTeam({
-            team_id,
+        const usersInTeam = await getAllUsersFromTeam({
+            team_id: team.id,
+            includeDevices: true,
         });
-
-        const usersIds = usersInTeam.map(user => user.id);
-
-        const usersDevices = await usersDevicesRepo
-            .createQueryBuilder('device')
-            .where('device.user_id IN(:...usersIds)', { usersIds })
-            .getMany();
 
         const messaging = admin.messaging();
 
-        const messages = [];
+        const messages: TokenMessage[] = [];
 
-        messages.push({
-            notification: {
-                title: 'Check this product',
-                body: `${batch.name}`,
-            },
-            token: usersDevices[0].device_id,
+        const formatedDate = format(batch.exp_date, 'dd-MM-yyyy');
+
+        const messageString = `${batch.product.name} tem um lote que vence em ${formatedDate}`;
+
+        usersInTeam.forEach(user => {
+            if (user.id !== req.userId && !!user.device) {
+                messages.push({
+                    notification: {
+                        title: 'Verifique esse produto',
+                        body: messageString,
+                    },
+                    token: user.device,
+                });
+            }
         });
+
+        if (messages.length <= 0) {
+            throw new AppError({
+                message: 'There are no users to send',
+                statusCode: 400,
+            });
+        }
 
         await messaging.sendAll(messages);
 

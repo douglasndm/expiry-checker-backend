@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import AppError from '@errors/AppError';
 
 import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
-import { getAllUsersByTeam } from '@utils/Teams';
+import { getAllUsersFromTeam } from '@utils/Team/Users';
 import { sortProductsByBatchesExpDate } from '@utils/Products';
 
 import ProductTeams from '@models/ProductTeams';
@@ -55,7 +55,7 @@ class TeamController {
             });
         }
 
-        const usersInTeam = await getAllUsersByTeam({ team_id });
+        const usersInTeam = await getAllUsersFromTeam({ team_id });
 
         const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
 
