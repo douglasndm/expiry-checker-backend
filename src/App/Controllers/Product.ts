@@ -291,7 +291,7 @@ class ProductController {
             });
         }
 
-        await cache.invalidade(`products-from-teams:${product.team.id}`);
+        await cache.invalidade(`products-from-teams:${product.team.team.id}`);
 
         return res.status(200).json(updatedProduct);
     }
@@ -364,7 +364,7 @@ class ProductController {
 
         await productRepository.remove(prod);
 
-        await cache.invalidade(`products-from-teams:${prod.team.id}`);
+        await cache.invalidade(`products-from-teams:${prod.team.team.id}`);
 
         return res.status(204).send();
     }
