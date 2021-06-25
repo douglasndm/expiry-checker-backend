@@ -7,6 +7,7 @@ module.exports = {
         ['module-resolver', {
             alias: {
                 "@controllers": "./src/App/Controllers",
+                "@middlewares": "./src/App/Middlewares",
                 "@models": "./src/App/Models",
                 "@utils": "./src/Functions",
                 "@config": "./src/Config",

@@ -6,6 +6,7 @@ import AppError from '@errors/AppError';
 
 import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
 import { getAllUsersByTeam } from '@utils/Teams';
+import { sortProductsByBatchesExpDate } from '@utils/Products';
 
 import ProductTeams from '@models/ProductTeams';
 import UserRoles from '@models/UserRoles';
@@ -16,9 +17,30 @@ import Cache from '../../Services/Cache';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            team_id: Yup.string().required().uuid(),
+        });
+
+        const schemaQuerys = Yup.object().shape({
+            removeCheckedBatches: Yup.string(),
+            sortByBatches: Yup.string(),
+        });
+
+        try {
+            await schema.validate(req.params);
+            await schemaQuerys.validate(req.query);
+        } catch (err) {
+            throw new AppError({
+                message: err.message,
+                statusCode: 400,
+                internalErrorCode: 1,
+            });
+        }
+
         const cache = new Cache();
 
         const { team_id } = req.params;
+        const { removeCheckedBatches, sortByBatches } = req.query;
 
         const teamRepository = getRepository(Team);
         const productTeamsRepository = getRepository(ProductTeams);
@@ -52,7 +74,7 @@ class TeamController {
         if (!cachedProds) {
             const team = await teamRepository.findOne(team_id);
 
-            const products = await productTeamsRepository
+            const prodTeam = await productTeamsRepository
                 .createQueryBuilder('product_teams')
                 .select('product_teams.id')
                 .where('product_teams.team_id = :id', { id: team_id })
@@ -61,14 +83,33 @@ class TeamController {
                 .orderBy('batches.exp_date', 'ASC')
                 .getMany();
 
-            const productsWithoutId = products.map(p => p.product);
+            let products = prodTeam.map(p => p.product);
+
+            if (removeCheckedBatches) {
+                const checkedRemoved = products.map(prod => {
+                    const batches = prod.batches.filter(
+                        batch => batch.status !== 'checked',
+                    );
+
+                    return {
+                        ...prod,
+                        batches,
+                    };
+                });
+
+                products = checkedRemoved;
+            }
+
+            if (sortByBatches) {
+                products = sortProductsByBatchesExpDate(products);
+            }
 
             await cache.save(`products-from-teams:${team_id}`, {
                 team,
-                products: productsWithoutId,
+                products,
             });
 
-            return res.status(200).json({ team, products: productsWithoutId });
+            return res.status(200).json({ team, products });
         }
 
         return res.status(200).json(cachedProds);

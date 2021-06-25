@@ -4,7 +4,7 @@ import cors from 'cors';
 
 import rateLimiter from './App/Middlewares/RateLimiter';
 
-import Routes from './routes';
+import Routes from './Routes/index.routes';
 
 import './Functions/Auth/Firebase';
 
