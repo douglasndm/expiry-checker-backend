@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import User from '@controllers/User';
 import Product from '@controllers/Product';
-import Batch from '@controllers/Batch';
 import Category from '@controllers/Category';
 import UserManager from '@controllers/UserManager';
 import ProductCategory from '@controllers/ProductCategory';
@@ -12,6 +11,7 @@ import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
+import batchRoutes from './batch.routes';
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
 
@@ -35,10 +35,7 @@ routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
 
-routes.get('/batches/:batch_id', Batch.index);
-routes.post('/batches', Batch.store);
-routes.put('/batches/:batch_id', Batch.update);
-routes.delete('/batches/:batch_id', Batch.delete);
+routes.use('/batches', batchRoutes);
 
 routes.get('/categories/team/:team_id', Category.index);
 routes.post('/categories', Category.create);
