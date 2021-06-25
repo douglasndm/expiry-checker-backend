@@ -19,6 +19,7 @@ import {
 } from '@utils/Category/Products';
 import { sortBatchesByExpDate } from '@utils/Batches';
 import { getUserRole } from '@utils/Users/UserRoles';
+import { getProductTeam } from '@utils/Product/Team';
 
 import Cache from '../../Services/Cache';
 
@@ -291,7 +292,9 @@ class ProductController {
             });
         }
 
-        await cache.invalidade(`products-from-teams:${product.team.team.id}`);
+        const team = await getProductTeam(updatedProduct);
+
+        await cache.invalidade(`products-from-teams:${team.id}`);
 
         return res.status(200).json(updatedProduct);
     }
@@ -340,13 +343,15 @@ class ProductController {
             });
         }
 
+        const team = await getProductTeam(prod);
+
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: prod.id,
             user_id: req.userId,
         });
         const userRole = await getUserRole({
             user_id: req.userId,
-            team_id: prod.team.team.id,
+            team_id: team.id,
         });
 
         if (
@@ -364,7 +369,7 @@ class ProductController {
 
         await productRepository.remove(prod);
 
-        await cache.invalidade(`products-from-teams:${prod.team.team.id}`);
+        await cache.invalidade(`products-from-teams:${team.id}`);
 
         return res.status(204).send();
     }

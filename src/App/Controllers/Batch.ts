@@ -10,6 +10,7 @@ import { Batch } from '@models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getUserRole } from '@utils/Users/UserRoles';
+import { getProductTeam } from '@utils/Product/Team';
 
 import Cache from '../../Services/Cache';
 
@@ -143,7 +144,9 @@ class BatchController {
 
         const savedBatch = await batchReposity.save(batch);
 
-        await cache.invalidade(`products-from-teams:${product.team.team.id}`);
+        const team = await getProductTeam(product);
+
+        await cache.invalidade(`products-from-teams:${team.id}`);
 
         return res.status(200).json(savedBatch);
     }
@@ -186,10 +189,12 @@ class BatchController {
         const { name, exp_date, amount, price, status } = req.body;
 
         const batchReposity = getRepository(Batch);
-        const batch = await batchReposity.findOne({
-            where: { id: batch_id },
-            relations: ['product'],
-        });
+
+        const batch = await batchReposity
+            .createQueryBuilder('batch')
+            .leftJoinAndSelect('batch.product', 'product')
+            .where('batch.id = :batch_id', { batch_id })
+            .getOne();
 
         if (!batch) {
             throw new AppError({
@@ -223,9 +228,9 @@ class BatchController {
 
         const updatedBatch = await batchReposity.save(batch);
 
-        await cache.invalidade(
-            `products-from-teams:${batch.product.team.team.id}`,
-        );
+        const team = await getProductTeam(batch.product);
+
+        await cache.invalidade(`products-from-teams:${team.id}`);
 
         return res.status(200).json(updatedBatch);
     }
@@ -275,13 +280,15 @@ class BatchController {
             });
         }
 
+        const team = await getProductTeam(batch.product);
+
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch.product.id,
             user_id: req.userId,
         });
         const userRole = await getUserRole({
             user_id: req.userId,
-            team_id: batch.product.team.team.id,
+            team_id: team.id,
         });
 
         if (
@@ -299,9 +306,7 @@ class BatchController {
 
         await batchReposity.remove(batch);
 
-        await cache.invalidade(
-            `products-from-teams:${batch.product.team.team.id}`,
-        );
+        await cache.invalidade(`products-from-teams:${team.id}`);
 
         return res.status(204).send();
     }
