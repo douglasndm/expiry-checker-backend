@@ -18,11 +18,12 @@ import filesRoutes from './files.routes';
 const routes = Router();
 
 routes.post('/users', User.store);
-routes.post('/sessions', SessionController.store);
 
 // from now on all routes need authentication
 // routes.use(AuthMiddleware);
 routes.use(FirebaseAuth);
+
+routes.post('/sessions', SessionController.store);
 
 routes.get('/users/:id', User.index);
 

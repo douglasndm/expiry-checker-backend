@@ -1,11 +1,36 @@
 import { Request, Response } from 'express';
 import * as admin from 'firebase-admin';
 
+import { getUser, createUser } from '@utils/Users';
 import { addUserDevice } from '@utils/Users/Device';
+
 import AppError from '@errors/AppError';
 
 class SessionController {
     async store(req: Request, res: Response): Promise<Response> {
+        if (!req.userId || !req.userEmail) {
+            throw new AppError({
+                message: 'Provide the user id and email',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
+        }
+
+        const user = await getUser(req.userId);
+
+        if (!user) {
+            await createUser({
+                firebaseUid: req.userId,
+                email: req.userEmail,
+            });
+
+            throw new AppError({
+                message: 'User was not found',
+                statusCode: 400,
+                internalErrorCode: 7,
+            });
+        }
+
         if (!req.headers.deviceid) {
             throw new AppError({
                 message: 'Provide the device id',
