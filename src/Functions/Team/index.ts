@@ -6,7 +6,7 @@ import { Team } from '@models/Team';
 import AppError from '@errors/AppError';
 
 import { isUserManager } from '@utils/Users/UserRoles';
-import { getAllUsersByTeam } from '../Teams';
+import { getAllUsersFromTeam } from './Users';
 import { deleteAllProducts } from './Products';
 import {
     checkSubscriptionOnRevenueCat,
@@ -87,7 +87,7 @@ export async function checkMembersLimit({
     }
 
     if (compareAsc(startOfDay(new Date()), startOfDay(sub.expireIn)) <= 0) {
-        const users = await getAllUsersByTeam({ team_id });
+        const users = await getAllUsersFromTeam({ team_id });
 
         return {
             limit: sub.membersLimit,

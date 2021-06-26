@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { getAllUsersByTeam, UserResponse } from '@utils/Teams';
+import { getAllUsersFromTeam, UserResponse } from '@utils/Team/Users';
 
 import UserRoles from '@models/UserRoles';
 
@@ -22,7 +22,7 @@ class TeamUsersController {
 
         const { team_id } = req.params;
 
-        const usersInTeam = await getAllUsersByTeam({ team_id });
+        const usersInTeam = await getAllUsersFromTeam({ team_id });
 
         const isUserInTeam = usersInTeam.find(user => user.id === req.userId);
 

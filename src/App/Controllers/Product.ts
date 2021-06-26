@@ -11,7 +11,7 @@ import { Category } from '@models/Category';
 import { Batch } from '@models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
-import { getAllUsersByTeam } from '@utils/Teams';
+import { getAllUsersFromTeam } from '@utils/Team/Users';
 import { checkIfProductAlreadyExists } from '@utils/Products';
 import {
     addProductToCategory,
@@ -122,7 +122,7 @@ class ProductController {
 
         const { name, code, categories, team_id } = req.body;
 
-        const usersInTeam = await getAllUsersByTeam({ team_id });
+        const usersInTeam = await getAllUsersFromTeam({ team_id });
 
         const isUserInTeam = usersInTeam.filter(ut => ut.id === req.userId);
 
