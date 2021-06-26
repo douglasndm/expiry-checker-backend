@@ -1,18 +1,13 @@
-import 'reflect-metadata';
-import express from 'express';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import cors from 'cors';
-import dotenv from 'dotenv';
 
 import rateLimiter from './App/Middlewares/RateLimiter';
 import Routes from './Routes/index.routes';
 
 import './Functions/Auth/Firebase';
 
-dotenv.config();
-
-const App = express();
+import App from './start';
 
 Sentry.init({
     dsn: process.env.SENTRY_DSN,
@@ -30,7 +25,6 @@ App.use(Sentry.Handlers.tracingHandler());
 App.use(rateLimiter);
 
 App.use(cors());
-App.use(express.json());
 
 App.use(Routes);
 
