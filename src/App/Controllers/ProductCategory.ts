@@ -10,6 +10,7 @@ import { addProductToCategory } from '@utils/Category/Products';
 import { Category } from '@models/Category';
 import { Product } from '@models/Product';
 import ProductCategory from '@models/ProductCategory';
+import { getProductTeam } from '@utils/Product/Team';
 
 class ProductCategoryController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -53,8 +54,10 @@ class ProductCategoryController {
             return res.status(200).json({ category_name: '', products: [] });
         }
 
+        const team = await getProductTeam(productsInCategory[0].product);
+
         const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: productsInCategory[0].product.team.team.id,
+            team_id: team.id,
             user_id: req.userId,
         });
 
@@ -221,8 +224,11 @@ class ProductCategoryController {
                 internalErrorCode: 15,
             });
         }
+
+        const team = await getProductTeam(exists.product);
+
         const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: exists.product.team.team.id,
+            team_id: team.id,
             user_id: req.userId,
         });
 
