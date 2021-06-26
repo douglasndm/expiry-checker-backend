@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import redis from 'redis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
-import dotenv from 'dotenv';
 
 import AppError from '@errors/AppError';
-
-dotenv.config();
 
 const redisClient = redis.createClient({
     host: process.env.REDIS_HOST,

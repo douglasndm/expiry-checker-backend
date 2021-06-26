@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import * as Sentry from '@sentry/node';
 import 'express-async-errors';
 
 import AppError from '@errors/AppError';
@@ -8,6 +9,8 @@ import './Services/Database';
 
 const { PORT } = process.env;
 const { HOST } = process.env;
+
+App.use(Sentry.Handlers.errorHandler());
 
 App.use((err: Error, request: Request, response: Response, _: NextFunction) => {
     if (err instanceof AppError) {
