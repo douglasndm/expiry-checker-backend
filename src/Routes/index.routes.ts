@@ -47,7 +47,7 @@ routes.get('/categories/:category_id/products', ProductCategory.index);
 routes.post('/categories/:id', ProductCategory.create);
 routes.delete('/categories/product/:id', ProductCategory.delete);
 
-routes.use(teamRoutes);
+routes.use('/team/:team_id', teamRoutes);
 
 routes.use(filesRoutes);
 

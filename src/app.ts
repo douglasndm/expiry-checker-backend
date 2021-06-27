@@ -3,6 +3,7 @@ import * as Tracing from '@sentry/tracing';
 import cors from 'cors';
 
 import rateLimiter from './App/Middlewares/RateLimiter';
+
 import Routes from './Routes/index.routes';
 
 import './Functions/Auth/Firebase';
