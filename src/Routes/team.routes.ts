@@ -9,8 +9,6 @@ import { checkTeamId } from '@middlewares/TeamChecker';
 
 const routes = Router({ mergeParams: true });
 
-routes.post('', Team.store);
-
 routes.use(checkTeamId);
 
 routes.put('', Team.update);
