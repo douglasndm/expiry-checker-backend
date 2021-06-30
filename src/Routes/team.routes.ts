@@ -4,8 +4,10 @@ import Team from '@controllers/Team';
 import TeamUsers from '@controllers/TeamUsers';
 import TeamSubscriptions from '@controllers/TeamSubscription';
 import Subscription from '@controllers/Subscription';
+import UserManager from '@controllers/UserManager';
 
 import { checkTeamId } from '@middlewares/TeamChecker';
+import ManagerChecker from '@middlewares/ManagerChecker';
 
 const routes = Router({ mergeParams: true });
 
@@ -22,5 +24,11 @@ routes.get('/subscriptions', TeamSubscriptions.index);
 routes.get('/subscriptions/check', Subscription.check);
 
 routes.get('/subscriptions/recheck', Subscription.recheck);
+
+// From now one all routes will check if user is a manager
+routes.use(ManagerChecker);
+routes.post('/manager/user', UserManager.create);
+routes.put('/manager/user', UserManager.update);
+routes.delete('/manager/user/:user_id', UserManager.delete);
 
 export default routes;

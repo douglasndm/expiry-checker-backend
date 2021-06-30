@@ -1,27 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
-import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import UserRoles from '../Models/UserRoles';
+import UserRoles from '@models/UserRoles';
 
 async function CheckIfUserIsManager(
     req: Request,
     res: Response,
     next: NextFunction,
-): Promise<void | Response> {
-    const schema = Yup.object().shape({
-        team_id: Yup.string().required().uuid(),
-    });
-
-    if (!(await schema.isValid(req.params))) {
-        throw new AppError({
-            message: 'Provider the team id',
-            statusCode: 401,
-        });
-    }
-
+): Promise<void> {
     const { team_id } = req.params;
 
     const userRolesRepository = getRepository(UserRoles);
@@ -33,9 +21,11 @@ async function CheckIfUserIsManager(
     });
 
     if (user?.role.toLocaleLowerCase() !== 'manager') {
-        return res
-            .status(401)
-            .json({ error: 'You dont have permission to be here' });
+        throw new AppError({
+            message: '',
+            statusCode: 401,
+            internalErrorCode: 2,
+        });
     }
 
     return next();

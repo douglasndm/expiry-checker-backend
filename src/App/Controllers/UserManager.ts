@@ -12,16 +12,11 @@ import { checkMembersLimit } from '../../Functions/Team';
 
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
         const schemaBody = Yup.object().shape({
             email: Yup.string().required().email(),
         });
 
         try {
-            await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
             throw new AppError({ message: err.message });
@@ -59,6 +54,7 @@ class UserManagerController {
             throw new AppError({
                 message: 'User or team was not found',
                 statusCode: 400,
+                internalErrorCode: 18,
             });
         }
 
@@ -70,6 +66,7 @@ class UserManagerController {
             throw new AppError({
                 message: 'Team has reach the limit of members',
                 statusCode: 401,
+                internalErrorCode: 16,
             });
         }
 
@@ -86,17 +83,12 @@ class UserManagerController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
         const schemaBody = Yup.object().shape({
             user_id: Yup.string().required(),
             role: Yup.string(),
         });
 
         try {
-            await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
             throw new AppError({ message: err.message });
@@ -141,6 +133,7 @@ class UserManagerController {
             throw new AppError({
                 message: 'User in team was not found',
                 statusCode: 400,
+                internalErrorCode: 17,
             });
         }
 
@@ -153,9 +146,6 @@ class UserManagerController {
 
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            team_id: Yup.string()
-                .required('Provide the team id')
-                .uuid('Team ID is not valid'),
             user_id: Yup.string().required('Provide the user id'),
         });
 
@@ -188,12 +178,13 @@ class UserManagerController {
             throw new AppError({
                 message: 'User is not in team',
                 statusCode: 400,
+                internalErrorCode: 17,
             });
         }
 
         await repository.remove(role);
 
-        return res.status(200).json({ success: true });
+        return res.status(204).send();
     }
 }
 
