@@ -23,12 +23,6 @@ class SessionController {
                 firebaseUid: req.userId,
                 email: req.userEmail,
             });
-
-            throw new AppError({
-                message: 'User was not found',
-                statusCode: 400,
-                internalErrorCode: 7,
-            });
         }
 
         if (!req.headers.deviceid) {
