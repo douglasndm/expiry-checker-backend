@@ -3,14 +3,12 @@ import { Router } from 'express';
 import User from '@controllers/User';
 import Product from '@controllers/Product';
 import Category from '@controllers/Category';
-import UserManager from '@controllers/UserManager';
 import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
 
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
-import ManagerChecker from '@middlewares/ManagerChecker';
 
 import batchRoutes from './batch.routes';
 import teamRoutes from './team.routes';
@@ -52,15 +50,5 @@ routes.post('/team', Team.store);
 routes.use('/team/:team_id', teamRoutes);
 
 routes.use(filesRoutes);
-
-// From now one all routes will check if user is a manager
-
-routes.post('/team/:team_id/manager/user', ManagerChecker, UserManager.create);
-routes.put('/team/:team_id/manager/user', ManagerChecker, UserManager.update);
-routes.delete(
-    '/team/:team_id/manager/user/:user_id',
-    ManagerChecker,
-    UserManager.delete,
-);
 
 export default routes;

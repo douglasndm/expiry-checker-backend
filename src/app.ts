@@ -18,7 +18,7 @@ Sentry.init({
             app: App,
         }),
     ],
-    tracesSampleRate: 1.0,
+    tracesSampleRate: 0.5,
 });
 App.use(Sentry.Handlers.requestHandler());
 App.use(Sentry.Handlers.tracingHandler());
