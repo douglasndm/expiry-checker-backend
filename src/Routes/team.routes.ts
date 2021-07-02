@@ -6,12 +6,13 @@ import TeamSubscriptions from '@controllers/TeamSubscription';
 import Subscription from '@controllers/Subscription';
 import UserManager from '@controllers/UserManager';
 
-import { checkTeamId } from '@middlewares/TeamChecker';
+import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
 const routes = Router({ mergeParams: true });
 
 routes.use(checkTeamId);
+routes.use(checkIfUserIsPending);
 
 routes.put('', Team.update);
 routes.delete('', Team.delete);
