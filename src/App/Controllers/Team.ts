@@ -166,6 +166,17 @@ class TeamController {
             .where('user.firebaseUid = :user_id', { user_id: req.userId })
             .getMany();
 
+        const alreadyManager = userTeams.filter(
+            ur => ur.role.toLowerCase() === 'manager',
+        );
+
+        if (alreadyManager.length > 0) {
+            throw new AppError({
+                message: 'You are already a manager from another team',
+                statusCode: 400,
+            });
+        }
+
         const existsName = userTeams.filter(
             ur => ur.team.name.toLowerCase() === String(name).toLowerCase(),
         );
