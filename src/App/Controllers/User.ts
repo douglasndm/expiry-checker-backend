@@ -11,13 +11,19 @@ import { createUser, deleteUser } from '@utils/Users';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
-        const { id } = req.params;
+        if (!req.userId) {
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 1,
+            });
+        }
 
         const repository = getRepository(User);
 
         const user = await repository
             .createQueryBuilder('user')
-            .where('user.firebaseUid = :id', { id })
+            .where('user.firebaseUid = :id', { id: req.userId })
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('roles.team', 'team')
             .leftJoinAndSelect('team.subscriptions', 'subscriptions')
@@ -68,7 +74,7 @@ class UserController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            throw new AppError({ message: err.message, internalErrorCode: 1 });
         }
 
         const { firebaseUid, email } = req.body;
