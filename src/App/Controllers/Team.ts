@@ -159,14 +159,16 @@ class TeamController {
         }
 
         // Check if user already has a team with the same name
-        const userTeams = await userRolesRepository.find({
-            where: {
-                user: { id: req.userId },
-            },
-            relations: ['team'],
-        });
+        const userTeams = await userRolesRepository
+            .createQueryBuilder('userTeams')
+            .leftJoinAndSelect('userTeams.team', 'team')
+            .leftJoinAndSelect('userTeams.user', 'user')
+            .where('user.firebaseUid = :user_id', { user_id: req.userId })
+            .getMany();
 
-        const existsName = userTeams.filter(ur => ur.team.name === name);
+        const existsName = userTeams.filter(
+            ur => ur.team.name.toLowerCase() === String(name).toLowerCase(),
+        );
 
         if (existsName.length > 0) {
             throw new AppError({
