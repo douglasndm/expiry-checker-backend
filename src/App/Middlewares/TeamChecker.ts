@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
+import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
+
+import UserRoles from '@models/UserRoles';
 
 export async function checkTeamId(
     req: Request,
@@ -19,6 +22,50 @@ export async function checkTeamId(
             message: err.message,
             statusCode: 400,
             internalErrorCode: 1,
+        });
+    }
+
+    return next();
+}
+
+export async function checkIfUserIsPending(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): Promise<void> {
+    if (!req.userId) {
+        throw new AppError({
+            message: 'Provider the user id',
+            statusCode: 401,
+            internalErrorCode: 2,
+        });
+    }
+
+    const userRolesRepo = getRepository(UserRoles);
+
+    const { team_id } = req.params;
+
+    const userInTeam = await userRolesRepo
+        .createQueryBuilder('userRole')
+        .leftJoinAndSelect('userRole.team', 'team')
+        .leftJoinAndSelect('userRole.user', 'user')
+        .where('user.firebaseUid = :user_id', { user_id: req.userId })
+        .andWhere('team.id = :team_id', { team_id })
+        .getOne();
+
+    if (!userInTeam) {
+        throw new AppError({
+            message: 'User is not in team',
+            statusCode: 401,
+            internalErrorCode: 17,
+        });
+    }
+
+    if (userInTeam.status && userInTeam.status.toLowerCase() !== 'completed') {
+        throw new AppError({
+            message: 'User is still pending to enter the team',
+            statusCode: 401,
+            internalErrorCode: 19,
         });
     }
 

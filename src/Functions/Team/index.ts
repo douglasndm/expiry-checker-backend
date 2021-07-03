@@ -38,7 +38,9 @@ export async function checkIfTeamIsActive({
         !team.lastTimeChecked ||
         compareAsc(today, team.lastTimeChecked) === 1
     ) {
-        console.log('Checking subscription with Revenuecat');
+        console.log(
+            `Checking subscription with Revenuecat for team -> ${team.name}(${team_id})`,
+        );
         const revenuecat = await checkSubscriptionOnRevenueCat(team.id);
         await checkSubscriptions({
             team_id,

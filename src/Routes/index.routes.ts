@@ -24,9 +24,12 @@ routes.use(FirebaseAuth);
 
 routes.post('/sessions', SessionController.store);
 
-routes.get('/users/:id', User.index);
-
 routes.use(DeviceChecker);
+
+// temp route for old app version
+routes.get('/users/:user_id', User.index);
+// end temp route
+routes.get('/users', User.index);
 
 routes.delete('/users', User.delete);
 

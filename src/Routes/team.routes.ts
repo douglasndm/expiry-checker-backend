@@ -6,19 +6,21 @@ import TeamSubscriptions from '@controllers/TeamSubscription';
 import Subscription from '@controllers/Subscription';
 import UserManager from '@controllers/UserManager';
 
-import { checkTeamId } from '@middlewares/TeamChecker';
+import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
 const routes = Router({ mergeParams: true });
 
 routes.use(checkTeamId);
 
+routes.post('/join', TeamUsers.store);
+
+routes.use(checkIfUserIsPending);
+
 routes.put('', Team.update);
 routes.delete('', Team.delete);
 routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
-
-routes.post('/join', TeamUsers.store);
 
 routes.get('/subscriptions', TeamSubscriptions.index);
 routes.get('/subscriptions/check', Subscription.check);

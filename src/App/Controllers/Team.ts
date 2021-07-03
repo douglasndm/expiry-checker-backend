@@ -159,14 +159,27 @@ class TeamController {
         }
 
         // Check if user already has a team with the same name
-        const userTeams = await userRolesRepository.find({
-            where: {
-                user: { id: req.userId },
-            },
-            relations: ['team'],
-        });
+        const userTeams = await userRolesRepository
+            .createQueryBuilder('userTeams')
+            .leftJoinAndSelect('userTeams.team', 'team')
+            .leftJoinAndSelect('userTeams.user', 'user')
+            .where('user.firebaseUid = :user_id', { user_id: req.userId })
+            .getMany();
 
-        const existsName = userTeams.filter(ur => ur.team.name === name);
+        const alreadyManager = userTeams.filter(
+            ur => ur.role.toLowerCase() === 'manager',
+        );
+
+        if (alreadyManager.length > 0) {
+            throw new AppError({
+                message: 'You are already a manager from another team',
+                statusCode: 400,
+            });
+        }
+
+        const existsName = userTeams.filter(
+            ur => ur.team.name.toLowerCase() === String(name).toLowerCase(),
+        );
 
         if (existsName.length > 0) {
             throw new AppError({
