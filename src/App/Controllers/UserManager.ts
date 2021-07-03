@@ -91,17 +91,26 @@ class UserManagerController {
         try {
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            throw new AppError({ message: err.message, internalErrorCode: 1 });
         }
 
         const { team_id } = req.params;
         const { user_id, role } = req.body;
 
-        if (role.toLowerCase() !== 'manager') {
-            if (role.toLowerCase() !== 'supervisor') {
-                if (role.toLowerCase() !== 'repositor') {
-                    throw new AppError({ message: 'Role is invalid' });
-                }
+        if (role.toLowerCase() === 'manager') {
+            throw new AppError({
+                message: "You can't put another manager on team",
+                statusCode: 400,
+                internalErrorCode: 20,
+            });
+        }
+
+        if (role.toLowerCase() !== 'supervisor') {
+            if (role.toLowerCase() !== 'repositor') {
+                throw new AppError({
+                    message: 'Role is invalid',
+                    internalErrorCode: 21,
+                });
             }
         }
 
@@ -118,6 +127,7 @@ class UserManagerController {
             throw new AppError({
                 message: 'You dont have authorization to do that',
                 statusCode: 401,
+                internalErrorCode: 2,
             });
         }
 
