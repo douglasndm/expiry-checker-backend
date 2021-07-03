@@ -61,7 +61,7 @@ export async function checkIfUserIsPending(
         });
     }
 
-    if (userInTeam.status.toLowerCase() !== 'completed') {
+    if (userInTeam.status && userInTeam.status.toLowerCase() !== 'completed') {
         throw new AppError({
             message: 'User is still pending to enter the team',
             statusCode: 401,
