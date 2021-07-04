@@ -6,6 +6,7 @@ import Category from '@controllers/Category';
 import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
+import UserTeams from '@controllers/UserTeams';
 
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
@@ -32,6 +33,8 @@ routes.get('/users/:user_id', User.index);
 routes.get('/users', User.index);
 
 routes.delete('/users', User.delete);
+
+routes.get('/user/teams', UserTeams.index);
 
 routes.get('/products/:product_id', Product.index);
 routes.post('/products', Product.create);
