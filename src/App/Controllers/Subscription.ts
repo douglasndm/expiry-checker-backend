@@ -1,3 +1,4 @@
+import { recheck } from '@utils/Team/Subscription';
 import { Request, Response } from 'express';
 
 import {
@@ -28,53 +29,9 @@ class SubscriptionController {
     async recheck(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
 
-        const response = await checkSubscriptionOnRevenueCat(team_id);
-        const { subscriptions } = response.subscriber;
+        const subs = await recheck({ team_id });
 
-        interface Subs {
-            name: string;
-            subscription: RevenueCatSubscription;
-        }
-
-        const allSubscription: Array<Subs> = [];
-
-        if (subscriptions.expirybusiness_monthly_default_15people) {
-            allSubscription.push({
-                name: 'expirybusiness_monthly_default_15people',
-                subscription:
-                    subscriptions.expirybusiness_monthly_default_15people,
-            });
-        }
-        if (subscriptions.expirybusiness_monthly_default_10people) {
-            allSubscription.push({
-                name: 'expirybusiness_monthly_default_10people',
-                subscription:
-                    subscriptions.expirybusiness_monthly_default_10people,
-            });
-        }
-        if (subscriptions.expirybusiness_monthly_default_5people) {
-            allSubscription.push({
-                name: 'expirybusiness_monthly_default_5people',
-                subscription:
-                    subscriptions.expirybusiness_monthly_default_5people,
-            });
-        }
-        if (subscriptions.expirybusiness_monthly_default_3people) {
-            allSubscription.push({
-                name: 'expirybusiness_monthly_default_3people',
-                subscription:
-                    subscriptions.expirybusiness_monthly_default_3people,
-            });
-        }
-        if (subscriptions.expirybusiness_monthly_default_1person) {
-            allSubscription.push({
-                name: 'expirybusiness_monthly_default_1person',
-                subscription:
-                    subscriptions.expirybusiness_monthly_default_1person,
-            });
-        }
-
-        return res.status(200).json(allSubscription);
+        return res.status(200).json(subs);
     }
 }
 
