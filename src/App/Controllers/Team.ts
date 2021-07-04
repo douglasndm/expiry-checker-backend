@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import AppError from '@errors/AppError';
 
 import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
+import { deleteAllProducts } from '@utils/Team/Products';
 import { getAllUsersFromTeam } from '@utils/Team/Users';
 import { sortProductsByBatchesExpDate } from '@utils/Products';
 
@@ -287,18 +288,6 @@ class TeamController {
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string()
-                .required('Team ID is required')
-                .uuid('Team ID is not valid'),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            throw new AppError({ message: err.message });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -309,6 +298,7 @@ class TeamController {
 
         const { team_id } = req.params;
 
+        await deleteAllProducts({ team_id });
         await deleteTeam({ team_id, user_id: req.userId });
 
         return res.status(204).send();
