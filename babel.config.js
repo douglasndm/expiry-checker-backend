@@ -11,6 +11,7 @@ module.exports = {
                 "@models": "./src/App/Models",
                 "@utils": "./src/Functions",
                 "@config": "./src/Config",
+                "@services": "./src/Services",
                 "@errors": "./src/Errors"
             }
         }],

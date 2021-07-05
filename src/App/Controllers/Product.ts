@@ -8,7 +8,6 @@ import { Product } from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
 import { Team } from '@models/Team';
 import { Category } from '@models/Category';
-import { Batch } from '@models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getAllUsersFromTeam } from '@utils/Team/Users';
@@ -17,10 +16,10 @@ import {
     addProductToCategory,
     removeAllCategoriesFromProduct,
 } from '@utils/Category/Products';
-import { sortBatchesByExpDate } from '@utils/Batches';
 import { getUserRole } from '@utils/Users/UserRoles';
 import { getProductTeam } from '@utils/Product/Team';
 
+import { getProduct } from '@utils/Product';
 import Cache from '../../Services/Cache';
 
 class ProductController {
@@ -62,34 +61,9 @@ class ProductController {
             });
         }
 
-        const reposity = getRepository(Product);
+        const product = await getProduct({ product_id });
 
-        const product = await reposity
-            .createQueryBuilder('product')
-            .where('product.id = :product_id', { product_id })
-            .leftJoinAndSelect('product.categories', 'categories')
-            .leftJoinAndSelect('product.batches', 'batches')
-            .leftJoinAndSelect('categories.category', 'category')
-            .getOne();
-
-        const categories = product?.categories.map(cat => ({
-            id: cat.category.id,
-            name: cat.category.name,
-        }));
-
-        let batches: Array<Batch> = [];
-
-        if (product?.batches) {
-            batches = sortBatchesByExpDate(product.batches);
-        }
-
-        const organizedProduct = {
-            ...product,
-            categories,
-            batches,
-        };
-
-        return res.status(200).json(organizedProduct);
+        return res.status(200).json(product);
     }
 
     async create(req: Request, res: Response): Promise<Response> {
