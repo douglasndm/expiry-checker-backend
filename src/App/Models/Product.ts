@@ -20,7 +20,7 @@ export default class Product {
     name: string;
 
     @Column('varchar')
-    code: string;
+    code: string | null;
 
     @OneToMany(
         type => ProductCategory,
