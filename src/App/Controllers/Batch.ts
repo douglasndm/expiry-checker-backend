@@ -147,7 +147,7 @@ class BatchController {
         const team = await getProductTeam(product);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${product_id}`);
+        await cache.invalidade(`product:${team.id}:${product_id}`);
 
         return res.status(200).json(savedBatch);
     }
@@ -232,7 +232,7 @@ class BatchController {
         const team = await getProductTeam(batch.product);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${batch.product.id}`);
+        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
         return res.status(200).json(updatedBatch);
     }
@@ -309,7 +309,7 @@ class BatchController {
         await batchReposity.remove(batch);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${batch.product.id}`);
+        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
         return res.status(204).send();
     }

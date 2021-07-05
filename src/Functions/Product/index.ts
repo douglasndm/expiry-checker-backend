@@ -17,17 +17,24 @@ import AppError from '@errors/AppError';
 
 interface getProductProps {
     product_id: string;
+    team_id?: string;
 }
 
 export async function getProduct({
     product_id,
+    team_id,
 }: getProductProps): Promise<Product> {
     const cache = new Cache();
+    // We use team id cause when product is in a category and user remove it ou add it into a category
+    // all products with that team id will be removed from cache
+    if (team_id) {
+        const cachedProd = await cache.get<Product>(
+            `product:${team_id}:${product_id}`,
+        );
 
-    const cachedProd = await cache.get<Product>(`product:${product_id}`);
-
-    if (cachedProd) {
-        return cachedProd;
+        if (cachedProd) {
+            return cachedProd;
+        }
     }
 
     const reposity = getRepository(Product);
@@ -63,7 +70,9 @@ export async function getProduct({
         batches,
     };
 
-    await cache.save(`product:${product_id}`, organizedProduct);
+    if (team_id) {
+        await cache.save(`product:${team_id}:${product_id}`, organizedProduct);
+    }
 
     return organizedProduct;
 }

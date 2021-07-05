@@ -50,7 +50,7 @@ class ProductController {
             user_id: req.userId,
         });
 
-        if (!userHasAccessToProduct) {
+        if (!userHasAccessToProduct.hasAccess) {
             throw new AppError({
                 message: "You don't have authorization to be here",
                 statusCode: 401,
@@ -58,7 +58,10 @@ class ProductController {
             });
         }
 
-        const product = await getProduct({ product_id });
+        const product = await getProduct({
+            product_id,
+            team_id: userHasAccessToProduct.team?.id,
+        });
 
         return res.status(200).json(product);
     }
@@ -120,7 +123,7 @@ class ProductController {
 
         const schema = Yup.object().shape({
             name: Yup.string(),
-            code: Yup.string(),
+            code: Yup.string().nullable(),
             categories: Yup.array().of(Yup.string()),
         });
 
@@ -207,7 +210,7 @@ class ProductController {
         const team = await getProductTeam(updatedProduct);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${updatedProduct.id}`);
+        await cache.invalidade(`product:${team.id}:${updatedProduct.id}`);
 
         return res.status(200).json(updatedProduct);
     }
@@ -281,7 +284,7 @@ class ProductController {
         }
 
         await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${prod.id}`);
+        await cache.invalidade(`product:${team.id}:${prod.id}`);
 
         await productRepository.remove(prod);
 

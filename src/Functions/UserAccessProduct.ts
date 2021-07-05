@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 
 import AppError from '@errors/AppError';
 
-import UserTeam from '@models/UserRoles';
+import Team from '@models/Team';
 import ProductTeam from '@models/ProductTeams';
 
 import { checkIfUserHasAccessToTeam } from './Security/UserAccessTeam';
@@ -12,21 +12,16 @@ interface checkIfUserHasAccessToAProductProps {
     user_id: string;
 }
 
+interface checkIfUserHasAccessToAProductResponse {
+    team?: Team;
+    hasAccess: boolean;
+}
+
 export async function checkIfUserHasAccessToAProduct({
     user_id,
     product_id,
-}: checkIfUserHasAccessToAProductProps): Promise<boolean> {
-    const userTeamRepository = getRepository(UserTeam);
+}: checkIfUserHasAccessToAProductProps): Promise<checkIfUserHasAccessToAProductResponse> {
     const productTeamRepository = getRepository(ProductTeam);
-
-    const userTeams = await userTeamRepository.find({
-        where: {
-            user: {
-                firebaseUid: user_id,
-            },
-        },
-        relations: ['team'],
-    });
 
     const productTeam = await productTeamRepository
         .createQueryBuilder('prodTeam')
@@ -42,24 +37,19 @@ export async function checkIfUserHasAccessToAProduct({
         });
     }
 
-    const checkTeamAccess = await checkIfUserHasAccessToTeam({
+    const userHasAccess = await checkIfUserHasAccessToTeam({
         user_id,
-        team_id: productTeam?.team.id,
+        team_id: productTeam.team.id,
     });
 
-    if (!checkTeamAccess) {
-        throw new AppError({
-            message: "User doesn't have access to the team",
-            statusCode: 401,
-        });
+    if (userHasAccess) {
+        return {
+            team: productTeam.team,
+            hasAccess: true,
+        };
     }
 
-    const hasAccessToProduct = userTeams.filter(
-        userTeam => userTeam.team.id === productTeam?.team.id,
-    );
-
-    if (hasAccessToProduct.length > 0) {
-        return true;
-    }
-    return false;
+    return {
+        hasAccess: false,
+    };
 }
