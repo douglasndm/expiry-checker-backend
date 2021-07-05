@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
 import ProductTeams from '@models/ProductTeams';
-import { Product } from '@models/Product';
+import Product from '@models/Product';
 
 interface deleteAllProductsProps {
     team_id: string;

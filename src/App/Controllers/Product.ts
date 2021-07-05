@@ -4,10 +4,10 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { Product } from '@models/Product';
+import Product from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
-import { Team } from '@models/Team';
-import { Category } from '@models/Category';
+import Team from '@models/Team';
+import Category from '@models/Category';
 
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getAllUsersFromTeam } from '@utils/Team/Users';

@@ -4,11 +4,11 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import UserRoles from '../Models/UserRoles';
-import { Team } from '../Models/Team';
-import User from '../Models/User';
+import UserRoles from '@models/UserRoles';
+import Team from '@models/Team';
+import User from '@models/User';
 
-import { checkMembersLimit } from '../../Functions/Team';
+import { checkMembersLimit } from '@utils/Team';
 
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {

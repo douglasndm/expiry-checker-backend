@@ -3,11 +3,11 @@ import { startOfDay, parseISO } from 'date-fns';
 
 import AppError from '@errors/AppError';
 
-import { Product } from '@models/Product';
-import { Batch } from '@models/Batch';
-import { Team } from '@models/Team';
+import Product from '@models/Product';
+import Batch from '@models/Batch';
+import Team from '@models/Team';
 import ProductTeams from '@models/ProductTeams';
-import { Category } from '@models/Category';
+import Category from '@models/Category';
 import ProductCategory from '@models/ProductCategory';
 
 import { OldToNewCategories } from './Categories';

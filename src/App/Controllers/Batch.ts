@@ -5,8 +5,8 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { Product } from '@models/Product';
-import { Batch } from '@models/Batch';
+import Product from '@models/Product';
+import Batch from '@models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getUserRole } from '@utils/Users/UserRoles';

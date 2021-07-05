@@ -4,7 +4,7 @@ import { startOfDay, parseISO, compareAsc } from 'date-fns';
 
 import AppError from '@errors/AppError';
 
-import { Team } from '@models/Team';
+import Team from '@models/Team';
 import TeamSubscription from '@models/TeamSubscription';
 
 interface getTeamSubscriptionProps {

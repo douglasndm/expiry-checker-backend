@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { compareAsc, startOfDay } from 'date-fns';
 
 import ProductTeams from '@models/ProductTeams';
-import { Product } from '@models/Product';
+import Product from '@models/Product';
 
 import { sortBatchesByExpDate } from './Batches';
 

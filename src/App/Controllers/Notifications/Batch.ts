@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { Batch } from '@models/Batch';
+import Batch from '@models/Batch';
 
 import { getUserRole } from '@utils/Users/UserRoles';
 import { getProductTeam } from '@utils/Product/Team';

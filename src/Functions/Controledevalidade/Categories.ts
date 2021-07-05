@@ -2,8 +2,8 @@ import { getRepository } from 'typeorm';
 
 import AppError from '@errors/AppError';
 
-import { Category } from '@models/Category';
-import { Team } from '@models/Team';
+import Category from '@models/Category';
+import Team from '@models/Team';
 
 interface saveManyCategoriesProps {
     categories: Array<CVCategory>;

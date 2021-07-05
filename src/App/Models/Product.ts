@@ -7,12 +7,12 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import { Batch } from './Batch';
+import Batch from './Batch';
 import ProductTeams from './ProductTeams';
 import ProductCategory from './ProductCategory';
 
 @Entity({ name: 'products' })
-export class Product {
+export default class Product {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

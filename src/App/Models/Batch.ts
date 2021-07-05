@@ -8,10 +8,10 @@ import {
     JoinColumn,
 } from 'typeorm';
 
-import { Product } from './Product';
+import Product from './Product';
 
 @Entity({ name: 'batches' })
-export class Batch {
+export default class Batch {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

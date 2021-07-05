@@ -7,8 +7,8 @@ import AppError from '@errors/AppError';
 import { checkIfUserHasAccessToTeam } from '@utils/Security/UserAccessTeam';
 import { addProductToCategory } from '@utils/Category/Products';
 
-import { Category } from '@models/Category';
-import { Product } from '@models/Product';
+import Category from '@models/Category';
+import Product from '@models/Product';
 import ProductCategory from '@models/ProductCategory';
 import { getProductTeam } from '@utils/Product/Team';
 

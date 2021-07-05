@@ -12,7 +12,7 @@ import { sortProductsByBatchesExpDate } from '@utils/Products';
 import ProductTeams from '@models/ProductTeams';
 import UserRoles from '@models/UserRoles';
 import User from '@models/User';
-import { Team } from '@models/Team';
+import Team from '@models/Team';
 
 import Cache from '../../Services/Cache';
 

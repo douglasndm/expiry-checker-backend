@@ -7,13 +7,13 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import { Category } from './Category';
+import Category from './Category';
 import ProductTeams from './ProductTeams';
 import TeamSubscription from './TeamSubscription';
 import UserRoles from './UserRoles';
 
 @Entity({ name: 'teams' })
-export class Team {
+export default class Team {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

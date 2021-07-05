@@ -4,8 +4,8 @@ import Cache from '@services/Cache';
 
 import { sortBatchesByExpDate } from '@utils/Batches';
 
-import { Product } from '@models/Product';
-import { Batch } from '@models/Batch';
+import Product from '@models/Product';
+import Batch from '@models/Batch';
 import ProductCategory from '@models/ProductCategory';
 
 import AppError from '@errors/AppError';

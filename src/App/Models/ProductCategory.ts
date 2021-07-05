@@ -6,9 +6,9 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Category } from './Category';
+import Category from './Category';
 
-import { Product } from './Product';
+import Product from './Product';
 
 @Entity('product_category')
 class ProductCategory {

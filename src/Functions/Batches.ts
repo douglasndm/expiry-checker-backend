@@ -1,4 +1,4 @@
-import { Batch } from '../App/Models/Batch';
+import Batch from '@models/Batch';
 
 export function sortBatchesByExpDate(batches: Array<Batch>): Array<Batch> {
     if (batches.length > 1) {
