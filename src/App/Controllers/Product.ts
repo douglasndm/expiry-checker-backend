@@ -171,6 +171,7 @@ class ProductController {
         }
 
         await cache.invalidade(`products-from-teams:${team_id}`);
+        await cache.invalidade(`product:${prod.id}`);
 
         return res.status(201).json(savedProd);
     }
@@ -269,6 +270,7 @@ class ProductController {
         const team = await getProductTeam(updatedProduct);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`product:${updatedProduct.id}`);
 
         return res.status(200).json(updatedProduct);
     }
@@ -341,9 +343,10 @@ class ProductController {
             });
         }
 
-        await productRepository.remove(prod);
-
         await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`product:${prod.id}`);
+
+        await productRepository.remove(prod);
 
         return res.status(204).send();
     }
