@@ -63,7 +63,12 @@ class ProductController {
             team_id: userHasAccessToProduct.team?.id,
         });
 
-        return res.status(200).json(product);
+        const productWithFixCat = {
+            ...product,
+            categories: product.categories.map(cat => cat.category),
+        };
+
+        return res.status(200).json(productWithFixCat);
     }
 
     async create(req: Request, res: Response): Promise<Response> {
