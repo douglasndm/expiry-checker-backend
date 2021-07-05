@@ -6,11 +6,13 @@ import AppError from '@errors/AppError';
 
 import { checkIfUserHasAccessToTeam } from '@utils/Security/UserAccessTeam';
 import { addProductToCategory } from '@utils/Category/Products';
-
-import { Category } from '@models/Category';
-import { Product } from '@models/Product';
-import ProductCategory from '@models/ProductCategory';
 import { getProductTeam } from '@utils/Product/Team';
+
+import Category from '@models/Category';
+import Product from '@models/Product';
+import ProductCategory from '@models/ProductCategory';
+
+import Cache from '@services/Cache';
 
 class ProductCategoryController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -171,6 +173,8 @@ class ProductCategoryController {
             category,
             product_id,
         });
+        const cache = new Cache();
+        await cache.invalidadePrefix(`product:${category.team.id}`);
 
         return res.status(200).json(savedProductCategory);
     }
@@ -239,6 +243,10 @@ class ProductCategoryController {
                 internalErrorCode: 2,
             });
         }
+
+        // This remove all products from team from cache cause categories could be changed
+        const cache = new Cache();
+        await cache.invalidadePrefix(`product:${team.id}`);
 
         await repository.remove(exists);
 

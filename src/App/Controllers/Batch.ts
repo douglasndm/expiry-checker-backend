@@ -5,8 +5,8 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { Product } from '@models/Product';
-import { Batch } from '@models/Batch';
+import Product from '@models/Product';
+import Batch from '@models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
 import { getUserRole } from '@utils/Users/UserRoles';
@@ -147,6 +147,7 @@ class BatchController {
         const team = await getProductTeam(product);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`product:${team.id}:${product_id}`);
 
         return res.status(200).json(savedBatch);
     }
@@ -231,6 +232,7 @@ class BatchController {
         const team = await getProductTeam(batch.product);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
         return res.status(200).json(updatedBatch);
     }
@@ -307,6 +309,7 @@ class BatchController {
         await batchReposity.remove(batch);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
         return res.status(204).send();
     }

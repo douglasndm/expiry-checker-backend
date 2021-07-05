@@ -5,8 +5,8 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { convertExportFile } from '@utils/Controledevalidade/ConvertExportFile';
-import { saveManyCategories } from '@utils/Controledevalidade/Categories';
+import { convertExportFile } from '@utils/Apps/Classic/ConvertExportFile';
+import { saveManyCategories } from '@utils/Apps/Classic/Categories';
 
 class ImportController {
     async store(req: Request, res: Response): Promise<Response> {

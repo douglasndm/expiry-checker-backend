@@ -2,8 +2,8 @@ import { getRepository } from 'typeorm';
 
 import AppError from '@errors/AppError';
 
-import { Category } from '@models/Category';
-import { Product } from '@models/Product';
+import Category from '@models/Category';
+import Product from '@models/Product';
 import ProductCategory from '@models/ProductCategory';
 
 interface addProductToCategoryProps {

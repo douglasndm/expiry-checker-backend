@@ -9,7 +9,7 @@ import { checkIfTeamIsActive } from '@utils/Team';
 import { getAllUsersFromTeam } from '@utils/Team/Users';
 import { isUserManager } from '@utils/Users/UserRoles';
 
-import { Category } from '@models/Category';
+import Category from '@models/Category';
 
 class CategoryController {
     async index(req: Request, res: Response): Promise<Response> {

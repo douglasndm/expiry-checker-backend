@@ -7,7 +7,8 @@ import {
     UpdateDateColumn,
     JoinColumn,
 } from 'typeorm';
-import { Team } from './Team';
+
+import Team from './Team';
 
 @Entity('team_subscriptions')
 class TeamSubscription {

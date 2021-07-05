@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Team } from './Team';
+import Team from './Team';
 import User from './User';
 
 @Entity({ name: 'users_team_relationship' })

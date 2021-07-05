@@ -7,10 +7,10 @@ import {
     UpdateDateColumn,
     JoinColumn,
 } from 'typeorm';
-import { Team } from './Team';
+import Team from './Team';
 
 @Entity({ name: 'categories' })
-export class Category {
+export default class Category {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

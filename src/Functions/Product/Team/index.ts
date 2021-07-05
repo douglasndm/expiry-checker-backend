@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm';
 
 import ProductTeams from '@models/ProductTeams';
-import { Product } from '@models/Product';
-import { Team } from '@models/Team';
+import Product from '@models/Product';
+import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 

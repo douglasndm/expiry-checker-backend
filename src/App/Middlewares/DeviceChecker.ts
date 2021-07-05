@@ -28,6 +28,7 @@ export default async function deviceChecker(
         throw new AppError({
             message: 'Device is not allowed, please make login again',
             statusCode: 403,
+            internalErrorCode: 22,
         });
     }
 

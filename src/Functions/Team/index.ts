@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import { compareAsc, startOfDay } from 'date-fns';
 
-import { Team } from '@models/Team';
+import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
