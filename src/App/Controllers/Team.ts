@@ -14,7 +14,7 @@ import UserRoles from '@models/UserRoles';
 import User from '@models/User';
 import Team from '@models/Team';
 
-import Cache from '../../Services/Cache';
+import Cache from '@services/Cache';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -298,8 +298,13 @@ class TeamController {
 
         const { team_id } = req.params;
 
+        const cache = new Cache();
+
         await deleteAllProducts({ team_id });
         await deleteTeam({ team_id, user_id: req.userId });
+
+        await cache.invalidade(`products-from-teams:${team_id}`);
+        await cache.invalidade(`users-from-teams:${team_id}`);
 
         return res.status(204).send();
     }
