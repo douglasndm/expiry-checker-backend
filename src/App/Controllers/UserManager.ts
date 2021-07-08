@@ -10,6 +10,8 @@ import User from '@models/User';
 
 import { checkMembersLimit } from '@utils/Team';
 
+import Cache from '@services/Cache';
+
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
         const schemaBody = Yup.object().shape({
@@ -27,19 +29,42 @@ class UserManagerController {
 
         const userRolesRepository = getRepository(UserRoles);
 
-        const alreadyInARole = await userRolesRepository
-            .createQueryBuilder('userRole')
-            .leftJoinAndSelect('userRole.user', 'user')
-            .where('userRole.team.id = :team_id', { team_id })
-            .andWhere('LOWER(user.email) = LOWER(:email)', { email })
-            .getOne();
+        const cache = new Cache();
+        const cachedUsers = await cache.get<Array<UserRoles>>(
+            `users-from-teams:${team_id}`,
+        );
 
-        if (alreadyInARole) {
-            throw new AppError({
-                message: 'User is already into team',
-                statusCode: 400,
-            });
+        // Check if user is already on team
+        // #region
+        if (cachedUsers) {
+            const alreadyInTeam = cachedUsers.find(
+                u => u.user.email.toLowerCase() === String(email).toLowerCase(),
+            );
+
+            if (alreadyInTeam) {
+                throw new AppError({
+                    message: 'User is already into team',
+                    statusCode: 400,
+                    internalErrorCode: 23,
+                });
+            }
+        } else {
+            const alreadyInARole = await userRolesRepository
+                .createQueryBuilder('userRole')
+                .leftJoinAndSelect('userRole.user', 'user')
+                .where('userRole.team.id = :team_id', { team_id })
+                .andWhere('LOWER(user.email) = LOWER(:email)', { email })
+                .getOne();
+
+            if (alreadyInARole) {
+                throw new AppError({
+                    message: 'User is already into team',
+                    statusCode: 400,
+                    internalErrorCode: 23,
+                });
+            }
         }
+        // #endregion
 
         const teamRepository = getRepository(Team);
         const userRepository = getRepository(User);
@@ -78,6 +103,7 @@ class UserManagerController {
         teamUser.status = 'Pending';
 
         const savedRole = await userRolesRepository.save(teamUser);
+        await cache.invalidade(`users-from-teams:${team_id}`);
 
         return res.json(savedRole);
     }
@@ -113,6 +139,8 @@ class UserManagerController {
                 });
             }
         }
+
+        const cache = new Cache();
 
         const userRolesRepository = getRepository(UserRoles);
 
@@ -150,6 +178,7 @@ class UserManagerController {
         userRole.role = role.toLowerCase();
 
         const updateRole = await userRolesRepository.save(userRole);
+        await cache.invalidade(`users-from-teams:${team_id}`);
 
         return res.json(updateRole);
     }
@@ -174,6 +203,8 @@ class UserManagerController {
             });
         }
 
+        const cache = new Cache();
+
         const repository = getRepository(UserRoles);
 
         const role = await repository
@@ -193,6 +224,7 @@ class UserManagerController {
         }
 
         await repository.remove(role);
+        await cache.invalidade(`users-from-teams:${team_id}`);
 
         return res.status(204).send();
     }

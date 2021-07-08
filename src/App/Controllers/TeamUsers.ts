@@ -8,6 +8,8 @@ import { getAllUsersFromTeam, UserResponse } from '@utils/Team/Users';
 
 import UserRoles from '@models/UserRoles';
 
+import Cache from '@services/Cache';
+
 class TeamUsersController {
     async index(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -53,53 +55,56 @@ class TeamUsersController {
 
     async store(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
-        const schemaBody = Yup.object().shape({
             code: Yup.string().required(),
         });
 
-        if (
-            !(await schema.isValid(req.params)) ||
-            !(await schemaBody.isValid(req.body))
-        ) {
-            return res.status(400).json({ error: 'Validation fails' });
-        }
-
         try {
-            const { team_id } = req.params;
-            const { code } = req.body;
-
-            const userRolesRepositoy = getRepository(UserRoles);
-            const roles = await userRolesRepositoy
-                .createQueryBuilder('userRoles')
-                .leftJoinAndSelect('userRoles.team', 'team')
-                .leftJoinAndSelect('userRoles.user', 'user')
-                .where('team.id = :team_id', { team_id })
-                .andWhere('user.firebaseUid = :user_id', {
-                    user_id: req.userId,
-                })
-                .getOne();
-
-            if (!roles) {
-                return res
-                    .status(401)
-                    .json({ error: 'You was not invited to the team' });
-            }
-
-            if (code !== roles.code) {
-                return res.status(403).json({ error: 'Code is not valid' });
-            }
-
-            roles.status = 'Completed';
-
-            const updatedRole = await userRolesRepositoy.save(roles);
-
-            return res.status(200).json(updatedRole);
+            await schema.validate(req.body);
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            throw new AppError({
+                message: err.message,
+                internalErrorCode: 24,
+            });
         }
+
+        const { team_id } = req.params;
+        const { code } = req.body;
+
+        const cache = new Cache();
+
+        const userRolesRepositoy = getRepository(UserRoles);
+        const roles = await userRolesRepositoy
+            .createQueryBuilder('userRoles')
+            .leftJoinAndSelect('userRoles.team', 'team')
+            .leftJoinAndSelect('userRoles.user', 'user')
+            .where('team.id = :team_id', { team_id })
+            .andWhere('user.firebaseUid = :user_id', {
+                user_id: req.userId,
+            })
+            .getOne();
+
+        if (!roles) {
+            throw new AppError({
+                message: 'You was not invited to the team',
+                statusCode: 401,
+                internalErrorCode: 25,
+            });
+        }
+
+        if (code !== roles.code) {
+            throw new AppError({
+                message: 'Code is not valid',
+                statusCode: 401,
+                internalErrorCode: 24,
+            });
+        }
+
+        roles.status = 'Completed';
+
+        const updatedRole = await userRolesRepositoy.save(roles);
+        await cache.invalidade(`users-from-teams:${team_id}`);
+
+        return res.status(200).json(updatedRole);
     }
 }
 
