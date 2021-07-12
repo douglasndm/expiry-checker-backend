@@ -9,6 +9,7 @@ interface IRevenueCatResponse {
     subscriber: {
         subscriptions: {
             expirybusiness_monthly_default_1person?: RevenueCatSubscription;
+            expirybusiness_monthly_default_2people?: RevenueCatSubscription;
             expirybusiness_monthly_default_3people?: RevenueCatSubscription;
             expirybusiness_monthly_default_5people?: RevenueCatSubscription;
             expirybusiness_monthly_default_10people?: RevenueCatSubscription;

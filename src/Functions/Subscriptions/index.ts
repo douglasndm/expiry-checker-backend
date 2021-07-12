@@ -99,7 +99,7 @@ export async function checkSubscriptions({
     interface revenueSubscriptionsProps {
         expires_date: Date;
         purchase_date: Date;
-        membersLimit: 1 | 3 | 5 | 10 | 15;
+        membersLimit: 1 | 2 | 3 | 5 | 10 | 15;
     }
 
     const revenueSubscriptions: Array<revenueSubscriptionsProps> = [];
@@ -151,6 +151,18 @@ export async function checkSubscriptions({
             expires_date: parseISO(expires_date),
             purchase_date: parseISO(purchase_date),
             membersLimit: 3,
+        });
+    }
+    if (subs.expirybusiness_monthly_default_2people) {
+        const {
+            expires_date,
+            purchase_date,
+        } = subs.expirybusiness_monthly_default_2people;
+
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 2,
         });
     }
     if (subs.expirybusiness_monthly_default_1person) {
