@@ -8,6 +8,8 @@ import AppError from '@errors/AppError';
 import { convertExportFile } from '@utils/Apps/Classic/ConvertExportFile';
 import { saveManyCategories } from '@utils/Apps/Classic/Categories';
 
+import Cache from '@services/Cache';
+
 class ImportController {
     async store(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
@@ -52,6 +54,9 @@ class ImportController {
         );
         const originalFile = decodedFile.toString(CryptoJS.enc.Utf8);
         const parsedFile = JSON.parse(originalFile);
+
+        const cache = new Cache();
+        await cache.invalidade(`products-from-teams:${team_id}`);
 
         if (parsedFile.categories) {
             const { categories } = parsedFile;
