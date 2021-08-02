@@ -42,6 +42,7 @@ class ImportController {
             throw new AppError({
                 message: 'File is not valid',
                 statusCode: 400,
+                internalErrorCode: 26,
             });
         }
 
