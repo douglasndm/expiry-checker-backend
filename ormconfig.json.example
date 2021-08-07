@@ -1,8 +1,14 @@
 {
-    "type": "",
+    "type": "postgres",
     "host": "",
-    "port": "",
+    "port": 5432,
     "username": "",
     "password": "",
-    "database": ""
+    "database": "",
+    "migrations": [
+        "src/Services/Database/Typeorm/migrations/*.ts"
+    ],
+    "cli": {
+        "migrationsDir": "src/Services/Database/Typeorm/migrations"
+    }
 }
