@@ -30,6 +30,9 @@ export default class Batch {
     @Column('varchar')
     status: 'checked' | 'unchecked';
 
+    @Column('money', { name: 'tmp_price' })
+    price_tmp: number;
+
     @ManyToOne(() => Product, product => product.batches)
     @JoinColumn({ name: 'product_id' })
     product: Product;
