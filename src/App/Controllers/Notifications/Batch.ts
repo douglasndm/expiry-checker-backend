@@ -119,6 +119,7 @@ class BatchNotificationController {
             throw new AppError({
                 message: 'There are no users to send',
                 statusCode: 400,
+                internalErrorCode: 27,
             });
         }
 
