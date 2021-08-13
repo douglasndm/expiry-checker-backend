@@ -11,6 +11,8 @@ import ProductCategory from '@models/ProductCategory';
 import TeamSubscriptions from '@models/TeamSubscription';
 import UserDevice from '@models/UserDevice';
 
+import NotificationsPreferences from '@models/NotificationsPreferences';
+
 async function setConnection(): Promise<void> {
     const defaultOptions = await getConnectionOptions();
 
@@ -27,6 +29,7 @@ async function setConnection(): Promise<void> {
                 ProductCategory,
                 TeamSubscriptions,
                 UserDevice,
+                NotificationsPreferences,
             ],
         }),
     );
