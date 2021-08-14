@@ -9,7 +9,7 @@ import { getAllProductsFromManyTeams } from '@utils/Team/Products';
 
 import UserRoles from '@models/UserRoles';
 
-const job = schedule.scheduleJob('* * * * * *', async () => {
+const job = schedule.scheduleJob('0 * * * *', async () => {
     const usersTeams = await UserAndTeams();
     const allowedUsers = await getAllUsersIDAllowedToSendEmail();
 
