@@ -37,6 +37,7 @@ export async function getAllProductsFromManyTeams({
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('prods.team', 'team')
         .where('team.id IN (:...teamsIds)', { teamsIds: teams })
+        .orderBy('batches.exp_date', 'ASC')
         .getMany();
 
     return products;

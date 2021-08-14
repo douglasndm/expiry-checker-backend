@@ -1,6 +1,6 @@
 import schedule from 'node-schedule';
 import axios from 'axios';
-import { addDays, format, isAfter } from 'date-fns';
+import { addDays, format, isBefore } from 'date-fns';
 
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
 
@@ -59,8 +59,15 @@ const job = schedule.scheduleJob('0 * * * *', async () => {
 
     productsTeams.forEach(productTeam => {
         if (productTeam.product.batches) {
-            const onlyExpOrNextBatches = productTeam.product.batches.filter(b =>
-                isAfter(addDays(new Date(), 30), b.exp_date),
+            const onlyExpOrNextBatches = productTeam.product.batches.filter(
+                b => {
+                    if (b.status === 'checked') return false;
+
+                    if (isBefore(b.exp_date, addDays(new Date(), 30))) {
+                        return true;
+                    }
+                    return false;
+                },
             );
 
             onlyExpOrNextBatches.forEach(b => {
@@ -74,12 +81,6 @@ const job = schedule.scheduleJob('0 * * * *', async () => {
                 });
             });
         }
-    });
-
-    const sortedBatches = batches.sort((batch1, batch2) => {
-        if (batch1.exp_date > batch2.exp_date) return 1;
-        if (batch1.exp_date < batch2.exp_date) return -1;
-        return 0;
     });
 
     interface Notification {
@@ -97,7 +98,7 @@ const job = schedule.scheduleJob('0 * * * *', async () => {
             item => item.user.id === user.id,
         );
 
-        const teamBatches = sortedBatches.filter(
+        const teamBatches = batches.filter(
             b => b.team_id === userTeam?.team.id,
         );
 
