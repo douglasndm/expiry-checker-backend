@@ -8,6 +8,8 @@ import Routes from './Routes/index.routes';
 
 import './Functions/Auth/Firebase';
 
+import './Services/Cron';
+
 import App from './start';
 
 Sentry.init({

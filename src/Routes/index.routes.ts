@@ -11,6 +11,8 @@ import UserTeams from '@controllers/UserTeams';
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
 
+import NotificationsPreferences from '@controllers/Notifications/Preferences';
+
 import batchRoutes from './batch.routes';
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
@@ -54,6 +56,8 @@ routes.delete('/categories/product/:id', ProductCategory.delete);
 
 routes.post('/team', Team.store);
 routes.use('/team/:team_id', teamRoutes);
+
+routes.put('/notifications', NotificationsPreferences.update);
 
 routes.use(filesRoutes);
 
