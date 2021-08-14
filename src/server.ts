@@ -30,5 +30,5 @@ App.use((err: Error, request: Request, response: Response, _: NextFunction) => {
 });
 
 App.listen(Number(PORT), HOST || 'localhost', () => {
-    console.log(`Server is running at ${PORT}`);
+    console.log(`Server is running at ${HOST}:${PORT}`);
 });

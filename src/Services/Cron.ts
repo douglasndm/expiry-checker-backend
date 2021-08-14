@@ -1,5 +1,6 @@
 import schedule from 'node-schedule';
 import axios from 'axios';
+import { addDays, format, isAfter } from 'date-fns';
 
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
 
@@ -36,6 +37,11 @@ const job = schedule.scheduleJob('* * * * * *', async () => {
 
     const teamsIds = teams.map(team => team.team.id);
 
+    // avoid cron crash if nobody wants email notification
+    if (teamsIds.length <= 0) {
+        return;
+    }
+
     const productsTeams = await getAllProductsFromManyTeams({
         teams: teamsIds,
     });
@@ -45,23 +51,35 @@ const job = schedule.scheduleJob('* * * * * *', async () => {
         code: string | null;
         productName: string;
         batch: string | null;
-        exp_date: Date;
+        exp_date: string;
         amount: number | null;
     }
 
     const batches: Array<batch> = [];
 
     productsTeams.forEach(productTeam => {
-        productTeam.product.batches.forEach(b => {
-            batches.push({
-                team_id: productTeam.team.id,
-                productName: productTeam.product.name,
-                code: productTeam.product.code || null,
-                amount: b.amount,
-                batch: b.name,
-                exp_date: b.exp_date,
+        if (productTeam.product.batches) {
+            const onlyExpOrNextBatches = productTeam.product.batches.filter(b =>
+                isAfter(addDays(new Date(), 30), b.exp_date),
+            );
+
+            onlyExpOrNextBatches.forEach(b => {
+                batches.push({
+                    team_id: productTeam.team.id,
+                    productName: productTeam.product.name,
+                    code: productTeam.product.code || null,
+                    amount: b.amount,
+                    batch: b.name,
+                    exp_date: format(b.exp_date, 'dd/MM/yyyy'),
+                });
             });
-        });
+        }
+    });
+
+    const sortedBatches = batches.sort((batch1, batch2) => {
+        if (batch1.exp_date > batch2.exp_date) return 1;
+        if (batch1.exp_date < batch2.exp_date) return -1;
+        return 0;
     });
 
     interface Notification {
@@ -79,14 +97,14 @@ const job = schedule.scheduleJob('* * * * * *', async () => {
             item => item.user.id === user.id,
         );
 
-        const teamBatches = batches.filter(
+        const teamBatches = sortedBatches.filter(
             b => b.team_id === userTeam?.team.id,
         );
 
         notifications.push({
             name: userTeam?.user.email || 'untitled',
             to: 'nucleodosdownloads@outlook.com',
-            subject: 'Resumo semanal de vencimentos',
+            subject: `Resumo semanal de vencimentos (${userTeam?.team.name})`,
             AppName: 'Controle de Validades',
             batches: teamBatches,
         });
