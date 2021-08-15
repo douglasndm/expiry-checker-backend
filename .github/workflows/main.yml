@@ -67,11 +67,11 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: | 
-            cd ~/apps/teams/dist/Config/Firebase/
+            cd "~/apps/teams/dist/Config/Firebase/"
             touch ServiceAccountKey.json
-            echo ${{ secrets.FIREBASE_ACCOUNT_KEY }} >> ServiceAccountKey.json
+            echo ${{secrets.FIREBASE_ACCOUNT_KEY}} >> ServiceAccountKey.json
             cat ServiceAccountKey.json
-            cd ../../../
+            cd "../../../"
             yarn            
             ./node_modules/.bin/typeorm migration:run
             pm2 restart ExpiryTeams
