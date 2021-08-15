@@ -58,14 +58,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: ".,!node_modules"
           target: "~/apps/teams"
-          
-      - name: Add Firebase Account Service into Config
-        uses: DamianReeves/write-file-action@v1.0
-        with:
-          path: "~/apps/teams/dist/Config/Firebase/ServiceAccountKey.json"
-          contents: ${{ secrets.FIREBASE_ACCOUNT_KEY }}
-          write-mode: overwrite
-          
+                    
       - name: Run production scripts
         uses: appleboy/ssh-action@master
         with:
@@ -74,9 +67,13 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: | 
-            cd ~/apps/teams
+            cd ~/apps/teams/dist/Config/Firebase/
+            touch ServiceAccountKey.json
+            echo ${{ secrets.FIREBASE_ACCOUNT_KEY }} >> ServiceAccountKey.json
+            cat ServiceAccountKey.json
+            cd ../../../
             yarn            
             ./node_modules/.bin/typeorm migration:run
-            pm2 restart 0
+            pm2 restart ExpiryTeams
             
 
