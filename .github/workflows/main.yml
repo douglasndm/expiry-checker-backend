@@ -47,15 +47,7 @@ jobs:
         
       # Realização da build
       - name: Run build
-        run: yarn build
-        
-      - name: Add Firebase Account Service into Config
-        uses: DamianReeves/write-file-action@v1.0
-        with:
-          path: ./dist/Config/Firebase/ServiceAccountKey.json
-          contents: ${{ secrets.FIREBASE_ACCOUNT_KEY }}
-          write-mode: overwrite
-        
+        run: yarn build        
         
       - name: Copy code to Digital Ocean
         uses: appleboy/scp-action@master
@@ -65,7 +57,14 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           source: ".,!node_modules"
-          target: "~/app/cv-business-backend"
+          target: "~/apps/teams"
+          
+      - name: Add Firebase Account Service into Config
+        uses: DamianReeves/write-file-action@v1.0
+        with:
+          path: "~/apps/teams/dist/Config/Firebase/ServiceAccountKey.json"
+          contents: ${{ secrets.FIREBASE_ACCOUNT_KEY }}
+          write-mode: overwrite
           
       - name: Run production scripts
         uses: appleboy/ssh-action@master
@@ -75,7 +74,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: | 
-            cd ~/app/cv-business-backend
+            cd ~/apps/teams
             yarn            
             ./node_modules/.bin/typeorm migration:run
             pm2 restart 0
