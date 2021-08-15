@@ -57,6 +57,7 @@ routes.delete('/categories/product/:id', ProductCategory.delete);
 routes.post('/team', Team.store);
 routes.use('/team/:team_id', teamRoutes);
 
+routes.get('/notifications', NotificationsPreferences.index);
 routes.put('/notifications', NotificationsPreferences.update);
 
 routes.use(filesRoutes);

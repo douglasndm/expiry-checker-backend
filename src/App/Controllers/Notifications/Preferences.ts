@@ -9,6 +9,24 @@ import { getUser } from '@utils/Users';
 import AppError from '@errors/AppError';
 
 class EmailPreferences {
+    async index(req: Request, res: Response): Promise<Response> {
+        if (!req.userId) {
+            throw new AppError({
+                message: 'Provide user id',
+                internalErrorCode: 2,
+            });
+        }
+
+        const notificationRepository = getRepository(NotificationsPreferences);
+        const settings = await notificationRepository
+            .createQueryBuilder('notification')
+            .leftJoinAndSelect('notification.user', 'user')
+            .where('user.firebaseUid = :user_id', { user_id: req.userId })
+            .getOne();
+
+        return res.status(200).json(settings);
+    }
+
     async update(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             allowEmailNotification: Yup.bool().required(),
