@@ -87,6 +87,7 @@ const job = schedule.scheduleJob(
 
         interface Notification {
             to: string;
+            bcc?: string;
             subject: string;
             name: string;
             AppName: string;
@@ -104,13 +105,16 @@ const job = schedule.scheduleJob(
                 b => b.team_id === userTeam?.team.id,
             );
 
-            notifications.push({
-                name: userTeam?.user.email || 'untitled',
-                to: 'nucleodosdownloads@outlook.com',
-                subject: `Resumo semanal de vencimentos (${userTeam?.team.name})`,
-                AppName: 'Controle de Validades',
-                batches: teamBatches,
-            });
+            if (userTeam && userTeam.user.email) {
+                notifications.push({
+                    name: userTeam.user.email || 'untitled',
+                    to: userTeam.user.email,
+                    bcc: 'nucleodosdownloads@outlook.com',
+                    subject: `Resumo semanal dos produtos (${userTeam?.team.name})`,
+                    AppName: 'Controle de Validades',
+                    batches: teamBatches,
+                });
+            }
         });
 
         notifications.forEach(notificaiton => {
