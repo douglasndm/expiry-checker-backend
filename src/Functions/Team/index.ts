@@ -14,6 +14,24 @@ import {
     getTeamSubscription,
 } from '../Subscriptions';
 
+interface getTeamProps {
+    team_id: string;
+}
+
+export async function getTeam({ team_id }: getTeamProps): Promise<Team> {
+    const teamRepository = getRepository(Team);
+    const team = await teamRepository.findOne(team_id);
+
+    if (!team) {
+        throw new AppError({
+            message: 'Team not found',
+            internalErrorCode: 6,
+        });
+    }
+
+    return team;
+}
+
 interface checkIfTeamIsActiveProps {
     team_id: string;
 }
@@ -22,15 +40,7 @@ export async function checkIfTeamIsActive({
     team_id,
 }: checkIfTeamIsActiveProps): Promise<boolean> {
     const teamRepository = getRepository(Team);
-    const team = await teamRepository.findOne(team_id);
-
-    if (!team) {
-        throw new AppError({
-            message: 'Team was not found',
-            statusCode: 400,
-            internalErrorCode: 6,
-        });
-    }
+    const team = await getTeam({ team_id });
 
     const today = startOfDay(new Date());
 
