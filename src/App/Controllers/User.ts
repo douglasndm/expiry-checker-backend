@@ -7,7 +7,7 @@ import AppError from '@errors/AppError';
 
 import User from '@models/User';
 
-import { createUser, deleteUser } from '@utils/Users';
+import { createUser, deleteUser } from '@functions/Users';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {

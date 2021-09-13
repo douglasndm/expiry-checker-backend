@@ -4,8 +4,8 @@ import { addDays, format, isBefore } from 'date-fns';
 
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
 
-import { getAllRoles as UserAndTeams } from '@utils/UserRoles';
-import { getAllProductsFromManyTeams } from '@utils/Team/Products';
+import { getAllRoles as UserAndTeams } from '@functions/UserRoles';
+import { getAllProductsFromManyTeams } from '@functions/Team/Products';
 
 import UserRoles from '@models/UserRoles';
 

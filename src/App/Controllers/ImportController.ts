@@ -5,8 +5,8 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { convertExportFile } from '@utils/Apps/Classic/ConvertExportFile';
-import { saveManyCategories } from '@utils/Apps/Classic/Categories';
+import { convertExportFile } from '@functions/Apps/Classic/ConvertExportFile';
+import { saveManyCategories } from '@functions/Apps/Classic/Categories';
 
 import Cache from '@services/Cache';
 

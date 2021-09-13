@@ -7,16 +7,16 @@ import AppError from '@errors/AppError';
 import Product from '@models/Product';
 import Category from '@models/Category';
 
-import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
-import { getAllUsersFromTeam } from '@utils/Team/Users';
+import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
+import { getAllUsersFromTeam } from '@functions/Team/Users';
 import {
     addProductToCategory,
     removeAllCategoriesFromProduct,
-} from '@utils/Category/Products';
-import { getUserRole } from '@utils/Users/UserRoles';
-import { getProductTeam } from '@utils/Product/Team';
+} from '@functions/Category/Products';
+import { getUserRole } from '@functions/Users/UserRoles';
+import { getProductTeam } from '@functions/Product/Team';
 
-import { createProduct, getProduct } from '@utils/Product';
+import { createProduct, getProduct } from '@functions/Product';
 import Cache from '../../Services/Cache';
 
 class ProductController {

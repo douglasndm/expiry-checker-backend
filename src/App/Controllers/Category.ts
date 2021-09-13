@@ -4,10 +4,10 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { createCategory } from '@utils/Category';
-import { checkIfTeamIsActive } from '@utils/Team';
-import { getAllUsersFromTeam } from '@utils/Team/Users';
-import { isUserManager } from '@utils/Users/UserRoles';
+import { createCategory } from '@functions/Category';
+import { checkIfTeamIsActive } from '@functions/Team';
+import { getAllUsersFromTeam } from '@functions/Team/Users';
+import { isUserManager } from '@functions/Users/UserRoles';
 
 import Category from '@models/Category';
 

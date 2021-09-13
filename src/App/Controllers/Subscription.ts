@@ -1,4 +1,4 @@
-import { recheck } from '@utils/Team/Subscription';
+import { recheck } from '@functions/Team/Subscription';
 import { Request, Response } from 'express';
 
 import {

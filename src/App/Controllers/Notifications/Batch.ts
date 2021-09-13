@@ -8,9 +8,9 @@ import AppError from '@errors/AppError';
 
 import Batch from '@models/Batch';
 
-import { getUserRole } from '@utils/Users/UserRoles';
-import { getProductTeam } from '@utils/Product/Team';
-import { getAllUsersFromTeam } from '@utils/Team/Users';
+import { getUserRole } from '@functions/Users/UserRoles';
+import { getProductTeam } from '@functions/Product/Team';
+import { getAllUsersFromTeam } from '@functions/Team/Users';
 
 interface BaseMessage {
     data?: {

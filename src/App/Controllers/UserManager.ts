@@ -8,7 +8,7 @@ import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 import User from '@models/User';
 
-import { checkMembersLimit } from '@utils/Team';
+import { checkMembersLimit } from '@functions/Team';
 
 import Cache from '@services/Cache';
 

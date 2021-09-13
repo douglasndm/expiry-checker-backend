@@ -8,9 +8,9 @@ import AppError from '@errors/AppError';
 import Product from '@models/Product';
 import Batch from '@models/Batch';
 
-import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
-import { getUserRole } from '@utils/Users/UserRoles';
-import { getProductTeam } from '@utils/Product/Team';
+import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
+import { getUserRole } from '@functions/Users/UserRoles';
+import { getProductTeam } from '@functions/Product/Team';
 
 import Cache from '../../Services/Cache';
 

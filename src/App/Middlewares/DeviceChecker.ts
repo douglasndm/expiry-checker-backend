@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import AppError from '@errors/AppError';
 
-import { getUserDeviceId } from '@utils/Users/Device';
+import { getUserDeviceId } from '@functions/Users/Device';
 
 export default async function deviceChecker(
     req: Request,

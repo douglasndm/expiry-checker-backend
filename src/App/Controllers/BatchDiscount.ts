@@ -4,8 +4,8 @@ import * as Yup from 'yup';
 
 import Batch from '@models/Batch';
 
-import { checkIfUserHasAccessToAProduct } from '@utils/UserAccessProduct';
-import { getProductTeam } from '@utils/Product/Team';
+import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
+import { getProductTeam } from '@functions/Product/Team';
 
 import Cache from '@services/Cache';
 
