@@ -13,7 +13,7 @@ import UserRoles from '@models/UserRoles';
 
 // every monday -> friday at 8
 const dailyPushJob = schedule.scheduleJob(
-    '0 8 * * 1,2,3,4,5',
+    '0 11 * * 1,2,3,4,5',
     dailyPushNotification,
 );
 
