@@ -50,8 +50,9 @@ jobs:
         env:
           FIREBASE_FILE: ${{ secrets.FIREBASE_ACCOUNT_KEY }}
         run: |
-          yarn build          
-          echo $FIREBASE_FILE > /dist/Config/Firebase/ServiceAccountKey.json
+          yarn build
+          ls
+          echo $FIREBASE_FILE > ./dist/Config/Firebase/ServiceAccountKey.json
           
         
       - name: Copy code to Digital Ocean
