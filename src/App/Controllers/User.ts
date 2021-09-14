@@ -9,6 +9,8 @@ import User from '@models/User';
 
 import { createUser, deleteUser } from '@functions/Users';
 
+import Cache from '@services/Cache';
+
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
         if (!req.userId) {
@@ -98,7 +100,11 @@ class UserController {
             throw new AppError({ message: 'User already exists' });
         }
 
+        const cache = new Cache();
+
         const savedUser = await createUser({ firebaseUid, email });
+
+        await cache.invalidade('users_devices');
 
         return res.status(201).json(savedUser);
     }
@@ -112,6 +118,9 @@ class UserController {
         }
 
         await deleteUser({ user_id: req.userId });
+
+        const cache = new Cache();
+        await cache.invalidade('users_devices');
 
         return res.status(204).send();
     }

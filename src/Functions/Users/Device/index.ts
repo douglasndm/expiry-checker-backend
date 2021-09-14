@@ -1,9 +1,11 @@
 import { getRepository } from 'typeorm';
 
-import AppError from '@errors/AppError';
-
 import User from '@models/User';
 import UserDevice from '@models/UserDevice';
+
+import Cache from '@services/Cache';
+
+import AppError from '@errors/AppError';
 
 interface getUserDeviceIdProps {
     user_id: string;
@@ -67,6 +69,9 @@ export async function addUserDevice({
     const device = new UserDevice();
     device.user = user;
     device.device_id = device_id;
+
+    const cache = new Cache();
+    await cache.invalidade('users_devices');
 
     await deviceRepository.save(device);
 }
