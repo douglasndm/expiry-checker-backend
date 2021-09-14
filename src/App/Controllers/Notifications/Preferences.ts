@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
-import { getUser } from '@utils/Users';
+import { getUser } from '@functions/Users';
 
 import AppError from '@errors/AppError';
 

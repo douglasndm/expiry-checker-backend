@@ -4,10 +4,10 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { checkIfTeamIsActive, deleteTeam } from '@utils/Team';
-import { deleteAllProducts } from '@utils/Team/Products';
-import { getAllUsersFromTeam } from '@utils/Team/Users';
-import { sortProductsByBatchesExpDate } from '@utils/Products';
+import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
+import { deleteAllProducts } from '@functions/Team/Products';
+import { getAllUsersFromTeam } from '@functions/Team/Users';
+import { sortProductsByBatchesExpDate } from '@functions/Products';
 
 import ProductTeams from '@models/ProductTeams';
 import UserRoles from '@models/UserRoles';

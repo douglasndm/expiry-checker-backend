@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 
 import User from '@models/User';
 
-import { removeUserFromAllTeams } from '@utils/Users/Teams';
+import { removeUserFromAllTeams } from '@functions/Users/Teams';
 
 import AppError from '@errors/AppError';
 

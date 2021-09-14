@@ -5,7 +5,7 @@ import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
-import { isUserManager } from '@utils/Users/UserRoles';
+import { isUserManager } from '@functions/Users/UserRoles';
 import { getAllUsersFromTeam } from './Users';
 import { deleteAllProducts } from './Products';
 import {

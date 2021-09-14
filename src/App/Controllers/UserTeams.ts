@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 
 import AppError from '@errors/AppError';
 
-import { recheck } from '@utils/Team/Subscription';
+import { recheck } from '@functions/Team/Subscription';
 
 import UserRoles from '@models/UserRoles';
 

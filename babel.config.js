@@ -9,7 +9,8 @@ module.exports = {
                 "@controllers": "./src/App/Controllers",
                 "@middlewares": "./src/App/Middlewares",
                 "@models": "./src/App/Models",
-                "@utils": "./src/Functions",
+                "@utils": './src/Utils',
+                "@functions": "./src/Functions",
                 "@config": "./src/Config",
                 "@services": "./src/Services",
                 "@errors": "./src/Errors"

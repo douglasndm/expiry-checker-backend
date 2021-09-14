@@ -2,9 +2,9 @@ import { getRepository } from 'typeorm';
 
 import Cache from '@services/Cache';
 
-import { checkIfProductAlreadyExists } from '@utils/Products';
-import { sortBatchesByExpDate } from '@utils/Batches';
-import { addProductToCategory } from '@utils/Category/Products';
+import { checkIfProductAlreadyExists } from '@functions/Products';
+import { sortBatchesByExpDate } from '@functions/Batches';
+import { addProductToCategory } from '@functions/Category/Products';
 
 import Product from '@models/Product';
 import Category from '@models/Category';

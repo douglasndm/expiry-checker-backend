@@ -4,9 +4,9 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { checkIfUserHasAccessToTeam } from '@utils/Security/UserAccessTeam';
-import { addProductToCategory } from '@utils/Category/Products';
-import { getProductTeam } from '@utils/Product/Team';
+import { checkIfUserHasAccessToTeam } from '@functions/Security/UserAccessTeam';
+import { addProductToCategory } from '@functions/Category/Products';
+import { getProductTeam } from '@functions/Product/Team';
 
 import Category from '@models/Category';
 import Product from '@models/Product';

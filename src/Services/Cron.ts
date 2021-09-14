@@ -4,10 +4,18 @@ import { addDays, format, isBefore } from 'date-fns';
 
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
 
-import { getAllRoles as UserAndTeams } from '@utils/UserRoles';
-import { getAllProductsFromManyTeams } from '@utils/Team/Products';
+import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
+
+import { getAllRoles as UserAndTeams } from '@functions/UserRoles';
+import { getAllProductsFromManyTeams } from '@functions/Team/Products';
 
 import UserRoles from '@models/UserRoles';
+
+// every monday -> friday at 8
+const dailyPushJob = schedule.scheduleJob(
+    '0 8 * * 1,2,3,4,5',
+    dailyPushNotification,
+);
 
 const job = schedule.scheduleJob(
     process.env.MAIL_NOTIFICATION_PERIOD || '0 9 * * 1',

@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import AppError from '@errors/AppError';
 
-import { getAllUsersFromTeam, UserResponse } from '@utils/Team/Users';
+import { getAllUsersFromTeam, UserResponse } from '@functions/Team/Users';
 
 import UserRoles from '@models/UserRoles';
 

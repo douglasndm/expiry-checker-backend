@@ -50,7 +50,8 @@
         "@controllers/*": ["App/Controllers/*"],
         "@middlewares/*": ["App/Middlewares/*"],
         "@models/*": ["App/Models/*"],
-        "@utils/*": ["Functions/*"],
+        "@utils/*": ["Utils/*"],
+        "@functions/*": ["Functions/*"],
         "@config/*": ["Config/*"],
         "@services/*": ["Services/*"],
         "@errors/*": ["Errors/*"]
