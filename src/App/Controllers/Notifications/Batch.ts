@@ -12,26 +12,6 @@ import { getUserRole } from '@functions/Users/UserRoles';
 import { getProductTeam } from '@functions/Product/Team';
 import { getAllUsersFromTeam } from '@functions/Team/Users';
 
-interface BaseMessage {
-    data?: {
-        [key: string]: string;
-    };
-    notification?: Notification;
-    android?: admin.messaging.AndroidConfig;
-    webpush?: admin.messaging.WebpushConfig;
-    apns?: admin.messaging.ApnsConfig;
-    fcmOptions?: admin.messaging.FcmOptions;
-}
-export interface TokenMessage extends BaseMessage {
-    token: string;
-}
-export interface TopicMessage extends BaseMessage {
-    topic: string;
-}
-export interface ConditionMessage extends BaseMessage {
-    condition: string;
-}
-
 class BatchNotificationController {
     async store(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
