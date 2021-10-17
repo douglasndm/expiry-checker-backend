@@ -80,6 +80,8 @@ class TeamController {
                 .select('product_teams.id')
                 .where('product_teams.team_id = :id', { id: team_id })
                 .leftJoinAndSelect('product_teams.product', 'product')
+                .leftJoinAndSelect('product.categories', 'prodCat')
+                .leftJoinAndSelect('prodCat.category', 'category')
                 .leftJoinAndSelect('product.batches', 'batches')
                 .orderBy('batches.exp_date', 'ASC')
                 .getMany();
@@ -105,9 +107,18 @@ class TeamController {
                 products = sortProductsByBatchesExpDate(products);
             }
 
+            const fixedCategories = products.map(p => {
+                const categories = p.categories.map(c => c.category);
+
+                return {
+                    ...p,
+                    categories,
+                };
+            });
+
             await cache.save(`products-from-teams:${team_id}`, {
                 team,
-                products,
+                products: fixedCategories,
             });
 
             return res.status(200).json({ team, products });
