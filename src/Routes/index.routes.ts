@@ -42,7 +42,11 @@ routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
 
+routes.get('/brands/team/:team_id', Brand.index);
 routes.post('/brand', Brand.store);
+routes.put('/brand/:id', Brand.update);
+routes.delete(`/brand/:brand_id`, Brand.delete);
+routes.get('/brand/:brand_id', Brand.allProducts);
 
 routes.use('/batches', batchRoutes);
 
