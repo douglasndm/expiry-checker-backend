@@ -78,10 +78,12 @@ class BrandController {
 
         const { name, brand_id } = req.body;
 
+        const user = await getUserByFirebaseId(req.userId || '');
+
         const brand = await updateBrand({
             name,
             brand_id,
-            user_id: req.userId || '',
+            user_id: user.id,
         });
 
         return res.status(201).json(brand);
