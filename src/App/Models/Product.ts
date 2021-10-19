@@ -2,7 +2,9 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -10,6 +12,7 @@ import {
 import Batch from './Batch';
 import ProductTeams from './ProductTeams';
 import ProductCategory from './ProductCategory';
+import Brand from './Brand';
 
 @Entity({ name: 'products' })
 export default class Product {
@@ -22,8 +25,12 @@ export default class Product {
     @Column('varchar')
     code: string | null;
 
+    @OneToOne(() => Brand)
+    @JoinColumn({ name: 'brand_id' })
+    brand?: Brand | null;
+
     @OneToMany(
-        type => ProductCategory,
+        () => ProductCategory,
         productCategory => productCategory.product,
     )
     categories: Array<ProductCategory>;
@@ -31,7 +38,7 @@ export default class Product {
     @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;
 
-    @OneToMany(type => ProductTeams, productTeams => productTeams.product)
+    @OneToMany(() => ProductTeams, productTeams => productTeams.product)
     team: ProductTeams;
 
     @CreateDateColumn()

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import User from '@controllers/User';
 import Product from '@controllers/Product';
+import Brand from '@controllers/Brand';
 import Category from '@controllers/Category';
 import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
@@ -29,8 +30,6 @@ routes.post('/sessions', SessionController.store);
 
 routes.use(DeviceChecker);
 
-// temp route for old app version
-routes.get('/users/:user_id', User.index);
 // end temp route
 routes.get('/users', User.index);
 
@@ -42,6 +41,8 @@ routes.get('/products/:product_id', Product.index);
 routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
+
+routes.post('/brand', Brand.store);
 
 routes.use('/batches', batchRoutes);
 
