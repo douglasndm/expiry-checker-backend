@@ -52,10 +52,12 @@ class BrandController {
 
         const { name, team_id } = req.body;
 
+        const user = await getUserByFirebaseId(req.userId || '');
+
         const brand = await createBrand({
             name,
             team_id,
-            user_id: req.userId || '',
+            user_id: user.id,
         });
 
         return res.status(201).json(brand);
