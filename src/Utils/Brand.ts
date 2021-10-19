@@ -138,6 +138,7 @@ export async function getAllProductsFromBrand({
 
     const products = await productRepository
         .createQueryBuilder('prod')
+        .leftJoinAndSelect('prod.batches', 'batches')
         .where('prod.brand = :brand_id', { brand_id })
         .getMany();
 

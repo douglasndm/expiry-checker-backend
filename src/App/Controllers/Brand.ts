@@ -8,6 +8,7 @@ import {
     getAllProductsFromBrand,
     updateBrand,
 } from '@utils/Brand';
+import { getUserByFirebaseId } from '@utils/User';
 
 import AppError from '@errors/AppError';
 
@@ -92,7 +93,7 @@ class BrandController {
         });
 
         try {
-            await schema.validate(req.body);
+            await schema.validate(req.params);
         } catch (err) {
             if (err instanceof Error)
                 throw new AppError({
@@ -102,9 +103,11 @@ class BrandController {
 
         const { brand_id } = req.params;
 
+        const user = await getUserByFirebaseId(req.userId || '');
+
         await deleteBrand({
             brand_id,
-            user_id: req.userId || '',
+            user_id: user.id,
         });
 
         return res.status(200).send();
