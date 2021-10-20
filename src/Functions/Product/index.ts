@@ -43,6 +43,7 @@ export async function getProduct({
     const product = await reposity
         .createQueryBuilder('product')
         .where('product.id = :product_id', { product_id })
+        .leftJoinAndSelect('product.brand', 'brand')
         .leftJoinAndSelect('product.categories', 'categories')
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('categories.category', 'category')

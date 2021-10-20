@@ -29,11 +29,12 @@ class ProductController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -66,6 +67,7 @@ class ProductController {
 
         const productWithFixCat = {
             ...product,
+            brand: product.brand?.id,
             categories: product.categories.map(cat => cat.category),
         };
 
