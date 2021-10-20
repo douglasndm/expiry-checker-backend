@@ -31,11 +31,12 @@ class TeamController {
             await schema.validate(req.params);
             await schemaQuerys.validate(req.query);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         const cache = new Cache();
@@ -80,6 +81,8 @@ class TeamController {
                 .select('product_teams.id')
                 .where('product_teams.team_id = :id', { id: team_id })
                 .leftJoinAndSelect('product_teams.product', 'product')
+
+                .leftJoinAndSelect('product.brand', 'brand')
                 .leftJoinAndSelect('product.categories', 'prodCat')
                 .leftJoinAndSelect('prodCat.category', 'category')
                 .leftJoinAndSelect('product.batches', 'batches')
@@ -112,6 +115,7 @@ class TeamController {
 
                 return {
                     ...p,
+                    brand: p.brand?.id,
                     categories,
                 };
             });
