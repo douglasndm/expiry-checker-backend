@@ -7,6 +7,7 @@ import AppError from '@errors/AppError';
 
 import { convertExportFile } from '@functions/Apps/Classic/ConvertExportFile';
 import { saveManyCategories } from '@functions/Apps/Classic/Categories';
+import { getUser } from '@functions/Users';
 
 import Cache from '@services/Cache';
 
@@ -19,11 +20,12 @@ class ImportController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!process.env.APPLICATION_SECRET_BACKUP_CRYPT) {
@@ -59,6 +61,9 @@ class ImportController {
         const cache = new Cache();
         await cache.invalidade(`products-from-teams:${team_id}`);
 
+        const user = await getUser(req.userId || '');
+        if (!user) return res.status(400).send();
+
         if (parsedFile.categories) {
             const { categories } = parsedFile;
 
@@ -72,6 +77,8 @@ class ImportController {
                     oldProducts: parsedFile.products,
                     team_id,
                     categories: savedCategories,
+                    brands: parsedFile.brands,
+                    user_id: user.id,
                 });
 
                 return res.json(productsSaved);
@@ -84,6 +91,8 @@ class ImportController {
             const productsSaved = await convertExportFile({
                 oldProducts: products,
                 team_id,
+                brands: parsedFile.brands,
+                user_id: user.id,
             });
 
             return res.json(productsSaved);
@@ -91,6 +100,8 @@ class ImportController {
         const productsSaved = await convertExportFile({
             oldProducts: parsedFile,
             team_id,
+            brands: parsedFile.brands,
+            user_id: user.id,
         });
 
         return res.json(productsSaved);

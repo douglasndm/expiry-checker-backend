@@ -11,6 +11,7 @@ interface CVProduct {
     id: number;
     name: string;
     code?: string;
+    brand?: string;
     photo?: string;
     store?: string;
     categories: Array<string>;
@@ -18,6 +19,11 @@ interface CVProduct {
 }
 
 interface CVCategory {
+    id: string;
+    name: string;
+}
+
+interface ICVBrand {
     id: string;
     name: string;
 }

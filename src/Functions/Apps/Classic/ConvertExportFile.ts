@@ -1,6 +1,8 @@
 import { getRepository } from 'typeorm';
 import { startOfDay, parseISO } from 'date-fns';
 
+import { createManyBrands, getAllBrands } from '@utils/Brand';
+
 import AppError from '@errors/AppError';
 
 import Product from '@models/Product';
@@ -15,13 +17,17 @@ import { OldToNewCategories } from './Categories';
 interface convertExportFileProps {
     oldProducts: Array<CVProduct>;
     team_id: string;
+    user_id: string;
     categories?: Array<OldToNewCategories>;
+    brands: Array<ICVBrand>;
 }
 
 export async function convertExportFile({
     oldProducts,
     team_id,
+    user_id,
     categories,
+    brands,
 }: convertExportFileProps): Promise<Array<Product>> {
     const teamRepository = getRepository(Team);
     const productRepository = getRepository(Product);
@@ -53,6 +59,14 @@ export async function convertExportFile({
             .getMany();
     }
 
+    const brandsResponse = await createManyBrands({
+        brands,
+        team_id,
+        user_id,
+    });
+
+    const allBrands = await getAllBrands({ team_id });
+
     const products: Array<Product> = [];
     const prodTeam: Array<ProductTeams> = [];
     const batc: Array<Batch> = [];
@@ -63,6 +77,25 @@ export async function convertExportFile({
         const product = productRepository.create();
         product.name = prod.name;
         product.code = prod.code || '';
+
+        if (prod.brand) {
+            const brandToAdd = allBrands.find(brand => {
+                const oldBrand = brandsResponse.brands.find(b => {
+                    if (b.old_id === prod.brand) {
+                        if (brand.name.toLowerCase() === b.name.toLowerCase()) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
+
+                if (oldBrand) return true;
+                return false;
+            });
+
+            if (brandToAdd) product.brand = brandToAdd;
+        }
 
         const batches: Array<Batch> = [];
 

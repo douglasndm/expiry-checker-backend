@@ -6,6 +6,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import Brand from './Brand';
 
 import Category from './Category';
 import ProductTeams from './ProductTeams';
@@ -23,13 +24,16 @@ export default class Team {
     @OneToMany(() => Category, category => category.team)
     categories: Array<Category>;
 
-    @OneToMany(type => UserRoles, userRoles => userRoles.user)
+    @OneToMany(() => UserRoles, userRoles => userRoles.user)
     users: Array<UserRoles>;
 
-    @OneToMany(type => ProductTeams, productTeams => productTeams.team)
+    @OneToMany(() => ProductTeams, productTeams => productTeams.team)
     products: Array<ProductTeams>;
 
-    @OneToMany(type => TeamSubscription, subscriptions => subscriptions.team)
+    @OneToMany(() => Brand, brand => brand.team)
+    brands: Array<Brand>;
+
+    @OneToMany(() => TeamSubscription, subscriptions => subscriptions.team)
     subscriptions: Array<TeamSubscription>;
 
     @Column({ name: 'subs_last_time_checked' })

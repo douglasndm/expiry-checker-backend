@@ -17,6 +17,7 @@ import { getUserRole } from '@functions/Users/UserRoles';
 import { getProductTeam } from '@functions/Product/Team';
 
 import { createProduct, getProduct } from '@functions/Product';
+import { getAllBrands } from '@utils/Brand';
 import Cache from '../../Services/Cache';
 
 class ProductController {
@@ -28,11 +29,12 @@ class ProductController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -65,6 +67,7 @@ class ProductController {
 
         const productWithFixCat = {
             ...product,
+            brand: product.brand?.id,
             categories: product.categories.map(cat => cat.category),
         };
 
@@ -75,6 +78,7 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string().required(),
             code: Yup.string(),
+            brand: Yup.string().uuid(),
             categories: Yup.array().of(Yup.string()),
             team_id: Yup.string().required().uuid(),
         });
@@ -97,7 +101,7 @@ class ProductController {
             });
         }
 
-        const { name, code, categories, team_id } = req.body;
+        const { name, code, brand, categories, team_id } = req.body;
 
         const usersInTeam = await getAllUsersFromTeam({ team_id });
 
@@ -114,6 +118,7 @@ class ProductController {
         const createdProd = await createProduct({
             name,
             code,
+            brand,
             team_id,
             categories,
         });
@@ -129,6 +134,7 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string().nullable(),
+            brand: Yup.string().uuid(),
             categories: Yup.array().of(Yup.string()),
         });
 
@@ -154,7 +160,7 @@ class ProductController {
         const cache = new Cache();
 
         const { product_id } = req.params;
-        const { name, code, categories } = req.body;
+        const { name, code, brand, categories } = req.body;
 
         const userHasAccessToProduct = await checkIfUserHasAccessToAProduct({
             product_id,
@@ -181,8 +187,14 @@ class ProductController {
             });
         }
 
+        const team = await getProductTeam(product);
+
+        const brands = await getAllBrands({ team_id: team.id });
+        const findedBrand = brands.find(b => b.id === brand);
+
         product.name = name;
         product.code = code;
+        product.brand = findedBrand;
 
         const updatedProduct = await productRepository.save(product);
 
@@ -211,8 +223,6 @@ class ProductController {
                 category,
             });
         }
-
-        const team = await getProductTeam(updatedProduct);
 
         await cache.invalidade(`products-from-teams:${team.id}`);
         await cache.invalidade(`product:${team.id}:${updatedProduct.id}`);

@@ -5,6 +5,7 @@ import Cache from '@services/Cache';
 import { checkIfProductAlreadyExists } from '@functions/Products';
 import { sortBatchesByExpDate } from '@functions/Batches';
 import { addProductToCategory } from '@functions/Category/Products';
+import { getAllBrands } from '@utils/Brand';
 
 import Product from '@models/Product';
 import Category from '@models/Category';
@@ -42,6 +43,7 @@ export async function getProduct({
     const product = await reposity
         .createQueryBuilder('product')
         .where('product.id = :product_id', { product_id })
+        .leftJoinAndSelect('product.brand', 'brand')
         .leftJoinAndSelect('product.categories', 'categories')
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('categories.category', 'category')
@@ -80,6 +82,7 @@ export async function getProduct({
 interface createProductProps {
     name: string;
     code?: string;
+    brand?: string;
     team_id: string;
     categories?: Array<string>;
 }
@@ -87,6 +90,7 @@ interface createProductProps {
 export async function createProduct({
     name,
     code,
+    brand,
     team_id,
     categories,
 }: createProductProps): Promise<Product> {
@@ -120,9 +124,13 @@ export async function createProduct({
         });
     }
 
+    const allBrands = await getAllBrands({ team_id });
+    const findedBrand = allBrands.find(b => b.id === brand);
+
     const prod: Product = new Product();
     prod.name = name;
     prod.code = code || null;
+    prod.brand = findedBrand;
 
     const savedProd = await repository.save(prod);
 

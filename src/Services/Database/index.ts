@@ -3,6 +3,7 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import Batch from '@models/Batch';
 import Category from '@models/Category';
 import Product from '@models/Product';
+import Brand from '@models/Brand';
 import Team from '@models/Team';
 import User from '@models/User';
 import UserRoles from '@models/UserRoles';
@@ -22,6 +23,7 @@ async function setConnection(): Promise<void> {
                 Batch,
                 Category,
                 Product,
+                Brand,
                 Team,
                 User,
                 UserRoles,
