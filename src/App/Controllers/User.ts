@@ -10,7 +10,7 @@ import User from '@models/User';
 import { deleteUser } from '@functions/Users';
 
 import Cache from '@services/Cache';
-import { createUser, updateUser } from '@utils/User';
+import { createUser, getUserByFirebaseId, updateUser } from '@utils/User';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -139,12 +139,7 @@ class UserController {
             ),
         });
 
-        const schemaParams = Yup.object().shape({
-            user_id: Yup.string().required().uuid(),
-        });
-
         try {
-            await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
             if (err instanceof Error)
@@ -154,11 +149,12 @@ class UserController {
                 });
         }
 
-        const { user_id } = req.params;
         const { name, lastName, email, password } = req.body;
 
+        const user = await getUserByFirebaseId(req.userId || '');
+
         const updatedUser = await updateUser({
-            id: user_id,
+            id: user.id,
             name,
             lastName,
             email,

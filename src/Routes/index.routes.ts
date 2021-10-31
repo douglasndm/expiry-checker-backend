@@ -30,9 +30,8 @@ routes.post('/sessions', SessionController.store);
 
 routes.use(DeviceChecker);
 
-// end temp route
 routes.get('/users', User.index);
-
+routes.put('/users', User.update);
 routes.delete('/users', User.delete);
 
 routes.get('/user/teams', UserTeams.index);
