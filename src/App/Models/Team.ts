@@ -19,7 +19,7 @@ export default class Team {
     id: string;
 
     @Column('varchar')
-    name: string;
+    name?: string;
 
     @OneToMany(() => Category, category => category.team)
     categories: Array<Category>;
