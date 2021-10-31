@@ -11,7 +11,7 @@ interface UserToNotificate {
 
 interface TeamToNotificate {
     id: string;
-    name: string;
+    name?: string;
     expiredBatches?: number;
     nextExpBatches?: number;
     users: UserToNotificate[];
