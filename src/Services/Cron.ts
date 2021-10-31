@@ -125,8 +125,12 @@ const job = schedule.scheduleJob(
             }
         });
 
-        notifications.forEach(notificaiton => {
-            axios.post(`${process.env.MAIL_SERVICE_URL}/send`, notificaiton);
-        });
+        if (true === false)
+            notifications.forEach(notificaiton => {
+                axios.post(
+                    `${process.env.MAIL_SERVICE_URL}/send`,
+                    notificaiton,
+                );
+            });
     },
 );
