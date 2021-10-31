@@ -16,13 +16,22 @@ export default class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column()
+    name?: string;
+
+    @Column({ name: 'last_name' })
+    lastName?: string;
+
     @Column('varchar', { name: 'firebase_uid' })
     firebaseUid: string;
 
     @Column('varchar')
     email: string;
 
-    @OneToMany(type => UserRoles, userRoles => userRoles.user)
+    @Column()
+    password?: string;
+
+    @OneToMany(() => UserRoles, userRoles => userRoles.user)
     roles: Array<UserRoles>;
 
     @OneToOne(() => UserDevice)

@@ -125,7 +125,7 @@ const job = schedule.scheduleJob(
             }
         });
 
-        if (true === false)
+        if (!process.env.DEV_MODE)
             notifications.forEach(notificaiton => {
                 axios.post(
                     `${process.env.MAIL_SERVICE_URL}/send`,
