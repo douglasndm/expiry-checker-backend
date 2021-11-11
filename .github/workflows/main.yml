@@ -75,7 +75,7 @@ jobs:
           script: |            
             cd "~/apps/teams"
             yarn            
-            ./node_modules/.bin/typeorm migration:run
+            ~/apps/teams/node_modules/.bin/typeorm migration:run
             pm2 restart ExpiryTeams
             
 
