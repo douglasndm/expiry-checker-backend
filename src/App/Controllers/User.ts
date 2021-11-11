@@ -7,9 +7,10 @@ import AppError from '@errors/AppError';
 
 import User from '@models/User';
 
-import { createUser, deleteUser } from '@functions/Users';
+import { deleteUser } from '@functions/Users';
 
 import Cache from '@services/Cache';
+import { createUser, getUserByFirebaseId, updateUser } from '@utils/User';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -70,16 +71,27 @@ class UserController {
     async store(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             firebaseUid: Yup.string().required(),
+            name: Yup.string(),
+            lastName: Yup.string(),
             email: Yup.string().required().email(),
+            password: Yup.string(),
+            passwordConfirm: Yup.string().oneOf(
+                [Yup.ref('password'), null],
+                'Password confirmation does not match',
+            ),
         });
 
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message, internalErrorCode: 1 });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    internalErrorCode: 1,
+                });
         }
 
-        const { firebaseUid, email } = req.body;
+        const { firebaseUid, email, name, lastName, password } = req.body;
 
         let userId = firebaseUid;
 
@@ -102,11 +114,54 @@ class UserController {
 
         const cache = new Cache();
 
-        const savedUser = await createUser({ firebaseUid, email });
+        const savedUser = await createUser({
+            firebaseUid,
+            email,
+            name,
+            lastName,
+            password,
+        });
 
         await cache.invalidade('users_devices');
 
         return res.status(201).json(savedUser);
+    }
+
+    async update(req: Request, res: Response): Promise<Response> {
+        const schema = Yup.object().shape({
+            name: Yup.string(),
+            lastName: Yup.string(),
+            email: Yup.string().email(),
+            password: Yup.string(),
+            passwordConfirm: Yup.string().oneOf(
+                [Yup.ref('password'), null],
+                'Password confirmation does not match',
+            ),
+        });
+
+        try {
+            await schema.validate(req.body);
+        } catch (err) {
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    internalErrorCode: 1,
+                });
+        }
+
+        const { name, lastName, email, password } = req.body;
+
+        const user = await getUserByFirebaseId(req.userId || '');
+
+        const updatedUser = await updateUser({
+            id: user.id,
+            name,
+            lastName,
+            email,
+            password,
+        });
+
+        return res.status(201).json(updatedUser);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {

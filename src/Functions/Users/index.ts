@@ -21,26 +21,6 @@ export async function getUser(user_id: string): Promise<User | null> {
     return user;
 }
 
-interface createUserProps {
-    firebaseUid: string;
-    email: string;
-}
-
-export async function createUser({
-    firebaseUid,
-    email,
-}: createUserProps): Promise<User> {
-    const userRepository = getRepository(User);
-
-    const user = new User();
-    user.firebaseUid = firebaseUid;
-    user.email = email;
-
-    const savedUser = await userRepository.save(user);
-
-    return savedUser;
-}
-
 // #region
 interface deleteUserProps {
     user_id: string;

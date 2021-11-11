@@ -11,10 +11,10 @@ import { sortProductsByBatchesExpDate } from '@functions/Products';
 
 import ProductTeams from '@models/ProductTeams';
 import UserRoles from '@models/UserRoles';
-import User from '@models/User';
 import Team from '@models/Team';
 
 import Cache from '@services/Cache';
+import { createTeam } from '@utils/Team';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -139,11 +139,12 @@ class TeamController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -156,71 +157,12 @@ class TeamController {
 
         const { name } = req.body;
 
-        const teamRepository = getRepository(Team);
-        const userRepository = getRepository(User);
-        const userRolesRepository = getRepository(UserRoles);
-
-        const user = await userRepository.findOne({
-            where: {
-                firebaseUid: req.userId,
-            },
+        const team = await createTeam({
+            name,
+            admin_id: req.userId,
         });
 
-        if (!user) {
-            throw new AppError({
-                message: 'User was not found',
-                statusCode: 400,
-                internalErrorCode: 7,
-            });
-        }
-
-        // Check if user already has a team with the same name
-        const userTeams = await userRolesRepository
-            .createQueryBuilder('userTeams')
-            .leftJoinAndSelect('userTeams.team', 'team')
-            .leftJoinAndSelect('userTeams.user', 'user')
-            .where('user.firebaseUid = :user_id', { user_id: req.userId })
-            .getMany();
-
-        const alreadyManager = userTeams.filter(
-            ur => ur.role.toLowerCase() === 'manager',
-        );
-
-        if (alreadyManager.length > 0) {
-            throw new AppError({
-                message: 'You are already a manager from another team',
-                statusCode: 400,
-            });
-        }
-
-        const existsName = userTeams.filter(
-            ur => ur.team.name.toLowerCase() === String(name).toLowerCase(),
-        );
-
-        if (existsName.length > 0) {
-            throw new AppError({
-                message: 'You already have a team with that name',
-                statusCode: 400,
-                internalErrorCode: 14,
-            });
-        }
-
-        const team = new Team();
-        team.name = name;
-
-        const savedTeam = await teamRepository.save(team);
-
-        const userRole = new UserRoles();
-        userRole.team = savedTeam;
-        userRole.user = user;
-        userRole.role = 'Manager';
-
-        const savedRole = await userRolesRepository.save(userRole);
-
-        return res.status(200).json({
-            team: savedTeam,
-            user_role: savedRole.role,
-        });
+        return res.status(200).json(team);
     }
 
     async update(req: Request, res: Response): Promise<Response> {
@@ -236,7 +178,11 @@ class TeamController {
             await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message, internalErrorCode: 1 });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
