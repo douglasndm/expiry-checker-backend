@@ -2,7 +2,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -15,11 +15,11 @@ class ProductTeams {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Product, product => product.team)
+    @OneToOne(() => Product, product => product.team)
     @JoinColumn({ name: 'product_id' })
     product: Product;
 
-    @ManyToOne(type => Team, team => team.users)
+    @OneToOne(() => Team, team => team.users)
     @JoinColumn({ name: 'team_id' })
     team: Team;
 
