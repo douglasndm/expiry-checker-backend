@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import User from '@controllers/User';
 import Product from '@controllers/Product';
+import Products from '@controllers/Products';
 import Brand from '@controllers/Brand';
 import Category from '@controllers/Category';
 import ProductCategory from '@controllers/ProductCategory';
@@ -40,6 +41,8 @@ routes.get('/products/:product_id', Product.index);
 routes.post('/products', Product.create);
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
+
+routes.delete('/products', Products.delete);
 
 routes.get('/brands/team/:team_id', Brand.index);
 routes.post('/brand', Brand.store);

@@ -3,6 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -27,7 +28,7 @@ export default class Team {
     @OneToMany(() => UserRoles, userRoles => userRoles.user)
     users: Array<UserRoles>;
 
-    @OneToMany(() => ProductTeams, productTeams => productTeams.team)
+    @OneToOne(() => ProductTeams, productTeams => productTeams.team)
     products: Array<ProductTeams>;
 
     @OneToMany(() => Brand, brand => brand.team)
