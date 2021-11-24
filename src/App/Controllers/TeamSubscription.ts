@@ -15,7 +15,8 @@ class TeamSubscriptionsController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            if (err instanceof Error)
+                throw new AppError({ message: err.message });
         }
 
         if (!req.userId) {
