@@ -9,7 +9,6 @@ export default async function deviceChecker(
     res: Response,
     next: NextFunction,
 ): Promise<void | Response> {
-    return next();
     const device_id = req.headers.deviceid;
 
     if (!device_id) {
