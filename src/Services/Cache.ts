@@ -16,8 +16,8 @@ export default class RedisCache {
             return null;
         }
 
-        if (process.env.DEV_MODE)
-            console.log(`Getting from cache. Key -> ${key}`);
+        // if (process.env.DEV_MODE)
+        //     console.log(`Getting from cache. Key -> ${key}`);
 
         const parsedData = JSON.parse(response) as T;
 
@@ -27,14 +27,14 @@ export default class RedisCache {
     public async save(key: string, value: any): Promise<void> {
         await this.client.set(key, JSON.stringify(value));
 
-        if (process.env.DEV_MODE) console.log(`Saving in cache. Key -> ${key}`);
+        // if (process.env.DEV_MODE) console.log(`Saving in cache. Key -> ${key}`);
     }
 
     public async invalidade(key: string): Promise<void> {
         await this.client.del(key);
 
-        if (process.env.DEV_MODE)
-            console.log(`Invalidaing cache. Key -> ${key}`);
+        // if (process.env.DEV_MODE)
+        //     console.log(`Invalidaing cache. Key -> ${key}`);
     }
 
     public async invalidadePrefix(prefix: string): Promise<void> {
