@@ -12,7 +12,7 @@ import './Services/Cron';
 
 import App from './start';
 
-if (!process.env.DEV_MODE) {
+if (Boolean(process.env.DEV_MODE) !== true) {
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
         integrations: [
