@@ -89,6 +89,9 @@ class BatchNotificationController {
                     notification: {
                         title: 'Verifique esse produto',
                         body: messageString,
+                        data: {
+                            deeplinking: `expiryteams://product/${batch.product.id}`,
+                        },
                     },
                     token: user.device,
                 });
