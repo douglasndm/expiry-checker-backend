@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import { addDays } from 'date-fns';
+import { addDays, compareAsc, startOfDay } from 'date-fns';
 
 import Team from '@models/Team';
 import Batch from '@models/Batch';
@@ -37,12 +37,27 @@ export async function getAllTeamsExpiredProducts(): Promise<
 
     const teams = teamsWithProducts.map(team => {
         const products = team.products.map(prod => {
-            const expiredBatches = prod.product.batches.filter(
-                batch => batch.exp_date <= new Date(),
-            );
-            const nextBatches = prod.product.batches.filter(
-                batch => batch.exp_date > new Date(),
-            );
+            const { batches } = prod.product;
+
+            const today = startOfDay(new Date());
+
+            const expiredBatches = batches.filter(batch => {
+                const batchDate = startOfDay(batch.exp_date);
+
+                if (compareAsc(batchDate, today) < 0) {
+                    return true;
+                }
+                return false;
+            });
+
+            const nextBatches = batches.filter(batch => {
+                const batchDate = startOfDay(batch.exp_date);
+
+                if (compareAsc(batchDate, today) >= 0) {
+                    return true;
+                }
+                return false;
+            });
 
             return {
                 id: prod.product.id,
@@ -54,7 +69,7 @@ export async function getAllTeamsExpiredProducts(): Promise<
 
         return {
             id: team.id,
-            name: team.name,
+            name: team.name || '',
             products,
         };
     });
