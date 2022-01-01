@@ -9,11 +9,10 @@ import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
+import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
-
-import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
 import batchRoutes from './batch.routes';
 import teamRoutes from './team.routes';

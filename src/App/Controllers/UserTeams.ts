@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
-import AppError from '@errors/AppError';
-
-import { recheck } from '@functions/Team/Subscription';
-
 import UserRoles from '@models/UserRoles';
+
+import { recheckTemp } from '@functions/Subscriptions';
+
+import AppError from '@errors/AppError';
 
 class UserTeams {
     async index(req: Request, res: Response): Promise<Response> {
@@ -30,9 +30,9 @@ class UserTeams {
             role => role.role.toLowerCase() === 'manager',
         );
 
-        const subscription = await recheck({
-            team_id: teamsManager[0].team.id,
-        });
+        const team_id = teamsManager[0].team.id;
+
+        const subscription = await recheckTemp(team_id);
 
         const teams = userRoles.map(team => {
             if (team.role.toLowerCase() === 'manager') {

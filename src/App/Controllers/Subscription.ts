@@ -1,50 +1,31 @@
 import { Request, Response } from 'express';
 
-import { recheck } from '@functions/Team/Subscription';
-import {
-    checkSubscriptionOnRevenueCat,
-    checkSubscriptions,
-    getTeamSubscription,
-} from '@functions/Subscriptions';
-import { getTeamAdmin } from '@utils/UserRoles';
+import { getTeamSubscription } from '@utils/Subscription';
+import { recheckTemp } from '@functions/Subscriptions';
 
 class SubscriptionController {
-    async check(req: Request, res: Response): Promise<Response> {
+    async index(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
 
-        let response = await checkSubscriptionOnRevenueCat(team_id);
+        // this is temporary while an app update will be prepare to fix it
+        // Mobile app expect an empty response when no subscriptions are available
+        // new method will responde an error
+        try {
+            const subscription = await getTeamSubscription(team_id);
 
-        // Check if subscriptions object is empty for TEAM ID, if true
-        // check for subscription for the manager id
-        if (Object.keys(response.subscriber.subscriptions).length <= 0) {
-            console.log(
-                `Team: ${team_id} does not have a subscription, checking for its manager`,
-            );
-            const admin = await getTeamAdmin(team_id);
-
-            response = await checkSubscriptionOnRevenueCat(admin.firebaseUid);
+            return res.json(subscription);
+        } catch {
+            return res.send();
         }
-
-        await checkSubscriptions({
-            team_id,
-            revenuecatSubscriptions: response,
-        });
-
-        const subscription = await getTeamSubscription({ team_id });
-
-        if (subscription) {
-            return res.status(200).json(subscription);
-        }
-
-        return res.status(204).send();
     }
 
+    // TEMP FOR LEGACY
     async recheck(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
 
-        const subs = await recheck({ team_id });
+        const subscriptions = await recheckTemp(team_id);
 
-        return res.status(200).json(subs);
+        return res.json(subscriptions);
     }
 }
 
