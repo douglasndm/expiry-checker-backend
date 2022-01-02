@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
-    "dev": "ts-node-dev -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
     "typeorm": "node --require ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
@@ -19,7 +19,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
-    "firebase-admin": "^9.8.0",
+    "firebase-admin": "^10.0.1",
     "ioredis": "^4.27.6",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",

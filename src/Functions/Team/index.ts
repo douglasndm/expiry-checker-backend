@@ -3,16 +3,13 @@ import { compareAsc, startOfDay } from 'date-fns';
 
 import Team from '@models/Team';
 
+import { getTeamSubscription } from '@utils/Subscription';
+
 import AppError from '@errors/AppError';
 
 import { isUserManager } from '@functions/Users/UserRoles';
 import { getAllUsersFromTeam } from './Users';
 import { deleteAllProducts } from './Products';
-import {
-    checkSubscriptionOnRevenueCat,
-    checkSubscriptions,
-    getTeamSubscription,
-} from '../Subscriptions';
 
 interface getTeamProps {
     team_id: string;
@@ -39,29 +36,9 @@ interface checkIfTeamIsActiveProps {
 export async function checkIfTeamIsActive({
     team_id,
 }: checkIfTeamIsActiveProps): Promise<boolean> {
-    const teamRepository = getRepository(Team);
-    const team = await getTeam({ team_id });
-
     const today = startOfDay(new Date());
 
-    if (
-        !team.lastTimeChecked ||
-        compareAsc(today, team.lastTimeChecked) === 1
-    ) {
-        console.log(
-            `Checking subscription with Revenuecat for team -> ${team.name}(${team_id})`,
-        );
-        const revenuecat = await checkSubscriptionOnRevenueCat(team.id);
-        await checkSubscriptions({
-            team_id,
-            revenuecatSubscriptions: revenuecat,
-        });
-
-        team.lastTimeChecked = today;
-        await teamRepository.save(team);
-    }
-
-    const subscriptions = await getTeamSubscription({ team_id });
+    const subscriptions = await getTeamSubscription(team_id);
 
     if (!subscriptions) {
         return false;
@@ -88,7 +65,7 @@ interface checkMembersLimitResponse {
 export async function checkMembersLimit({
     team_id,
 }: checkMembersLimitProps): Promise<checkMembersLimitResponse> {
-    const sub = await getTeamSubscription({ team_id });
+    const sub = await getTeamSubscription(team_id);
 
     if (!sub) {
         throw new AppError({

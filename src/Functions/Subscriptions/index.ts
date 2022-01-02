@@ -1,11 +1,13 @@
 import { getRepository } from 'typeorm';
-import axios from 'axios';
-import { startOfDay, parseISO, compareAsc } from 'date-fns';
-
-import AppError from '@errors/AppError';
+import { startOfDay, compareAsc } from 'date-fns';
 
 import Team from '@models/Team';
 import TeamSubscription from '@models/TeamSubscription';
+
+import { getExternalSubscriptionStatus } from '@utils/Subscription';
+import { getTeamAdmin } from '@utils/UserRoles';
+
+import AppError from '@errors/AppError';
 
 interface getTeamSubscriptionProps {
     team_id: string;
@@ -83,146 +85,98 @@ export async function createSubscription({
     await teamSubscriptionRepository.save(teamSubscription);
 }
 
-interface checkSubscriptionsProps {
-    team_id: string;
-    revenuecatSubscriptions: IRevenueCatResponse;
+interface recheckResponse {
+    name: string;
+    subscription: RevenueCatSubscription;
 }
 
-export async function checkSubscriptions({
-    team_id,
-    revenuecatSubscriptions,
-}: checkSubscriptionsProps): Promise<void> {
-    const { subscriptions: subs } = revenuecatSubscriptions.subscriber;
+export async function recheckTemp(id: string): Promise<recheckResponse[]> {
+    const response = await getExternalSubscriptionStatus(id);
+    const { subscriptions: subs } = response.subscriber;
 
-    const subscription = await getTeamSubscription({ team_id });
+    const subscriptions = subs;
 
-    interface revenueSubscriptionsProps {
-        expires_date: Date;
-        purchase_date: Date;
-        membersLimit: 1 | 2 | 3 | 5 | 10 | 15;
-    }
+    const allSubscription: Array<recheckResponse> = [];
 
-    const revenueSubscriptions: Array<revenueSubscriptionsProps> = [];
-
-    // #region
-    if (subs.expirybusiness_monthly_default_15people) {
-        const {
-            expires_date,
-            purchase_date,
-        } = subs.expirybusiness_monthly_default_15people;
-
-        revenueSubscriptions.push({
-            expires_date: parseISO(expires_date),
-            purchase_date: parseISO(purchase_date),
-            membersLimit: 15,
+    if (subscriptions.expirybusiness_monthly_default_15people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_15people',
+            subscription: subscriptions.expirybusiness_monthly_default_15people,
         });
     }
-    if (subs.expirybusiness_monthly_default_10people) {
-        const {
-            expires_date,
-            purchase_date,
-        } = subs.expirybusiness_monthly_default_10people;
-
-        revenueSubscriptions.push({
-            expires_date: parseISO(expires_date),
-            purchase_date: parseISO(purchase_date),
-            membersLimit: 10,
+    if (subscriptions.expirybusiness_monthly_default_10people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_10people',
+            subscription: subscriptions.expirybusiness_monthly_default_10people,
         });
     }
-    if (subs.expirybusiness_monthly_default_5people) {
-        const {
-            expires_date,
-            purchase_date,
-        } = subs.expirybusiness_monthly_default_5people;
-
-        revenueSubscriptions.push({
-            expires_date: parseISO(expires_date),
-            purchase_date: parseISO(purchase_date),
-            membersLimit: 5,
+    if (subscriptions.expirybusiness_monthly_default_5people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_5people',
+            subscription: subscriptions.expirybusiness_monthly_default_5people,
         });
     }
-    if (subs.expirybusiness_monthly_default_3people) {
-        const {
-            expires_date,
-            purchase_date,
-        } = subs.expirybusiness_monthly_default_3people;
-
-        revenueSubscriptions.push({
-            expires_date: parseISO(expires_date),
-            purchase_date: parseISO(purchase_date),
-            membersLimit: 3,
+    if (subscriptions.expirybusiness_monthly_default_3people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_3people',
+            subscription: subscriptions.expirybusiness_monthly_default_3people,
         });
     }
-    if (subs.expirybusiness_monthly_default_2people) {
-        const {
-            expires_date,
-            purchase_date,
-        } = subs.expirybusiness_monthly_default_2people;
-
-        revenueSubscriptions.push({
-            expires_date: parseISO(expires_date),
-            purchase_date: parseISO(purchase_date),
-            membersLimit: 2,
+    if (subscriptions.expirybusiness_monthly_default_2people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_2people',
+            subscription: subscriptions.expirybusiness_monthly_default_2people,
         });
     }
-    if (subs.expirybusiness_monthly_default_1person) {
-        const {
-            expires_date,
-            purchase_date,
-        } = subs.expirybusiness_monthly_default_1person;
-
-        revenueSubscriptions.push({
-            expires_date: parseISO(expires_date),
-            purchase_date: parseISO(purchase_date),
-            membersLimit: 1,
+    if (subscriptions.expirybusiness_monthly_default_1person) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_1person',
+            subscription: subscriptions.expirybusiness_monthly_default_1person,
         });
     }
-    // #endregion
 
-    // sort subscriptions by exp date
-    const sortedRevenueSubs = revenueSubscriptions.sort((sub1, sub2) => {
-        if (compareAsc(sub1.purchase_date, sub2.purchase_date) < 0) {
-            return 1;
-        }
-        if (compareAsc(sub1.purchase_date, sub2.purchase_date) === 0) {
-            return 0;
-        }
-        return -1;
-    });
-
-    if (subscription && sortedRevenueSubs.length > 0) {
-        if (subscription.membersLimit === sortedRevenueSubs[0].membersLimit) {
-            const subsciptionDate = startOfDay(subscription.expireIn);
-            const revenueDate = startOfDay(sortedRevenueSubs[0].expires_date);
-
-            if (compareAsc(subsciptionDate, revenueDate) === 0) {
-                return;
-            }
-        }
-    }
-
-    if (sortedRevenueSubs.length > 0) {
-        const date = startOfDay(sortedRevenueSubs[0].expires_date);
-
-        await createSubscription({
-            team_id,
-            exp_date: date,
-            members_limit: sortedRevenueSubs[0].membersLimit,
-        });
-    }
-}
-
-export async function checkSubscriptionOnRevenueCat(
-    team_id: string,
-): Promise<IRevenueCatResponse> {
-    const response = await axios.get<IRevenueCatResponse>(
-        `https://api.revenuecat.com/v1/subscribers/${team_id}`,
-        {
-            headers: {
-                Authorization: process.env.REVENUECAT_API_KEY,
-            },
-        },
+    const teamAdmin = await getTeamAdmin(id);
+    const adminSubscription = await getExternalSubscriptionStatus(
+        teamAdmin.firebaseUid,
     );
 
-    return response.data;
+    const adminSub = adminSubscription.subscriber.subscriptions;
+
+    if (adminSub.expirybusiness_monthly_default_15people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_15people',
+            subscription: adminSub.expirybusiness_monthly_default_15people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_10people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_10people',
+            subscription: adminSub.expirybusiness_monthly_default_10people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_5people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_5people',
+            subscription: adminSub.expirybusiness_monthly_default_5people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_3people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_3people',
+            subscription: adminSub.expirybusiness_monthly_default_3people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_2people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_2people',
+            subscription: adminSub.expirybusiness_monthly_default_2people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_1person) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_1person',
+            subscription: adminSub.expirybusiness_monthly_default_1person,
+        });
+    }
+    return allSubscription;
 }

@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import Team from '@controllers/Team';
 import TeamUsers from '@controllers/TeamUsers';
-import TeamSubscriptions from '@controllers/TeamSubscription';
 import Subscription from '@controllers/Subscription';
 import UserManager from '@controllers/UserManager';
 
@@ -21,9 +20,9 @@ routes.put('', Team.update);
 routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
 
-routes.get('/subscriptions', TeamSubscriptions.index);
-routes.get('/subscriptions/check', Subscription.check);
+routes.get('/subscriptions', Subscription.index);
 
+// temp route
 routes.get('/subscriptions/recheck', Subscription.recheck);
 
 // From now one all routes will check if user is a manager
