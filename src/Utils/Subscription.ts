@@ -165,32 +165,16 @@ export async function getTeamSubscription(
             teamAdmin.firebaseUid,
         );
 
-        const { subscriber_attributes } = adminSubscription.subscriber;
-
-        if (subscriber_attributes && subscriber_attributes.team_id) {
-            const { value } = subscriber_attributes.team_id;
-
-            // Check if admin team id is the same as team id
-            if (value === team_id) {
-                if (
-                    Object.keys(adminSubscription.subscriber.subscriptions)
-                        .length <= 0
-                ) {
-                    throw new AppError({
-                        message:
-                            "Team or admin doesn't have an active subscription",
-                        internalErrorCode: 5,
-                    });
-                }
-
-                subscriptionToCheck = adminSubscription;
-            }
-        } else {
+        if (
+            Object.keys(adminSubscription.subscriber.subscriptions).length <= 0
+        ) {
             throw new AppError({
                 message: "Team or admin doesn't have an active subscription",
                 internalErrorCode: 5,
             });
         }
+
+        subscriptionToCheck = adminSubscription;
     }
 
     await checkAndSaveTeamSubscription({
