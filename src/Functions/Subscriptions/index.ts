@@ -94,17 +94,7 @@ export async function recheckTemp(id: string): Promise<recheckResponse[]> {
     const response = await getExternalSubscriptionStatus(id);
     const { subscriptions: subs } = response.subscriber;
 
-    let subscriptions = subs;
-
-    if (Object.keys(subs).length <= 0) {
-        const teamAdmin = await getTeamAdmin(id);
-
-        const adminSubscription = await getExternalSubscriptionStatus(
-            teamAdmin.firebaseUid,
-        );
-
-        subscriptions = adminSubscription.subscriber.subscriptions;
-    }
+    const subscriptions = subs;
 
     const allSubscription: Array<recheckResponse> = [];
 
@@ -132,6 +122,12 @@ export async function recheckTemp(id: string): Promise<recheckResponse[]> {
             subscription: subscriptions.expirybusiness_monthly_default_3people,
         });
     }
+    if (subscriptions.expirybusiness_monthly_default_2people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_2people',
+            subscription: subscriptions.expirybusiness_monthly_default_2people,
+        });
+    }
     if (subscriptions.expirybusiness_monthly_default_1person) {
         allSubscription.push({
             name: 'expirybusiness_monthly_default_1person',
@@ -139,5 +135,48 @@ export async function recheckTemp(id: string): Promise<recheckResponse[]> {
         });
     }
 
+    const teamAdmin = await getTeamAdmin(id);
+    const adminSubscription = await getExternalSubscriptionStatus(
+        teamAdmin.firebaseUid,
+    );
+
+    const adminSub = adminSubscription.subscriber.subscriptions;
+
+    if (adminSub.expirybusiness_monthly_default_15people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_15people',
+            subscription: adminSub.expirybusiness_monthly_default_15people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_10people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_10people',
+            subscription: adminSub.expirybusiness_monthly_default_10people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_5people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_5people',
+            subscription: adminSub.expirybusiness_monthly_default_5people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_3people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_3people',
+            subscription: adminSub.expirybusiness_monthly_default_3people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_2people) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_2people',
+            subscription: adminSub.expirybusiness_monthly_default_2people,
+        });
+    }
+    if (adminSub.expirybusiness_monthly_default_1person) {
+        allSubscription.push({
+            name: 'expirybusiness_monthly_default_1person',
+            subscription: adminSub.expirybusiness_monthly_default_1person,
+        });
+    }
     return allSubscription;
 }
