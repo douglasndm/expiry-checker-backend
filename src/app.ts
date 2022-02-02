@@ -8,11 +8,12 @@ import Routes from './Routes/index.routes';
 
 import './Functions/Auth/Firebase';
 
+import './Services/Database';
 import './Services/Cron';
 
 import App from './start';
 
-if (Boolean(process.env.DEV_MODE) !== true) {
+if (process.env.DEV_MODE === 'false') {
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
         integrations: [

@@ -1,15 +1,15 @@
 module.exports = {
     presets: [
-        ['@babel/preset-env', { targets: { node: 'current' }}],
-        '@babel/preset-typescript'
+        ["@babel/preset-env", { targets: { node: "current" }}],
+        "@babel/preset-typescript"
     ],
     plugins: [
-        ['module-resolver', {
+        ["module-resolver", {
             alias: {
                 "@controllers": "./src/App/Controllers",
                 "@middlewares": "./src/App/Middlewares",
                 "@models": "./src/App/Models",
-                "@utils": './src/Utils',
+                "@utils": "./src/Utils",
                 "@functions": "./src/Functions",
                 "@config": "./src/Config",
                 "@services": "./src/Services",
