@@ -32,6 +32,42 @@ async function checkAndSaveTeamSubscription({
     const revenueSubscriptions: Array<revenueSubscriptionsProps> = [];
 
     // #region adiciona cada uma das assinaturas no array
+    if (subs.expiryteams_monthly_default_60people) {
+        const {
+            expires_date,
+            purchase_date,
+        } = subs.expiryteams_monthly_default_60people;
+
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 60,
+        });
+    }
+    if (subs.expiryteams_monthly_default_45people) {
+        const {
+            expires_date,
+            purchase_date,
+        } = subs.expiryteams_monthly_default_45people;
+
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 45,
+        });
+    }
+    if (subs.expiryteams_monthly_default_30people) {
+        const {
+            expires_date,
+            purchase_date,
+        } = subs.expiryteams_monthly_default_30people;
+
+        revenueSubscriptions.push({
+            expires_date: parseISO(expires_date),
+            purchase_date: parseISO(purchase_date),
+            membersLimit: 30,
+        });
+    }
     if (subs.expirybusiness_monthly_default_15people) {
         const {
             expires_date,

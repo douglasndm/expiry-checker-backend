@@ -14,6 +14,9 @@ interface IRevenueCatResponse {
             expirybusiness_monthly_default_5people?: RevenueCatSubscription;
             expirybusiness_monthly_default_10people?: RevenueCatSubscription;
             expirybusiness_monthly_default_15people?: RevenueCatSubscription;
+            expiryteams_monthly_default_30people?: RevenueCatSubscription;
+            expiryteams_monthly_default_45people?: RevenueCatSubscription;
+            expiryteams_monthly_default_60people?: RevenueCatSubscription;
         };
     };
 }
