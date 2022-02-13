@@ -116,6 +116,20 @@ export async function updateBrand({
     return updatedBrand;
 }
 
+export async function getAllProductsFromBrand({
+    brand_id,
+}: getAllProductsFromBrand): Promise<Product[]> {
+    const productRepository = getRepository(Product);
+
+    const products = await productRepository
+        .createQueryBuilder('prod')
+        .leftJoinAndSelect('prod.batches', 'batches')
+        .where('prod.brand = :brand_id', { brand_id })
+        .getMany();
+
+    return products;
+}
+
 export async function deleteBrand({
     brand_id,
     user_id,
@@ -147,24 +161,27 @@ export async function deleteBrand({
         });
     }
 
+    const produtsInBrandRepository = getRepository(Product);
+    const produtsInBrand = await produtsInBrandRepository
+        .createQueryBuilder('prod')
+        .leftJoinAndSelect('prod.brand', 'brand')
+        .where('brand.id = :brand_id', { brand_id })
+        .getMany();
+
+    const updatedProds = produtsInBrand.map(prod => {
+        return {
+            ...prod,
+            brand: null,
+        };
+    });
+
+    await produtsInBrandRepository.save(updatedProds);
+
     await brandRepository.remove(brand);
 
     const cache = new Cache();
+    await cache.invalidade(`products-from-teams:${brand.team.id}`);
     await cache.invalidade(`team_brands:${brand.team.id}`);
-}
-
-export async function getAllProductsFromBrand({
-    brand_id,
-}: getAllProductsFromBrand): Promise<Product[]> {
-    const productRepository = getRepository(Product);
-
-    const products = await productRepository
-        .createQueryBuilder('prod')
-        .leftJoinAndSelect('prod.batches', 'batches')
-        .where('prod.brand = :brand_id', { brand_id })
-        .getMany();
-
-    return products;
 }
 
 export async function createManyBrands({
