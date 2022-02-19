@@ -6,8 +6,8 @@ export default async function check(
     next: NextFunction,
 ): Promise<Response | void> {
     if (
-        req.headers.internal_id &&
-        req.headers.internal_id === process.env.INTERNAL_ID
+        req.headers.internalid &&
+        req.headers.internalid === process.env.INTERNAL_ID
     ) {
         return next();
     }
