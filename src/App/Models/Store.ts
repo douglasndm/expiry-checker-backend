@@ -11,6 +11,7 @@ import {
 
 import UsersStores from '@models/UsersStores';
 import Team from '@models/Team';
+import Product from './Product';
 
 @Entity({ name: 'stores' })
 class Store {
@@ -26,6 +27,9 @@ class Store {
 
     @OneToMany(() => UsersStores, usersStores => usersStores.user)
     users: Array<UsersStores>;
+
+    @OneToMany(() => Product, product => product.store)
+    products: Array<Product>;
 
     @CreateDateColumn()
     created_at: Date;

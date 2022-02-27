@@ -82,6 +82,7 @@ class TeamController {
                 .where('product_teams.team_id = :id', { id: team_id })
                 .leftJoinAndSelect('product_teams.product', 'product')
 
+                .leftJoinAndSelect('product.store', 'store')
                 .leftJoinAndSelect('product.brand', 'brand')
                 .leftJoinAndSelect('product.categories', 'prodCat')
                 .leftJoinAndSelect('prodCat.category', 'category')
