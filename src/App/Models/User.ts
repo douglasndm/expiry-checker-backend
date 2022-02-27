@@ -10,6 +10,7 @@ import {
 
 import UserRoles from './UserRoles';
 import UserDevice from './UserDevice';
+import UsersStores from './UsersStores';
 
 @Entity({ name: 'users' })
 export default class User {
@@ -33,6 +34,9 @@ export default class User {
 
     @OneToMany(() => UserRoles, userRoles => userRoles.user)
     roles: Array<UserRoles>;
+
+    @OneToMany(() => UsersStores, usersStores => usersStores.user)
+    stores: Array<UsersStores>;
 
     @OneToOne(() => UserDevice)
     device: string;
