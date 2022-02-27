@@ -122,4 +122,42 @@ async function addUserToStore({
     await userStoresRepository.save(userStore);
 }
 
-export { getAllUsersFromStore, addUserToStore };
+async function removeUserFromStore({
+    user_id,
+    store_id,
+}: addUserToStoreProps): Promise<void> {
+    const schema = Yup.object().shape({
+        user_id: Yup.string().uuid().required(),
+        store_id: Yup.string().uuid().required(),
+    });
+
+    try {
+        await schema.validate({ store_id, user_id });
+    } catch (err) {
+        throw new AppError({
+            message: 'Check the user/store id',
+            internalErrorCode: 1,
+        });
+    }
+
+    const userStoresRepository = getRepository(UserStores);
+
+    const userStore = await userStoresRepository
+        .createQueryBuilder('userStore')
+        .leftJoinAndSelect('userStore.user', 'user')
+        .leftJoinAndSelect('userStore.store', 'store')
+        .where('user.id = :user_id', { user_id })
+        .andWhere('store.id = :store_id', { store_id })
+        .getOne();
+
+    if (!userStore) {
+        throw new AppError({
+            message: 'User is not in store',
+            internalErrorCode: 39,
+        });
+    }
+
+    await userStoresRepository.remove(userStore);
+}
+
+export { getAllUsersFromStore, addUserToStore, removeUserFromStore };
