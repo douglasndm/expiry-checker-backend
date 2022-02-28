@@ -42,6 +42,7 @@ class TeamUsersController {
             usersInTeam.forEach(user => {
                 usersResponse.push({
                     id: user.id,
+                    fid: user.fid,
                     email: user.email,
                     role: user.role,
                     status: user.status,
