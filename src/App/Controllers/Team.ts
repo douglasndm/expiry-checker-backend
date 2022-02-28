@@ -2,19 +2,22 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
+import Cache from '@services/Cache';
+
+import { createTeam } from '@utils/Team';
+import { getProductsFromTeam } from '@utils/Team/Products';
 
 import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
 import { deleteAllProducts } from '@functions/Team/Products';
 import { getAllUsersFromTeam } from '@functions/Team/Users';
 import { sortProductsByBatchesExpDate } from '@functions/Products';
 
-import ProductTeams from '@models/ProductTeams';
 import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 
-import Cache from '@services/Cache';
-import { createTeam } from '@utils/Team';
+import AppError from '@errors/AppError';
+import { getUserByFirebaseId } from '@utils/User';
+import Product from '@models/Product';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -45,7 +48,6 @@ class TeamController {
         const { removeCheckedBatches, sortByBatches } = req.query;
 
         const teamRepository = getRepository(Team);
-        const productTeamsRepository = getRepository(ProductTeams);
 
         const subscription = await checkIfTeamIsActive({ team_id });
 
@@ -69,67 +71,47 @@ class TeamController {
             });
         }
 
-        const cachedProds = await cache.get<Array<ProductTeams>>(
-            `products-from-teams:${team_id}`,
-        );
+        const team = await teamRepository.findOne(team_id);
 
-        if (!cachedProds) {
-            const team = await teamRepository.findOne(team_id);
+        const user = await getUserByFirebaseId(req.userId || '');
 
-            const prodTeam = await productTeamsRepository
-                .createQueryBuilder('product_teams')
-                .select('product_teams.id')
-                .where('product_teams.team_id = :id', { id: team_id })
-                .leftJoinAndSelect('product_teams.product', 'product')
+        const prodTeam = await getProductsFromTeam({
+            team_id,
+            user_id: user.id,
+        });
 
-                .leftJoinAndSelect('product.store', 'store')
-                .leftJoinAndSelect('product.brand', 'brand')
-                .leftJoinAndSelect('product.categories', 'prodCat')
-                .leftJoinAndSelect('prodCat.category', 'category')
-                .leftJoinAndSelect('product.batches', 'batches')
-                .orderBy('batches.exp_date', 'ASC')
-                .getMany();
+        let products: Product[] = prodTeam;
 
-            let products = prodTeam.map(p => p.product);
-
-            if (removeCheckedBatches) {
-                const checkedRemoved = products.map(prod => {
-                    const batches = prod.batches.filter(
-                        batch => batch.status !== 'checked',
-                    );
-
-                    return {
-                        ...prod,
-                        batches,
-                    };
-                });
-
-                products = checkedRemoved;
-            }
-
-            if (sortByBatches) {
-                products = sortProductsByBatchesExpDate(products);
-            }
-
-            const fixedCategories = products.map(p => {
-                const categories = p.categories.map(c => c.category);
+        if (removeCheckedBatches) {
+            const checkedRemoved = products.map(prod => {
+                const batches = prod.batches.filter(
+                    batch => batch.status !== 'checked',
+                );
 
                 return {
-                    ...p,
-                    brand: p.brand?.id,
-                    categories,
+                    ...prod,
+                    batches,
                 };
             });
 
-            await cache.save(`products-from-teams:${team_id}`, {
-                team,
-                products: fixedCategories,
-            });
-
-            return res.status(200).json({ team, products });
+            products = checkedRemoved;
         }
 
-        return res.status(200).json(cachedProds);
+        if (sortByBatches) {
+            products = sortProductsByBatchesExpDate(products);
+        }
+
+        const fixedCategories = products.map(p => {
+            const categories = p.categories.map(c => c.category);
+
+            return {
+                ...p,
+                brand: p.brand?.id,
+                categories,
+            };
+        });
+
+        return res.status(200).json({ team, products: fixedCategories });
     }
 
     async store(req: Request, res: Response): Promise<Response> {

@@ -9,13 +9,9 @@ import UserStores from '@models/UsersStores';
 
 import AppError from '@errors/AppError';
 
-interface getAllUsersFromStoreProps {
-    store_id: string;
-}
-
 async function getAllUsersFromStore({
     store_id,
-}: getAllUsersFromStoreProps): Promise<User[]> {
+}: getAllUsersFromStoreProps): Promise<getAllUsersFromStoreResponse[]> {
     const schema = Yup.object().shape({
         store_id: Yup.string().uuid().required(),
     });
@@ -31,18 +27,48 @@ async function getAllUsersFromStore({
 
     const userRepository = getRepository(User);
 
-    const users = userRepository
+    const users = await userRepository
         .createQueryBuilder('users')
-        .leftJoinAndSelect('users.stores', 'store')
-        .where('store.store_id = :store_id', { store_id })
+        .leftJoinAndSelect('users.stores', 'usersStores')
+        .leftJoinAndSelect('usersStores.store', 'store')
+        .where('store.id = :store_id', { store_id })
         .getMany();
 
-    return users;
+    const usersWithFixedStores = users.map(user => ({
+        ...user,
+        stores: user.stores.map(userStores => userStores.store),
+    }));
+
+    return usersWithFixedStores;
 }
 
-interface addUserToStoreProps {
-    user_id: string;
-    store_id: string;
+async function getAllStoresFromUser({
+    user_id,
+}: getAllStoresFromUserProps): Promise<Store[]> {
+    const schema = Yup.object().shape({
+        user_id: Yup.string().uuid().required(),
+    });
+
+    try {
+        await schema.validate({ user_id });
+    } catch (err) {
+        throw new AppError({
+            message: 'Check the user id',
+            internalErrorCode: 1,
+        });
+    }
+
+    const userStoresRepository = getRepository(UserStores);
+    const userStores = await userStoresRepository
+        .createQueryBuilder('userStores')
+        .leftJoinAndSelect('userStores.user', 'user')
+        .leftJoinAndSelect('userStores.store', 'store')
+        .where('user.id = :user_id', { user_id })
+        .getMany();
+
+    const stores = userStores.map(userStore => userStore.store);
+
+    return stores;
 }
 
 async function addUserToStore({
@@ -125,7 +151,7 @@ async function addUserToStore({
 async function removeUserFromStore({
     user_id,
     store_id,
-}: addUserToStoreProps): Promise<void> {
+}: removeUserFromStoreProps): Promise<void> {
     const schema = Yup.object().shape({
         user_id: Yup.string().uuid().required(),
         store_id: Yup.string().uuid().required(),
@@ -160,4 +186,9 @@ async function removeUserFromStore({
     await userStoresRepository.remove(userStore);
 }
 
-export { getAllUsersFromStore, addUserToStore, removeUserFromStore };
+export {
+    getAllUsersFromStore,
+    getAllStoresFromUser,
+    addUserToStore,
+    removeUserFromStore,
+};
