@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { sendMail } from '@services/Notification/Email/SendMail';
 import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
+import { clearAllCache } from '@utils/Admin/Cache';
 
 import User from '@controllers/User';
 import Product from '@controllers/Product';
@@ -33,6 +34,12 @@ routes.post('/internal/pn', InternalCheck, (req, res) => {
     dailyPushNotification();
 
     return res.send('Will be called :)');
+});
+
+routes.post('/internal/rc', InternalCheck, async (req, res) => {
+    await clearAllCache();
+
+    return res.send('Done');
 });
 
 routes.post('/users', User.store);
