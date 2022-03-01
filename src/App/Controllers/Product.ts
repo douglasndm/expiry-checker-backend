@@ -18,7 +18,9 @@ import { getProductTeam } from '@functions/Product/Team';
 
 import { createProduct, getProduct } from '@functions/Product';
 import { getAllBrands } from '@utils/Brand';
-import Cache from '../../Services/Cache';
+import { getUserByFirebaseId } from '@utils/User';
+
+import Cache from '@services/Cache';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -115,11 +117,14 @@ class ProductController {
             });
         }
 
+        const user = await getUserByFirebaseId(req.userId);
+
         const createdProd = await createProduct({
             name,
             code,
             brand,
             team_id,
+            user_id: user.id,
             categories,
         });
 

@@ -1,92 +1,115 @@
 import admin from 'firebase-admin';
 
-import { getAllUserRoles } from '@utils/UserRoles';
 import { getAllTeamsExpiredProducts } from '@utils/Notifications/Teams';
 import { getAllUsersDevices } from '@utils/Notifications/Users';
-
-interface UserToNotificate {
-    id: string;
-    device_id?: string;
-}
-
-interface TeamToNotificate {
-    id: string;
-    name?: string;
-    expiredBatches?: number;
-    nextExpBatches?: number;
-    users: UserToNotificate[];
-}
+import { getAllStoreTeamsToNotificate } from './TeamStores';
 
 export async function dailyPushNotification(): Promise<void> {
-    const allRoles = await getAllUserRoles();
-
-    const teamsToNotificate: Array<TeamToNotificate> = [];
-
-    allRoles.forEach(role => {
-        const alreadyAdded = teamsToNotificate.find(
-            team => team.id === role.team.id,
-        );
-
-        if (alreadyAdded) {
-            alreadyAdded.users.push({
-                id: role.user.id,
-            });
-            return;
-        }
-
-        teamsToNotificate.push({
-            id: role.team.id,
-            name: role.team.name,
-            users: [
-                {
-                    id: role.user.id,
-                },
-            ],
-        });
-    });
+    const teamsToNotificate = await getAllStoreTeamsToNotificate();
 
     const teamProducts = await getAllTeamsExpiredProducts();
 
-    teamProducts.forEach(t => {
-        const team = teamsToNotificate.find(tn => tn.id === t.id);
+    teamProducts.forEach(team => {
+        const teamIndex = teamsToNotificate.findIndex(
+            t => t.team_id === team.id,
+        );
 
-        if (team) {
-            let expired_batches = 0;
-            let next_to_exp = 0;
+        const teamNote = teamsToNotificate[teamIndex];
 
-            t.products.forEach(product => {
-                expired_batches += product.expired_batches.length;
-                next_to_exp += product.nextToExp_batches.length;
-            });
+        team.products.forEach(product => {
+            const storeIndex = teamNote.stores.findIndex(
+                store => store.id === product.store_id,
+            );
 
-            team.expiredBatches = expired_batches;
-            team.nextExpBatches = next_to_exp;
-        }
-    });
+            const store = teamNote.stores[storeIndex];
 
-    const usersDevices = await getAllUsersDevices();
+            if (store) {
+                if (store.expiredBatches !== undefined) {
+                    store.expiredBatches += product.expired_batches.length;
+                }
+                if (store.nextExpBatches !== undefined) {
+                    store.nextExpBatches += product.nextToExp_batches.length;
+                }
+            }
 
-    teamsToNotificate.forEach(team => {
-        // busca o usuário na lista de times para enviar notificação
-        // e atrui a ele o device id para enviar a notificação
-        team.users.forEach(user => {
-            const user_device = usersDevices.find(u => u.user.id === user.id);
-
-            if (user_device) {
-                user.device_id = user_device.device_id;
+            // Adiciona também a quantidade de vencidos/proximos a lista
+            // de usuários que não tem loja definida
+            // já que os usuários sem loja vão ter acesso a todos os produtos
+            if (teamNote.noStore.expiredBatches !== undefined) {
+                teamNote.noStore.expiredBatches +=
+                    product.expired_batches.length;
+            }
+            if (teamNote.noStore.nextExpBatches !== undefined) {
+                teamNote.noStore.nextExpBatches +=
+                    product.nextToExp_batches.length;
             }
         });
     });
 
-    const onlyTeamsWithNextOrExpBatches = teamsToNotificate.filter(team => {
-        if (!team.expiredBatches && !team.nextExpBatches) {
+    const usersDevices = await getAllUsersDevices();
+
+    // busca o usuário na lista de times para enviar notificação
+    // e atrui a ele o device id para enviar a notificação
+    teamsToNotificate.forEach(team => {
+        team.stores.forEach(store => {
+            if (store.users) {
+                store.users.forEach(user => {
+                    const userDevice = usersDevices.find(
+                        u => u.user.id === user.id,
+                    );
+
+                    if (userDevice) {
+                        user.device_id = userDevice.device_id;
+                    }
+                });
+            }
+        });
+
+        team.noStore.users.forEach(user => {
+            const userDevice = usersDevices.find(u => u.user.id === user.id);
+
+            if (userDevice) {
+                user.device_id = userDevice.device_id;
+            }
+        });
+    });
+
+    const storesWithNotifications = teamsToNotificate.map(team => {
+        const storesWithExpNextProds = team.stores.filter(store => {
+            if (!store.expiredBatches && !store.nextExpBatches) {
+                return false;
+            }
+            if (
+                store.expiredBatches &&
+                store.expiredBatches < 0 &&
+                store.nextExpBatches &&
+                store.nextExpBatches < 0
+            ) {
+                return false;
+            }
+            return true;
+        });
+
+        return {
+            ...team,
+            stores: storesWithExpNextProds,
+        };
+    });
+
+    // Somente times que tenham notificações
+    const teamWithNotifications = storesWithNotifications.filter(team => {
+        if (team.stores.length > 0) {
+            return true;
+        }
+
+        if (!team.noStore.expiredBatches && !team.noStore.nextExpBatches) {
             return false;
         }
         if (
-            team.expiredBatches &&
-            team.expiredBatches < 0 &&
-            team.nextExpBatches &&
-            team.nextExpBatches < 0
+            team.noStore.expiredBatches &&
+            team.noStore.expiredBatches < 0 &&
+            team.noStore.nextExpBatches &&
+            team.noStore.nextExpBatches < 0
         ) {
             return false;
         }
@@ -95,23 +118,61 @@ export async function dailyPushNotification(): Promise<void> {
 
     const messages: TokenMessage[] = [];
 
-    onlyTeamsWithNextOrExpBatches.forEach(team => {
-        team.users.forEach(userNote => {
-            if (userNote.device_id) {
+    teamWithNotifications.forEach(team => {
+        team.stores.forEach(store => {
+            store.users.forEach(user => {
+                if (user.device_id) {
+                    let message = '';
+
+                    if (store.expiredBatches && store.expiredBatches > 0) {
+                        if (store.nextExpBatches && store.nextExpBatches > 0) {
+                            message = `Você tem ${store.expiredBatches} lotes vencidos e ${store.nextExpBatches} lotes próximos ao vencimento`;
+                        } else {
+                            message = `Você tem ${store.expiredBatches} lotes vencidos`;
+                        }
+                    } else if (
+                        store.nextExpBatches &&
+                        store.nextExpBatches > 0
+                    ) {
+                        message = `Você tem ${store.nextExpBatches} lotes próximos ao vencimento`;
+                    }
+
+                    messages.push({
+                        token: user.device_id,
+                        notification: {
+                            title: 'Seus produtos precisam de atenção',
+                            body: message,
+                        },
+                    });
+                }
+            });
+        });
+
+        team.noStore.users.forEach(user => {
+            if (user.device_id) {
                 let message = '';
 
-                if (team.expiredBatches && team.expiredBatches > 0) {
-                    if (team.nextExpBatches && team.nextExpBatches > 0) {
-                        message = `Você tem ${team.expiredBatches} lotes vencidos e ${team.nextExpBatches} lotes próximos ao vencimento`;
+                if (
+                    team.noStore.expiredBatches &&
+                    team.noStore.expiredBatches > 0
+                ) {
+                    if (
+                        team.noStore.nextExpBatches &&
+                        team.noStore.nextExpBatches > 0
+                    ) {
+                        message = `Você tem ${team.noStore.expiredBatches} lotes vencidos e ${team.noStore.nextExpBatches} lotes próximos ao vencimento`;
                     } else {
-                        message = `Você tem ${team.expiredBatches} lotes vencidos`;
+                        message = `Você tem ${team.noStore.expiredBatches} lotes vencidos`;
                     }
-                } else if (team.nextExpBatches && team.nextExpBatches > 0) {
-                    message = `Você tem ${team.nextExpBatches} lotes próximos ao vencimento`;
+                } else if (
+                    team.noStore.nextExpBatches &&
+                    team.noStore.nextExpBatches > 0
+                ) {
+                    message = `Você tem ${team.noStore.nextExpBatches} lotes próximos ao vencimento`;
                 }
 
                 messages.push({
-                    token: userNote.device_id,
+                    token: user.device_id,
                     notification: {
                         title: 'Seus produtos precisam de atenção',
                         body: message,

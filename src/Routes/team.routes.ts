@@ -8,6 +8,8 @@ import UserManager from '@controllers/UserManager';
 import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
+import StoresRoutes from './stores.routes';
+
 const routes = Router({ mergeParams: true });
 
 routes.use(checkTeamId);
@@ -24,6 +26,8 @@ routes.get('/subscriptions', Subscription.index);
 
 // temp route
 routes.get('/subscriptions/recheck', Subscription.recheck);
+
+routes.use('/stores', StoresRoutes);
 
 // From now one all routes will check if user is a manager
 routes.use(ManagerChecker);

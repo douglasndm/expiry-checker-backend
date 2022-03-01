@@ -3,13 +3,15 @@ import { addDays, format, isBefore } from 'date-fns';
 
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
 
-import { getAllRoles as UserAndTeams } from '@functions/UserRoles';
+import { getAllUserRoles } from '@utils/UserRoles';
 import { getAllProductsFromManyTeams } from '@functions/Team/Products';
 
 import UserRoles from '@models/UserRoles';
+import Store from '@models/Store';
 
 async function sendMail(): Promise<void> {
-    const usersTeams = await UserAndTeams();
+    const usersTeams = await getAllUserRoles();
+
     const allowedUsers = await getAllUsersIDAllowedToSendEmail();
 
     const filtedUsersTeams = usersTeams.filter(item => {
@@ -45,15 +47,6 @@ async function sendMail(): Promise<void> {
         teams: teamsIds,
     });
 
-    interface batch {
-        team_id: string;
-        code: string | null;
-        productName: string;
-        batch: string | null;
-        exp_date: string;
-        amount: number | null;
-    }
-
     const batches: Array<batch> = [];
 
     productsTeams.forEach(productTeam => {
@@ -72,6 +65,7 @@ async function sendMail(): Promise<void> {
             onlyExpOrNextBatches.forEach(b => {
                 batches.push({
                     team_id: productTeam.team.id,
+                    store: productTeam.product.store || undefined,
                     productName: productTeam.product.name,
                     code: productTeam.product.code || null,
                     amount: b.amount,
@@ -82,25 +76,42 @@ async function sendMail(): Promise<void> {
         }
     });
 
-    interface Notification {
-        to: string;
-        bcc?: string;
-        subject: string;
-        name: string;
-        AppName: string;
-        batches: batch[];
-    }
-
-    const notifications: Notification[] = [];
+    const notifications: Omit<MailNotification, 'user_id'>[] = [];
 
     allowedUsers.forEach(user => {
         const userTeam = filtedUsersTeams.find(
             item => item.user.id === user.id,
         );
 
-        const teamBatches = batches.filter(
-            b => b.team_id === userTeam?.team.id,
-        );
+        const userFilted = usersTeams.filter(ut => ut.user.id === user.id);
+
+        const userStores: Store[] = [];
+
+        userFilted.forEach(u => {
+            u.user.stores.forEach(store => {
+                userStores.push(store.store);
+            });
+        });
+
+        const teamBatches = batches.filter(b => {
+            if (userStores.length > 0) {
+                if (b.store) {
+                    const userInStore = userStores.find(
+                        store => store.id === b.store.id,
+                    );
+
+                    if (userInStore) {
+                        return true;
+                    }
+
+                    return false;
+                }
+            } else if (b.team_id === userTeam?.team.id) {
+                return true;
+            }
+
+            return false;
+        });
 
         if (userTeam && userTeam.user.email) {
             notifications.push({
@@ -114,8 +125,12 @@ async function sendMail(): Promise<void> {
         }
     });
 
+    const notificationsWithBatches = notifications.filter(
+        notification => notification.batches.length > 0,
+    );
+
     if (process.env.DEV_MODE === 'false')
-        notifications.forEach(notification => {
+        notificationsWithBatches.forEach(notification => {
             axios.post(`${process.env.MAIL_SERVICE_URL}/send`, notification);
         });
 }

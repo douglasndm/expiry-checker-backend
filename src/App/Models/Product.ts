@@ -3,6 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
+    ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
@@ -13,6 +14,7 @@ import Batch from './Batch';
 import ProductTeams from './ProductTeams';
 import ProductCategory from './ProductCategory';
 import Brand from './Brand';
+import Store from './Store';
 
 @Entity({ name: 'products' })
 export default class Product {
@@ -40,6 +42,10 @@ export default class Product {
 
     @OneToMany(() => ProductTeams, productTeams => productTeams.product)
     team: ProductTeams;
+
+    @ManyToOne(() => Store, store => store.products)
+    @JoinColumn({ name: 'store_id' })
+    store?: Store;
 
     @CreateDateColumn()
     created_at: Date;
