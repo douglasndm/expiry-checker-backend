@@ -17,7 +17,6 @@ import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 import { getUserByFirebaseId } from '@utils/User';
-import Product from '@models/Product';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -41,8 +40,6 @@ class TeamController {
                     internalErrorCode: 1,
                 });
         }
-
-        const cache = new Cache();
 
         const { team_id } = req.params;
         const { removeCheckedBatches, sortByBatches } = req.query;
@@ -75,12 +72,10 @@ class TeamController {
 
         const user = await getUserByFirebaseId(req.userId || '');
 
-        const prodTeam = await getProductsFromTeam({
+        let products = await getProductsFromTeam({
             team_id,
             user_id: user.id,
         });
-
-        let products: Product[] = prodTeam;
 
         if (removeCheckedBatches) {
             const checkedRemoved = products.map(prod => {

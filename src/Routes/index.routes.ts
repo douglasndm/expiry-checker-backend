@@ -1,9 +1,5 @@
 import { Router } from 'express';
 
-import { sendMail } from '@services/Notification/Email/SendMail';
-import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
-import { clearAllCache } from '@utils/Admin/Cache';
-
 import User from '@controllers/User';
 import Product from '@controllers/Product';
 import Products from '@controllers/Products';
@@ -17,30 +13,15 @@ import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
-import InternalCheck from '@middlewares/InternalCheck';
 
 import batchRoutes from './batch.routes';
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
+import internalRoutes from './internal.routes';
 
 const routes = Router();
 
-routes.post('/internal/mn', InternalCheck, async (req, res) => {
-    await sendMail();
-
-    return res.send('Will be called :)');
-});
-routes.post('/internal/pn', InternalCheck, (req, res) => {
-    dailyPushNotification();
-
-    return res.send('Will be called :)');
-});
-
-routes.post('/internal/rc', InternalCheck, async (req, res) => {
-    await clearAllCache();
-
-    return res.send('Done');
-});
+routes.use('/internal', internalRoutes);
 
 routes.post('/users', User.store);
 
