@@ -34,6 +34,7 @@ export async function getAllProductsFromManyTeams({
     const products = await productTeamsRepo
         .createQueryBuilder('prods')
         .leftJoinAndSelect('prods.product', 'product')
+        .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('prods.team', 'team')
         .where('team.id IN (:...teamsIds)', { teamsIds: teams })
