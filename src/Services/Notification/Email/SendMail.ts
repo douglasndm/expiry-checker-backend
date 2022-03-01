@@ -76,7 +76,7 @@ async function sendMail(): Promise<void> {
         }
     });
 
-    const notifications: MailNotification[] = [];
+    const notifications: Omit<MailNotification, 'user_id'>[] = [];
 
     allowedUsers.forEach(user => {
         const userTeam = filtedUsersTeams.find(
@@ -115,7 +115,6 @@ async function sendMail(): Promise<void> {
 
         if (userTeam && userTeam.user.email) {
             notifications.push({
-                user_id: user.id,
                 name: userTeam.user.email || 'untitled',
                 to: userTeam.user.email,
                 bcc: 'noreplay@douglasndm.dev',
