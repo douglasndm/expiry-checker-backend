@@ -40,6 +40,8 @@ export async function getAllUsersFromTeam({
             .createQueryBuilder('usersTeam')
             .leftJoinAndSelect('usersTeam.user', 'user')
             .leftJoinAndSelect('usersTeam.team', 'team')
+            .leftJoinAndSelect('user.stores', 'userStores')
+            .leftJoinAndSelect('userStores.store', 'store')
             .where('team.id = :team_id', { team_id })
             .getMany();
 
@@ -81,11 +83,14 @@ export async function getAllUsersFromTeam({
             }
         }
 
+        const userStores = u.user.stores.map(store => store.store);
+
         return {
             id: firebaseUid,
             fid: firebaseUid,
             email: u.user.email,
             role: u.role,
+            stores: userStores,
             status: u.status,
             code: u.code,
             device: userDevice,

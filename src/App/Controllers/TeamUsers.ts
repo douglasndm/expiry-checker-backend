@@ -19,7 +19,7 @@ class TeamUsersController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            throw new AppError({ message: 'Check team id' });
         }
 
         const { team_id } = req.params;
@@ -63,7 +63,7 @@ class TeamUsersController {
             await schema.validate(req.body);
         } catch (err) {
             throw new AppError({
-                message: err.message,
+                message: 'Check the code',
                 internalErrorCode: 24,
             });
         }

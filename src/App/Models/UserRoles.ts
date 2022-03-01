@@ -15,11 +15,11 @@ class UserRoles {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => User, user => user.roles)
+    @ManyToOne(() => User, user => user.roles)
     @JoinColumn({ name: 'user_id', referencedColumnName: 'firebaseUid' })
     user: User;
 
-    @ManyToOne(type => Team, team => team.users)
+    @ManyToOne(() => Team, team => team.users)
     @JoinColumn({ name: 'team_id' })
     team: Team;
 
