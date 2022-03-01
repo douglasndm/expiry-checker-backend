@@ -126,8 +126,12 @@ async function sendMail(): Promise<void> {
         }
     });
 
+    const notificationsWithBatches = notifications.filter(
+        notification => notification.batches.length > 0,
+    );
+
     if (process.env.DEV_MODE === 'false')
-        notifications.forEach(notification => {
+        notificationsWithBatches.forEach(notification => {
             axios.post(`${process.env.MAIL_SERVICE_URL}/send`, notification);
         });
 }
