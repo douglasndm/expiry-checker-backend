@@ -15,6 +15,7 @@ import ProductCategory from '@models/ProductCategory';
 import ProductTeams from '@models/ProductTeams';
 
 import AppError from '@errors/AppError';
+import { getUserStoreOnTeam } from '@utils/Stores/Team';
 
 interface getProductProps {
     product_id: string;
@@ -84,6 +85,7 @@ interface createProductProps {
     code?: string;
     brand?: string;
     team_id: string;
+    user_id: string;
     categories?: Array<string>;
 }
 
@@ -92,6 +94,7 @@ export async function createProduct({
     code,
     brand,
     team_id,
+    user_id,
     categories,
 }: createProductProps): Promise<Product> {
     const cache = new Cache();
@@ -124,6 +127,8 @@ export async function createProduct({
         });
     }
 
+    const userStore = await getUserStoreOnTeam({ team_id, user_id });
+
     const allBrands = await getAllBrands({ team_id });
     const findedBrand = allBrands.find(b => b.id === brand);
 
@@ -131,6 +136,10 @@ export async function createProduct({
     prod.name = name;
     prod.code = code || null;
     prod.brand = findedBrand;
+
+    if (userStore) {
+        prod.store = userStore.store;
+    }
 
     const savedProd = await repository.save(prod);
 

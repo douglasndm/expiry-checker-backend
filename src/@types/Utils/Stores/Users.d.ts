@@ -20,6 +20,11 @@ interface getAllStoresFromUserProps {
     user_id: string;
 }
 
+interface getAllStoresFromUserResponse {
+    store: Store;
+    team_id: string;
+}
+
 interface addUserToStoreProps {
     user_id: string;
     store_id: string;

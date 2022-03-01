@@ -44,7 +44,7 @@ async function getAllUsersFromStore({
 
 async function getAllStoresFromUser({
     user_id,
-}: getAllStoresFromUserProps): Promise<Store[]> {
+}: getAllStoresFromUserProps): Promise<getAllStoresFromUserResponse[]> {
     const schema = Yup.object().shape({
         user_id: Yup.string().uuid().required(),
     });
@@ -63,10 +63,16 @@ async function getAllStoresFromUser({
         .createQueryBuilder('userStores')
         .leftJoinAndSelect('userStores.user', 'user')
         .leftJoinAndSelect('userStores.store', 'store')
+        .leftJoinAndSelect('store.team', 'team')
         .where('user.id = :user_id', { user_id })
         .getMany();
 
-    const stores = userStores.map(userStore => userStore.store);
+    const stores: getAllStoresFromUserResponse[] = userStores.map(
+        userStore => ({
+            store: userStore.store,
+            team_id: userStore.store.team.id,
+        }),
+    );
 
     return stores;
 }

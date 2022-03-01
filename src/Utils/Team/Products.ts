@@ -62,7 +62,7 @@ async function getProductsFromTeam({
         if (userStores.length > 0) {
             const prods = products.filter(p => {
                 if (p.store) {
-                    if (p.store.id === userStores[0].id) {
+                    if (p.store.id === userStores[0].store.id) {
                         return true;
                     }
                 }
