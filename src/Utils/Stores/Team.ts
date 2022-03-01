@@ -4,11 +4,6 @@ import { getAllStoresFromUser } from '@utils/Stores/Users';
 
 import AppError from '@errors/AppError';
 
-interface getUserStoreOnTeamProps {
-    team_id: string;
-    user_id: string;
-}
-
 async function getUserStoreOnTeam({
     team_id,
     user_id,

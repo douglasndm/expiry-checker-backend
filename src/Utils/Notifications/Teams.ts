@@ -10,6 +10,7 @@ interface getAllTeamsExpiredProductsResponse {
     products: {
         id: string;
         name: string;
+        store_id?: string;
         expired_batches: Batch[];
         nextToExp_batches: Batch[];
     }[];
@@ -25,6 +26,7 @@ export async function getAllTeamsExpiredProducts(): Promise<
         .leftJoinAndSelect('team.products', 'productTeams')
         .leftJoinAndSelect('productTeams.product', 'product')
         .leftJoinAndSelect('product.batches', 'batches')
+        .leftJoinAndSelect('product.store', 'store')
         .where('batches.status != :status', { status: 'checked' })
         .andWhere(`batches.exp_date <= :date`, {
             date: addDays(new Date(), 30), // THIS SELECT EXPIRED PRODUCTS AND PRODUCTS THAT WILL EXPIRE SOON
@@ -62,6 +64,7 @@ export async function getAllTeamsExpiredProducts(): Promise<
             return {
                 id: prod.product.id,
                 name: prod.product.name,
+                store_id: prod.product.store?.id,
                 expired_batches: expiredBatches,
                 nextToExp_batches: nextBatches,
             };

@@ -7,7 +7,8 @@ import {
     UpdateDateColumn,
     JoinColumn,
 } from 'typeorm';
-import Team from './Team';
+
+import Team from '@models/Team';
 
 @Entity({ name: 'brands' })
 export default class Brand {

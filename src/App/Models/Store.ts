@@ -11,7 +11,7 @@ import {
 
 import UsersStores from '@models/UsersStores';
 import Team from '@models/Team';
-import Product from './Product';
+import Product from '@models/Product';
 
 @Entity({ name: 'stores' })
 class Store {
@@ -21,7 +21,7 @@ class Store {
     @Column()
     name: string;
 
-    @ManyToOne(() => Team, team => team.subscriptions)
+    @ManyToOne(() => Team, team => team.stores)
     @JoinColumn({ name: 'team_id' })
     team: Team;
 
