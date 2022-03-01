@@ -31,6 +31,18 @@ export async function dailyPushNotification(): Promise<void> {
                     store.nextExpBatches += product.nextToExp_batches.length;
                 }
             }
+
+            // Adiciona também a quantidade de vencidos/proximos a lista
+            // de usuários que não tem loja definida
+            // já que os usuários sem loja vão ter acesso a todos os produtos
+            if (teamNote.noStore.expiredBatches !== undefined) {
+                teamNote.noStore.expiredBatches +=
+                    product.expired_batches.length;
+            }
+            if (teamNote.noStore.nextExpBatches !== undefined) {
+                teamNote.noStore.nextExpBatches +=
+                    product.nextToExp_batches.length;
+            }
         });
     });
 
@@ -50,6 +62,14 @@ export async function dailyPushNotification(): Promise<void> {
                         user.device_id = userDevice.device_id;
                     }
                 });
+            }
+        });
+
+        team.noStore.users.forEach(user => {
+            const userDevice = usersDevices.find(u => u.user.id === user.id);
+
+            if (userDevice) {
+                user.device_id = userDevice.device_id;
             }
         });
     });
@@ -76,9 +96,29 @@ export async function dailyPushNotification(): Promise<void> {
         };
     });
 
+    // Somente times que tenham notificações
+    const teamWithNotifications = storesWithNotifications.filter(team => {
+        if (team.stores.length > 0) {
+            return true;
+        }
+
+        if (!team.noStore.expiredBatches && !team.noStore.nextExpBatches) {
+            return false;
+        }
+        if (
+            team.noStore.expiredBatches &&
+            team.noStore.expiredBatches < 0 &&
+            team.noStore.nextExpBatches &&
+            team.noStore.nextExpBatches < 0
+        ) {
+            return false;
+        }
+        return true;
+    });
+
     const messages: TokenMessage[] = [];
 
-    storesWithNotifications.forEach(team => {
+    teamWithNotifications.forEach(team => {
         team.stores.forEach(store => {
             store.users.forEach(user => {
                 if (user.device_id) {
@@ -107,10 +147,40 @@ export async function dailyPushNotification(): Promise<void> {
                 }
             });
         });
-    });
 
-    console.log(messages);
-    return;
+        team.noStore.users.forEach(user => {
+            if (user.device_id) {
+                let message = '';
+
+                if (
+                    team.noStore.expiredBatches &&
+                    team.noStore.expiredBatches > 0
+                ) {
+                    if (
+                        team.noStore.nextExpBatches &&
+                        team.noStore.nextExpBatches > 0
+                    ) {
+                        message = `Você tem ${team.noStore.expiredBatches} lotes vencidos e ${team.noStore.nextExpBatches} lotes próximos ao vencimento`;
+                    } else {
+                        message = `Você tem ${team.noStore.expiredBatches} lotes vencidos`;
+                    }
+                } else if (
+                    team.noStore.nextExpBatches &&
+                    team.noStore.nextExpBatches > 0
+                ) {
+                    message = `Você tem ${team.noStore.nextExpBatches} lotes próximos ao vencimento`;
+                }
+
+                messages.push({
+                    token: user.device_id,
+                    notification: {
+                        title: 'Seus produtos precisam de atenção',
+                        body: message,
+                    },
+                });
+            }
+        });
+    });
 
     const messaging = admin.messaging();
     await messaging.sendAll(messages);

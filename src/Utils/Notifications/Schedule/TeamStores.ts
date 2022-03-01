@@ -17,32 +17,58 @@ async function getAllStoreTeamsToNotificate(): Promise<
             teamsToNotificate.push({
                 team_id: role.team.id,
                 stores: role.team.stores,
+                noStore: { users: [], expiredBatches: 0, nextExpBatches: 0 },
             });
         }
 
-        role.user.stores.forEach(userStore => {
-            const { store } = userStore;
-            // encontra o time onde a loja está adicionada
-            const teamWhereStoreIs = teamsToNotificate.findIndex(
-                team => team.team_id === store.team.id,
+        // se o usuário não tiver lojas, será adicionado ao time
+        // sem loja
+        if (role.user.stores.length <= 0) {
+            const teamIndex = teamsToNotificate.findIndex(
+                team => team.team_id === role.team.id,
             );
 
-            const storeIndex = teamsToNotificate[
-                teamWhereStoreIs
-            ].stores.findIndex(sto => sto.id === store.id);
-
-            // Gambiarra para criar um array vazio para adicionar os usuários
-            // Já que o response de loja não retorna os usuarios
-            if (!teamsToNotificate[teamWhereStoreIs].stores[storeIndex].users) {
-                teamsToNotificate[teamWhereStoreIs].stores[
-                    storeIndex
-                ].users = [];
-            }
-
-            teamsToNotificate[teamWhereStoreIs].stores[storeIndex].users.push({
+            teamsToNotificate[teamIndex].noStore.users.push({
                 id: role.user.id,
             });
-        });
+        } else {
+            role.user.stores.forEach(userStore => {
+                const { store } = userStore;
+
+                // encontra o time onde a loja está adicionada
+                const teamWhereStoreIs = teamsToNotificate.findIndex(
+                    team => team.team_id === store.team.id,
+                );
+
+                if (!store) {
+                    teamsToNotificate[teamWhereStoreIs].noStore.users.push({
+                        id: role.user.id,
+                    });
+                    return;
+                }
+
+                const storeIndex = teamsToNotificate[
+                    teamWhereStoreIs
+                ].stores.findIndex(sto => sto.id === store.id);
+
+                // Gambiarra para criar um array vazio para adicionar os usuários
+                // Já que o response de loja não retorna os usuarios
+                if (
+                    !teamsToNotificate[teamWhereStoreIs].stores[storeIndex]
+                        .users
+                ) {
+                    teamsToNotificate[teamWhereStoreIs].stores[
+                        storeIndex
+                    ].users = [];
+                }
+
+                teamsToNotificate[teamWhereStoreIs].stores[
+                    storeIndex
+                ].users.push({
+                    id: role.user.id,
+                });
+            });
+        }
     });
 
     teamsToNotificate.forEach(team => {

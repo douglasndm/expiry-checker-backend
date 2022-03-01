@@ -12,7 +12,14 @@ interface StoreToNotificate {
     users: UserToNotificate[];
 }
 
+interface NoStoreToNotificate {
+    expiredBatches?: number;
+    nextExpBatches?: number;
+    users: UserToNotificate[];
+}
+
 interface TeamToNotificate {
     team_id: string;
     stores: StoreToNotificate[];
+    noStore: NoStoreToNotificate;
 }
