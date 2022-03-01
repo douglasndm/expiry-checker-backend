@@ -42,6 +42,7 @@ class UserController {
 
         const organizedUser = {
             id: user.firebaseUid,
+            fid: user.firebaseUid,
             email: user.email,
 
             roles: user.roles.map(r => {
