@@ -19,4 +19,6 @@ routes.use(ManagerCheck);
 routes.post('/:store_id/users', StoreUsers.store);
 routes.delete('/:store_id/users', StoreUsers.delete);
 
+routes.delete('/users', StoreUsers.deleteAll);
+
 export default routes;
