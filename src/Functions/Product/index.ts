@@ -2,20 +2,24 @@ import { getRepository } from 'typeorm';
 
 import Cache from '@services/Cache';
 
+import { getAllBrands } from '@utils/Brand';
+import { getUserStoreOnTeam } from '@utils/Stores/Team';
+import { getUserRoleInTeam } from '@utils/UserRoles';
+import { getAllStoresFromTeam } from '@utils/Stores/List';
+
 import { checkIfProductAlreadyExists } from '@functions/Products';
 import { sortBatchesByExpDate } from '@functions/Batches';
 import { addProductToCategory } from '@functions/Category/Products';
-import { getAllBrands } from '@utils/Brand';
 
 import Product from '@models/Product';
 import Category from '@models/Category';
 import Batch from '@models/Batch';
 import Team from '@models/Team';
+import Store from '@models/Store';
 import ProductCategory from '@models/ProductCategory';
 import ProductTeams from '@models/ProductTeams';
 
 import AppError from '@errors/AppError';
-import { getUserStoreOnTeam } from '@utils/Stores/Team';
 
 interface getProductProps {
     product_id: string;
@@ -86,6 +90,7 @@ interface createProductProps {
     brand?: string;
     team_id: string;
     user_id: string;
+    store_id?: string;
     categories?: Array<string>;
 }
 
@@ -94,11 +99,10 @@ export async function createProduct({
     code,
     brand,
     team_id,
+    store_id,
     user_id,
     categories,
 }: createProductProps): Promise<Product> {
-    const cache = new Cache();
-
     const productAlreadyExists = await checkIfProductAlreadyExists({
         name,
         code,
@@ -127,7 +131,25 @@ export async function createProduct({
         });
     }
 
-    const userStore = await getUserStoreOnTeam({ team_id, user_id });
+    const userRoleOnTeam = await getUserRoleInTeam({ user_id, team_id });
+
+    let userStore: Store | undefined;
+
+    if (userRoleOnTeam === 'manager' && store_id) {
+        const stores = await getAllStoresFromTeam({ team_id });
+
+        const store = stores.find(sto => sto.id === store_id);
+
+        if (store) {
+            userStore = store;
+        }
+    } else {
+        const uStore = await getUserStoreOnTeam({ team_id, user_id });
+
+        if (uStore?.store) {
+            userStore = uStore.store;
+        }
+    }
 
     const allBrands = await getAllBrands({ team_id });
     const findedBrand = allBrands.find(b => b.id === brand);
@@ -138,7 +160,7 @@ export async function createProduct({
     prod.brand = findedBrand;
 
     if (userStore) {
-        prod.store = userStore.store;
+        prod.store = userStore;
     }
 
     const savedProd = await repository.save(prod);
@@ -171,6 +193,7 @@ export async function createProduct({
         });
     }
 
+    const cache = new Cache();
     await cache.invalidade(`products-from-teams:${team_id}`);
 
     return savedProd;

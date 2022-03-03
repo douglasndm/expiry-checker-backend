@@ -82,17 +82,19 @@ class ProductController {
             code: Yup.string(),
             brand: Yup.string().uuid(),
             categories: Yup.array().of(Yup.string()),
+            store_id: Yup.string().uuid(),
             team_id: Yup.string().required().uuid(),
         });
 
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -103,7 +105,7 @@ class ProductController {
             });
         }
 
-        const { name, code, brand, categories, team_id } = req.body;
+        const { name, code, brand, categories, store_id, team_id } = req.body;
 
         const usersInTeam = await getAllUsersFromTeam({ team_id });
 
@@ -125,6 +127,7 @@ class ProductController {
             brand,
             team_id,
             user_id: user.id,
+            store_id,
             categories,
         });
 
@@ -147,11 +150,12 @@ class ProductController {
             await schema.validate(req.body);
             await schemaParams.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
