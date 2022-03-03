@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 
 import UserRoles from '@models/UserRoles';
 import UserDevice from '@models/UserDevice';
+import Store from '@models/Store';
 
 import Cache from '@services/Cache';
 
@@ -84,7 +85,13 @@ export async function getAllUsersFromTeam({
             }
         }
 
-        const userStores = u.user.stores.map(store => store.store);
+        const stores: Store[] = [];
+
+        if (u.user.stores && u.user.stores.length > 0) {
+            u.user.stores.forEach(store => {
+                stores.push(store.store);
+            });
+        }
 
         return {
             uuid: u.user.id,
@@ -92,7 +99,7 @@ export async function getAllUsersFromTeam({
             fid: firebaseUid,
             email: u.user.email,
             role: u.role,
-            stores: userStores,
+            stores,
             status: u.status,
             code: u.code,
             device: userDevice,
