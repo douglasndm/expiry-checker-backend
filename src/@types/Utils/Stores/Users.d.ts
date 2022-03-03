@@ -1,3 +1,5 @@
+import Store from '@models/Store';
+
 interface getAllUsersFromStoreProps {
     store_id: string;
 }
