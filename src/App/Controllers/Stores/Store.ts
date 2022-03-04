@@ -30,6 +30,18 @@ class StoreControle {
 
         const user = await getUserByFirebaseId(req.userId);
 
+        const allStoresInTeam = await getAllStoresFromTeam({ team_id });
+        const alreadyExists = allStoresInTeam.find(
+            store => store.name.toLowerCase() === name.toLowerCase(),
+        );
+
+        if (alreadyExists) {
+            throw new AppError({
+                message: 'There are already a store with the same name',
+                internalErrorCode: 36,
+            });
+        }
+
         const createdStore = await createStore({
             name,
             team_id,
