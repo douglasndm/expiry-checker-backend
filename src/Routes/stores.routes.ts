@@ -10,6 +10,8 @@ const routes = Router({ mergeParams: true });
 
 routes.get('/', Store.index);
 routes.post('/', Store.create);
+routes.put('/:store_id', Store.update);
+routes.delete('/:store_id', Store.delete);
 
 routes.get('/:store_id/products', StoreProducts.index);
 
