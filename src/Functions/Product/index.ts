@@ -49,6 +49,7 @@ export async function getProduct({
         .createQueryBuilder('product')
         .where('product.id = :product_id', { product_id })
         .leftJoinAndSelect('product.brand', 'brand')
+        .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.categories', 'categories')
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('categories.category', 'category')
