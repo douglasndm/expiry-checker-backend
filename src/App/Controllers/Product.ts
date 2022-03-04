@@ -2,25 +2,21 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
-
 import Product from '@models/Product';
-import Category from '@models/Category';
 
+import { updateProduct } from '@utils/Product/Update';
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getAllUsersFromTeam } from '@functions/Team/Users';
-import {
-    addProductToCategory,
-    removeAllCategoriesFromProduct,
-} from '@functions/Category/Products';
+
 import { getUserRole } from '@functions/Users/UserRoles';
 import { getProductTeam } from '@functions/Product/Team';
 
 import { createProduct, getProduct } from '@functions/Product';
-import { getAllBrands } from '@utils/Brand';
 import { getUserByFirebaseId } from '@utils/User';
 
 import Cache from '@services/Cache';
+
+import AppError from '@errors/AppError';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -70,6 +66,7 @@ class ProductController {
         const productWithFixCat = {
             ...product,
             brand: product.brand?.id,
+            store: product.store?.id,
             categories: product.categories.map(cat => cat.category),
         };
 
@@ -142,7 +139,8 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string().nullable(),
-            brand: Yup.string().uuid(),
+            brand: Yup.string().uuid().nullable(),
+            store_id: Yup.string().uuid().nullable(),
             categories: Yup.array().of(Yup.string()),
         });
 
@@ -166,10 +164,8 @@ class ProductController {
             });
         }
 
-        const cache = new Cache();
-
         const { product_id } = req.params;
-        const { name, code, brand, categories } = req.body;
+        const { name, code, brand, store_id, categories } = req.body;
 
         const userHasAccessToProduct = await checkIfUserHasAccessToAProduct({
             product_id,
@@ -184,59 +180,16 @@ class ProductController {
             });
         }
 
-        const productRepository = getRepository(Product);
-
-        const product = await productRepository.findOne(product_id);
-
-        if (!product) {
-            throw new AppError({
-                message: 'Product was not found',
-                statusCode: 400,
-                internalErrorCode: 8,
-            });
-        }
-
-        const team = await getProductTeam(product);
-
-        const brands = await getAllBrands({ team_id: team.id });
-        const findedBrand = brands.find(b => b.id === brand);
-
-        product.name = name;
-        product.code = code;
-        product.brand = findedBrand;
-
-        const updatedProduct = await productRepository.save(product);
-
-        await removeAllCategoriesFromProduct({
-            product_id: updatedProduct.id,
+        const updatedProduct = await updateProduct({
+            id: product_id,
+            name,
+            code,
+            brand_id: brand,
+            store_id,
+            categories,
         });
 
-        if (!!categories && categories.length > 0) {
-            const categoryRepository = getRepository(Category);
-            const category = await categoryRepository.findOne({
-                where: {
-                    id: categories[0],
-                },
-            });
-
-            if (!category) {
-                throw new AppError({
-                    message: 'Category was not found',
-                    statusCode: 400,
-                    internalErrorCode: 10,
-                });
-            }
-
-            await addProductToCategory({
-                product_id: updatedProduct.id,
-                category,
-            });
-        }
-
-        await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${team.id}:${updatedProduct.id}`);
-
-        return res.status(200).json(updatedProduct);
+        return res.status(201).json(updatedProduct);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
@@ -247,11 +200,12 @@ class ProductController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {

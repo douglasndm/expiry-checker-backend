@@ -45,7 +45,7 @@ export default class Product {
 
     @ManyToOne(() => Store, store => store.products)
     @JoinColumn({ name: 'store_id' })
-    store?: Store;
+    store?: Store | null;
 
     @CreateDateColumn()
     created_at: Date;
