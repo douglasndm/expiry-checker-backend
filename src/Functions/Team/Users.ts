@@ -44,6 +44,7 @@ export async function getAllUsersFromTeam({
             .leftJoinAndSelect('usersTeam.team', 'team')
             .leftJoinAndSelect('user.stores', 'userStores')
             .leftJoinAndSelect('userStores.store', 'store')
+            .leftJoinAndSelect('userStores.user', 'uStore')
             .where('team.id = :team_id', { team_id })
             .getMany();
 
@@ -89,7 +90,7 @@ export async function getAllUsersFromTeam({
 
         if (u.user.stores && u.user.stores.length > 0) {
             u.user.stores.forEach(store => {
-                stores.push(store.store);
+                if (store.user.id === u.user.id) stores.push(store.store);
             });
         }
 

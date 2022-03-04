@@ -99,19 +99,15 @@ async function addUserToStore({
     const storeRepository = getRepository(Store);
     const userStoresRepository = getRepository(UserStores);
 
-    const alreadyInStore = await userStoresRepository
+    const alreadyHaveStore = await userStoresRepository
         .createQueryBuilder('userStore')
         .leftJoinAndSelect('userStore.store', 'store')
         .leftJoinAndSelect('userStore.user', 'user')
         .where('user.id = :user_id', { user_id })
-        .andWhere('store.id = :store_id', { store_id })
-        .getOne();
+        .getMany();
 
-    if (alreadyInStore) {
-        throw new AppError({
-            message: 'User is already in store',
-            internalErrorCode: 36,
-        });
+    if (alreadyHaveStore) {
+        await userStoresRepository.remove(alreadyHaveStore);
     }
 
     const user = await userRepository.findOne({ where: { id: user_id } });
