@@ -16,7 +16,7 @@ import ProductCategory from './ProductCategory';
 import Brand from './Brand';
 import Store from './Store';
 
-@Entity({ name: 'products' })
+@Entity({ name: 'user_products' })
 export default class Product {
     @PrimaryGeneratedColumn('uuid')
     id: string;
