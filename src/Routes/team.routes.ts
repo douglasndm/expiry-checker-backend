@@ -4,6 +4,7 @@ import Team from '@controllers/Team';
 import TeamUsers from '@controllers/TeamUsers';
 import Subscription from '@controllers/Subscription';
 import UserManager from '@controllers/UserManager';
+import TeamPreferences from '@controllers/TeamPreferences';
 
 import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
@@ -28,6 +29,8 @@ routes.get('/subscriptions', Subscription.index);
 routes.get('/subscriptions/recheck', Subscription.recheck);
 
 routes.use('/stores', StoresRoutes);
+
+routes.get('/preferences', TeamPreferences.index);
 
 // From now one all routes will check if user is a manager
 routes.use(ManagerChecker);

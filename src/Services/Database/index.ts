@@ -14,6 +14,7 @@ import TeamSubscriptions from '@models/TeamSubscription';
 import UserDevice from '@models/UserDevice';
 import UsersStores from '@models/UsersStores';
 
+import TeamPreferences from '@models/TeamPreferences';
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
 async function setConnection(): Promise<void> {
@@ -35,6 +36,7 @@ async function setConnection(): Promise<void> {
                 TeamSubscriptions,
                 UserDevice,
                 UsersStores,
+                TeamPreferences,
                 NotificationsPreferences,
             ],
         }),
