@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
-import { getUser } from '@functions/Users';
+import { getUserByFirebaseId } from '@utils/User';
 
 import AppError from '@errors/AppError';
 
@@ -41,7 +41,7 @@ class EmailPreferences {
             }
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            throw new AppError({ message: 'Check your FID' });
         }
 
         const { allowEmailNotification } = req.body;
@@ -54,7 +54,7 @@ class EmailPreferences {
             .getOne();
 
         if (!alreadyExists) {
-            const user = await getUser(req.userId);
+            const user = await getUserByFirebaseId(req.userId);
 
             if (!user) {
                 throw new AppError({
