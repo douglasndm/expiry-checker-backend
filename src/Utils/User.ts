@@ -23,6 +23,24 @@ export async function getUserByFirebaseId(firebase_id: string): Promise<User> {
     return user;
 }
 
+export async function getUserById(id: string): Promise<User> {
+    const userReposity = getRepository(User);
+
+    const user = await userReposity
+        .createQueryBuilder('user')
+        .where('user.id = :id', { id })
+        .getOne();
+
+    if (!user) {
+        throw new AppError({
+            message: 'User not found',
+            internalErrorCode: 7,
+        });
+    }
+
+    return user;
+}
+
 export async function createUser({
     firebaseUid,
     name,

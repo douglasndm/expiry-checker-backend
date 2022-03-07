@@ -4,13 +4,14 @@ import admin from 'firebase-admin';
 import { format } from 'date-fns';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
-
 import Batch from '@models/Batch';
 
-import { getUserRole } from '@functions/Users/UserRoles';
 import { getProductTeam } from '@functions/Product/Team';
 import { getAllUsersFromTeam } from '@functions/Team/Users';
+import { getUserRoleInTeam } from '@utils/UserRoles';
+import { getUserByFirebaseId } from '@utils/User';
+
+import AppError from '@errors/AppError';
 
 class BatchNotificationController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -21,11 +22,12 @@ class BatchNotificationController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -56,13 +58,14 @@ class BatchNotificationController {
         }
 
         const team = await getProductTeam(batch.product);
+        const user = await getUserByFirebaseId(req.userId);
 
-        const userRole = await getUserRole({
-            user_id: req.userId,
+        const role = await getUserRoleInTeam({
+            user_id: user.id,
             team_id: team.id,
         });
 
-        if (userRole !== 'Manager' && userRole !== 'Supervisor') {
+        if (role !== 'manager' && role !== 'supervisor') {
             throw new AppError({
                 message: "You don't have authorization to do this",
                 statusCode: 401,
@@ -75,16 +78,14 @@ class BatchNotificationController {
             includeDevices: true,
         });
 
-        const messaging = admin.messaging();
-
         const messages: TokenMessage[] = [];
 
         const formatedDate = format(batch.exp_date, 'dd-MM-yyyy');
 
         const messageString = `${batch.product.name} tem um lote que vence em ${formatedDate}`;
 
-        usersInTeam.forEach(user => {
-            if (user.id !== req.userId && !!user.device) {
+        usersInTeam.forEach(u => {
+            if (u.id !== req.userId && !!u.device) {
                 messages.push({
                     notification: {
                         title: 'Verifique esse produto',
@@ -93,7 +94,7 @@ class BatchNotificationController {
                             deeplinking: `expiryteams://product/${batch.product.id}`,
                         },
                     },
-                    token: user.device,
+                    token: u.device,
                 });
             }
         });
@@ -106,6 +107,7 @@ class BatchNotificationController {
             });
         }
 
+        const messaging = admin.messaging();
         await messaging.sendAll(messages);
 
         return res.status(204).send();

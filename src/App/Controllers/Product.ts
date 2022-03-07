@@ -5,14 +5,13 @@ import * as Yup from 'yup';
 import Product from '@models/Product';
 
 import { updateProduct } from '@utils/Product/Update';
+import { getUserRoleInTeam } from '@utils/UserRoles';
+import { getUserByFirebaseId } from '@utils/User';
+
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getAllUsersFromTeam } from '@functions/Team/Users';
-
-import { getUserRole } from '@functions/Users/UserRoles';
 import { getProductTeam } from '@functions/Product/Team';
-
 import { createProduct, getProduct } from '@functions/Product';
-import { getUserByFirebaseId } from '@utils/User';
 
 import Cache from '@services/Cache';
 
@@ -238,21 +237,23 @@ class ProductController {
         }
 
         const team = await getProductTeam(prod);
+        const user = await getUserByFirebaseId(req.userId);
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: prod.id,
             user_id: req.userId,
         });
-        const userRole = await getUserRole({
-            user_id: req.userId,
+
+        const userRole = await getUserRoleInTeam({
+            user_id: user.id,
             team_id: team.id,
         });
 
         if (
             !userHasAccess ||
             (userHasAccess &&
-                userRole !== 'Manager' &&
-                userRole !== 'Supervisor')
+                userRole !== 'manager' &&
+                userRole !== 'supervisor')
         ) {
             throw new AppError({
                 message: "You don't have authorization to be here",
