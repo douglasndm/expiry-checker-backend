@@ -3,13 +3,14 @@ import { Request, Response } from 'express';
 import CryptoJS from 'crypto-js';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
+import Cache from '@services/Cache';
+
+import { getUserByFirebaseId } from '@utils/User';
 
 import { convertExportFile } from '@functions/Apps/Classic/ConvertExportFile';
 import { saveManyCategories } from '@functions/Apps/Classic/Categories';
-import { getUser } from '@functions/Users';
 
-import Cache from '@services/Cache';
+import AppError from '@errors/AppError';
 
 class ImportController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -61,7 +62,7 @@ class ImportController {
         const cache = new Cache();
         await cache.invalidade(`products-from-teams:${team_id}`);
 
-        const user = await getUser(req.userId || '');
+        const user = await getUserByFirebaseId(req.userId || '');
         if (!user) return res.status(400).send();
 
         if (parsedFile.categories) {
