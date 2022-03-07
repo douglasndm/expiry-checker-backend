@@ -8,27 +8,6 @@ interface getUserRoleProps {
     useInternalId?: boolean;
 }
 
-export async function getUserRole({
-    user_id,
-    team_id,
-}: getUserRoleProps): Promise<'Manager' | 'Supervisor' | 'Repositor' | 'None'> {
-    const userRolesRepository = getRepository(UserRoles);
-    const userRole = await userRolesRepository.findOne({
-        where: {
-            user: { firebaseUid: user_id },
-            team: { id: team_id },
-        },
-    });
-
-    if (!userRole) {
-        return 'None';
-    }
-
-    if (userRole.role.toLowerCase() === 'manager') return 'Manager';
-    if (userRole.role.toLowerCase() === 'supervisor') return 'Supervisor';
-    return 'Repositor';
-}
-
 export async function isUserManager({
     user_id,
     team_id,

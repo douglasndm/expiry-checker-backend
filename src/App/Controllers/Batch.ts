@@ -3,16 +3,17 @@ import { getRepository } from 'typeorm';
 import { parseISO, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
+import Cache from '@services/Cache';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
 
+import { getUserRoleInTeam } from '@utils/UserRoles';
+import { getUserByFirebaseId } from '@utils/User';
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
-import { getUserRole } from '@functions/Users/UserRoles';
 import { getProductTeam } from '@functions/Product/Team';
 
-import Cache from '../../Services/Cache';
+import AppError from '@errors/AppError';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -23,11 +24,12 @@ class BatchController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -83,11 +85,12 @@ class BatchController {
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -169,11 +172,12 @@ class BatchController {
             await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -245,11 +249,12 @@ class BatchController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -283,21 +288,22 @@ class BatchController {
         }
 
         const team = await getProductTeam(batch.product);
+        const user = await getUserByFirebaseId(req.userId);
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch.product.id,
             user_id: req.userId,
         });
-        const userRole = await getUserRole({
-            user_id: req.userId,
+        const userRole = await getUserRoleInTeam({
+            user_id: user.id,
             team_id: team.id,
         });
 
         if (
             !userHasAccess ||
             (userHasAccess &&
-                userRole !== 'Manager' &&
-                userRole !== 'Supervisor')
+                userRole !== 'manager' &&
+                userRole !== 'supervisor')
         ) {
             throw new AppError({
                 message: "You don't have authorization to be here",
