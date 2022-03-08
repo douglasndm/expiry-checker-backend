@@ -46,12 +46,12 @@ class SessionController {
 
                 req.userId = verifyToken.uid;
 
+                const { deviceId, firebaseToken, oneSignalToken } = req.body;
+
                 await addUserDevice({
                     user_id: verifyToken.uid,
-                    device_id: String(device_id),
+                    device_id: deviceId || String(device_id),
                 });
-
-                const { deviceId, firebaseToken, oneSignalToken } = req.body;
 
                 if (deviceId)
                     await registerDevice({
