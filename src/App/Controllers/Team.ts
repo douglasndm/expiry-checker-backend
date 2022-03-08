@@ -6,6 +6,7 @@ import Cache from '@services/Cache';
 
 import { createTeam } from '@utils/Team';
 import { getProductsFromTeam } from '@utils/Team/Products';
+import { getUserByFirebaseId } from '@utils/User/Find';
 
 import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
 import { deleteAllProducts } from '@functions/Team/Products';
@@ -16,7 +17,6 @@ import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
-import { getUserByFirebaseId } from '@utils/User';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {

@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 
 import UserLogin from '@models/UserLogin';
 
-import { getUserById } from '@utils/User';
+import { getUserById } from '@utils/User/Find';
 
 interface registerDeviceProps {
     user_id: string;

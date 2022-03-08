@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { getAllStoresFromTeam } from '@utils/Stores/List';
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 import { createStore } from '@utils/Stores/Create';
 import { updateStore } from '@utils/Stores/Update';
 import { deleteStore } from '@utils/Stores/Delete';

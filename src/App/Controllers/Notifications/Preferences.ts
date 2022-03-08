@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 
 import AppError from '@errors/AppError';
 

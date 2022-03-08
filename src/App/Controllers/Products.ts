@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 import { getUserRoleInTeam } from '@utils/UserRoles';
 import { deleteManyProducts } from '@utils/Product';
 

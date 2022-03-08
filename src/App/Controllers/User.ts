@@ -3,14 +3,17 @@ import { getRepository } from 'typeorm';
 import { compareAsc, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
-
 import User from '@models/User';
+
+import { getUserByFirebaseId } from '@utils/User/Find';
+import { createUser } from '@utils/User/Create';
+import { updateUser } from '@utils/User/Update';
 
 import { deleteUser } from '@functions/Users';
 
 import Cache from '@services/Cache';
-import { createUser, getUserByFirebaseId, updateUser } from '@utils/User';
+
+import AppError from '@errors/AppError';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
