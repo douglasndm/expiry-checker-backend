@@ -9,7 +9,7 @@ import Product from '@models/Product';
 import Batch from '@models/Batch';
 
 import { getUserRoleInTeam } from '@utils/UserRoles';
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
 

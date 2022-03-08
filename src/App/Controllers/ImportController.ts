@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
 
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 
 import { convertExportFile } from '@functions/Apps/Classic/ConvertExportFile';
 import { saveManyCategories } from '@functions/Apps/Classic/Categories';

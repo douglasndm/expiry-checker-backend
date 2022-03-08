@@ -6,7 +6,7 @@ import Product from '@models/Product';
 
 import { updateProduct } from '@utils/Product/Update';
 import { getUserRoleInTeam } from '@utils/UserRoles';
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getAllUsersFromTeam } from '@functions/Team/Users';

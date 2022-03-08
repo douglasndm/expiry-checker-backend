@@ -8,7 +8,7 @@ import {
     getAllProductsFromBrand,
     updateBrand,
 } from '@utils/Brand';
-import { getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
 
 import AppError from '@errors/AppError';
 

@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import * as admin from 'firebase-admin';
 
-import { createUser, getUserByFirebaseId } from '@utils/User';
+import { getUserByFirebaseId } from '@utils/User/Find';
+import { createUser } from '@utils/User/Create';
 import { registerDevice } from '@utils/User/Login';
 
 import { addUserDevice } from '@functions/Users/Device';

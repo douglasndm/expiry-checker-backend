@@ -22,7 +22,7 @@ if (process.env.DEV_MODE === 'false') {
                 app: App,
             }),
         ],
-        tracesSampleRate: 0.5,
+        tracesSampleRate: 0.1,
     });
     App.use(Sentry.Handlers.requestHandler());
     App.use(Sentry.Handlers.tracingHandler());
