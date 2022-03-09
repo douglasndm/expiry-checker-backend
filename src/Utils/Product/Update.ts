@@ -59,12 +59,14 @@ async function updateProduct({
     if (code) product.code = code;
     product.store = findedStore || null;
 
-    if (findedBrand) {
-        // This invalida the old brand products and the new one
-        await cache.invalidade(`products-from-brand:${product.brand?.id}`);
+    // This invalidade the old brand products and the new one
+    if (product.brand)
+        await cache.invalidade(`products-from-brand:${product.brand.id}`);
+    // This update brand cache only if its have an update value
+    if (findedBrand)
         await cache.invalidade(`products-from-brand:${findedBrand.id}`);
-        product.brand = findedBrand;
-    }
+
+    product.brand = findedBrand || null;
 
     const updatedProduct = await productRepository.save(product);
 
