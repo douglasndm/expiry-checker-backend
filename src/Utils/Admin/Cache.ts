@@ -8,6 +8,7 @@ async function clearAllCache(): Promise<void> {
     await cache.invalidadePrefix('product');
     await cache.invalidadePrefix('products-from-teams');
     await cache.invalidadePrefix('products-from-category');
+    await cache.invalidadePrefix('products-from-brand');
     await cache.invalidadePrefix('users-from-teams');
 }
 

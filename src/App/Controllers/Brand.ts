@@ -9,6 +9,7 @@ import {
     updateBrand,
 } from '@utils/Brand';
 import { getUserByFirebaseId } from '@utils/User/Find';
+import { getAllStoresFromUser } from '@utils/Stores/Users';
 
 import AppError from '@errors/AppError';
 
@@ -131,11 +132,31 @@ class BrandController {
                 });
         }
 
+        if (!req.userId) {
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
+        }
+
         const { brand_id } = req.params;
 
-        const brands = await getAllProductsFromBrand({ brand_id });
+        const productsInBrands = await getAllProductsFromBrand({ brand_id });
 
-        return res.json(brands);
+        // REMOVE PRODUCTS FROM STORES THAT USER IS NOT IN
+        const user = await getUserByFirebaseId(req.userId);
+        const userStores = await getAllStoresFromUser({ user_id: user.id });
+
+        if (userStores.length > 0) {
+            const products = productsInBrands.filter(
+                prod => prod.store?.id === userStores[0].store.id,
+            );
+
+            return res.json(products);
+        }
+
+        return res.json(productsInBrands);
     }
 }
 

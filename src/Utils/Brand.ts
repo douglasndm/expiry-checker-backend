@@ -119,15 +119,26 @@ export async function updateBrand({
 export async function getAllProductsFromBrand({
     brand_id,
 }: getAllProductsFromBrand): Promise<Product[]> {
-    const productRepository = getRepository(Product);
+    const cache = new Cache();
 
-    const products = await productRepository
-        .createQueryBuilder('prod')
-        .leftJoinAndSelect('prod.batches', 'batches')
-        .where('prod.brand = :brand_id', { brand_id })
-        .getMany();
+    let productsInBrand = await cache.get<Product[]>(
+        `products-from-brand:${brand_id}`,
+    );
 
-    return products;
+    if (!productsInBrand) {
+        const productRepository = getRepository(Product);
+
+        productsInBrand = await productRepository
+            .createQueryBuilder('prod')
+            .leftJoinAndSelect('prod.batches', 'batches')
+            .leftJoinAndSelect('prod.store', 'store')
+            .where('prod.brand = :brand_id', { brand_id })
+            .getMany();
+
+        await cache.save(`products-from-brand:${brand_id}`, productsInBrand);
+    }
+
+    return productsInBrand;
 }
 
 export async function deleteBrand({
