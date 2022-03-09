@@ -224,6 +224,8 @@ class ProductController {
         const prod = await productRepository
             .createQueryBuilder('prod')
             .leftJoinAndSelect('prod.brand', 'brand')
+            .leftJoinAndSelect('prod.categories', 'prodCategories')
+            .leftJoinAndSelect('prodCategories.category', 'category')
             .leftJoinAndSelect('prod.team', 'prodTeam')
             .leftJoinAndSelect('prodTeam.team', 'team')
             .where('prod.id = :product_id', { product_id })
@@ -261,6 +263,12 @@ class ProductController {
                 statusCode: 401,
                 internalErrorCode: 2,
             });
+        }
+
+        if (prod.categories.length > 0) {
+            await cache.invalidade(
+                `products-from-category:${prod.categories[0].category.id}`,
+            );
         }
 
         await cache.invalidade(`products-from-brand:${prod.brand?.id}`);
