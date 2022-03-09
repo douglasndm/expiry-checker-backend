@@ -21,7 +21,7 @@ class CategoryController {
             await schema.validate(req.params);
         } catch (err) {
             throw new AppError({
-                message: err.message,
+                message: 'Check the team id',
                 statusCode: 400,
                 internalErrorCode: 1,
             });

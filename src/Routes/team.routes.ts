@@ -9,6 +9,8 @@ import TeamPreferences from '@controllers/TeamPreferences';
 import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
+import BrandsRoutes from './brands.routes';
+import CategoriesRoutes from './categories.routes';
 import StoresRoutes from './stores.routes';
 
 const routes = Router({ mergeParams: true });
@@ -28,6 +30,8 @@ routes.get('/subscriptions', Subscription.index);
 // temp route
 routes.get('/subscriptions/recheck', Subscription.recheck);
 
+routes.use('/brands', BrandsRoutes);
+routes.use('/categories', CategoriesRoutes);
 routes.use('/stores', StoresRoutes);
 
 routes.get('/preferences', TeamPreferences.index);
@@ -38,5 +42,7 @@ routes.delete('', Team.delete);
 routes.post('/manager/user', UserManager.create);
 routes.put('/manager/user', UserManager.update);
 routes.delete('/manager/user/:user_id', UserManager.delete);
+
+routes.put('/preferences', TeamPreferences.update);
 
 export default routes;

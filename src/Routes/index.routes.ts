@@ -46,12 +46,6 @@ routes.delete('/products/:product_id', Product.delete);
 
 routes.delete('/products', Products.delete);
 
-routes.get('/brands/team/:team_id', Brand.index);
-routes.post('/brand', Brand.store);
-routes.put('/brand', Brand.update);
-routes.delete(`/brand/:brand_id`, Brand.delete);
-routes.get('/brand/:brand_id', Brand.allProducts);
-
 routes.use('/batches', batchRoutes);
 
 routes.get('/categories/team/:team_id', Category.index);
@@ -59,9 +53,17 @@ routes.post('/categories', Category.create);
 routes.put('/categories/:id', Category.update);
 routes.delete('/categories/:id', Category.delete);
 
+// REMOVE SOON, MOVING TO INSIDE TEAM
+routes.get('/brand/:brand_id', Brand.allProducts);
+routes.get('/brands/team/:team_id', Brand.index);
+routes.post('/brand', Brand.store);
+routes.put('/brand', Brand.update);
+routes.delete(`/brand/:brand_id`, Brand.delete);
+
 routes.get('/categories/:category_id/products', ProductCategory.index);
 routes.post('/categories/:id', ProductCategory.create);
 routes.delete('/categories/product/:id', ProductCategory.delete);
+// END
 
 routes.post('/team', Team.store);
 routes.use('/team/:team_id', teamRoutes);
