@@ -39,4 +39,6 @@ routes.post('/manager/user', UserManager.create);
 routes.put('/manager/user', UserManager.update);
 routes.delete('/manager/user/:user_id', UserManager.delete);
 
+routes.put('/preferences', TeamPreferences.update);
+
 export default routes;
