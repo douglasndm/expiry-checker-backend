@@ -2,17 +2,20 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
+import Cache from '@services/Cache';
+
+import Category from '@models/Category';
+import ProductCategory from '@models/ProductCategory';
+
+import { getAllProductsFromCategory } from '@utils/Categories/Products';
+import { getUserByFirebaseId } from '@utils/User/Find';
+import { getAllStoresFromUser } from '@utils/Stores/Users';
 
 import { checkIfUserHasAccessToTeam } from '@functions/Security/UserAccessTeam';
 import { addProductToCategory } from '@functions/Category/Products';
 import { getProductTeam } from '@functions/Product/Team';
 
-import Category from '@models/Category';
-import Product from '@models/Product';
-import ProductCategory from '@models/ProductCategory';
-
-import Cache from '@services/Cache';
+import AppError from '@errors/AppError';
 
 class ProductCategoryController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -24,7 +27,7 @@ class ProductCategoryController {
             await schema.validate(req.params);
         } catch (err) {
             throw new AppError({
-                message: err.message,
+                message: 'Check the category id',
                 statusCode: 400,
                 internalErrorCode: 1,
             });
@@ -40,56 +43,13 @@ class ProductCategoryController {
 
         const { category_id } = req.params;
 
-        const productCategoryRepository = getRepository(ProductCategory);
-        const productsInCategory = await productCategoryRepository
-            .createQueryBuilder('prod_cat')
-            .leftJoinAndSelect('prod_cat.product', 'product')
-            .leftJoinAndSelect('product.batches', 'batches')
-            .leftJoinAndSelect('product.team', 'team')
-            .leftJoinAndSelect('team.team', 'teamObj')
-            .leftJoinAndSelect('prod_cat.category', 'category')
-            .where('category.id = :id', { id: category_id })
-            .orderBy('batches.exp_date', 'ASC')
-            .getMany();
-
-        if (productsInCategory.length <= 0) {
-            return res.status(200).json({ category_name: '', products: [] });
-        }
-
-        const team = await getProductTeam(productsInCategory[0].product);
-
-        const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: team.id,
-            user_id: req.userId,
+        const productsInCategory = await getAllProductsFromCategory({
+            category_id,
         });
 
-        if (!userHasAccess) {
-            throw new AppError({
-                message: "You don't have authorization to do this",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
+        let categoryName = productsInCategory.category_name;
 
-        let categoryName;
-
-        const products: Array<
-            Omit<Product, 'created_at' | 'updated_at' | 'categories'>
-        > = [];
-
-        productsInCategory.forEach(p =>
-            products.push({
-                id: p.product.id,
-                name: p.product.name,
-                code: p.product.code,
-                team: p.product.team,
-                batches: p.product.batches,
-            }),
-        );
-
-        if (productsInCategory.length > 0) {
-            categoryName = productsInCategory[0].category.name;
-        } else {
+        if (productsInCategory.category_name === '') {
             // This will return the category name even if no results where found
             const categoryRepository = getRepository(Category);
             const cate = await categoryRepository.findOne({
@@ -98,7 +58,6 @@ class ProductCategoryController {
                 },
             });
 
-            categoryName = cate?.name;
             if (!cate) {
                 throw new AppError({
                     message: 'Category was not found',
@@ -106,9 +65,29 @@ class ProductCategoryController {
                     internalErrorCode: 10,
                 });
             }
+
+            categoryName = cate.name;
         }
 
-        return res.json({ category_name: categoryName, products });
+        // REMOVE PRODUCTS FROM STORES THAT USER IS NOT IN
+        const user = await getUserByFirebaseId(req.userId);
+        const userStores = await getAllStoresFromUser({ user_id: user.id });
+
+        if (userStores.length > 0) {
+            const products = productsInCategory.products.filter(
+                prod => prod.store?.id === userStores[0].store.id,
+            );
+
+            return res.json({
+                category_name: categoryName,
+                products,
+            });
+        }
+
+        return res.json({
+            category_name: categoryName,
+            products: productsInCategory.products,
+        });
     }
 
     async create(req: Request, res: Response): Promise<Response> {
@@ -123,11 +102,12 @@ class ProductCategoryController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -191,11 +171,12 @@ class ProductCategoryController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {

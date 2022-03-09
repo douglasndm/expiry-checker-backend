@@ -59,6 +59,7 @@ routes.post('/categories', Category.create);
 routes.put('/categories/:id', Category.update);
 routes.delete('/categories/:id', Category.delete);
 
+// REMOVE SOON, MOVING TO INSIDE TEAM
 routes.get('/categories/:category_id/products', ProductCategory.index);
 routes.post('/categories/:id', ProductCategory.create);
 routes.delete('/categories/product/:id', ProductCategory.delete);

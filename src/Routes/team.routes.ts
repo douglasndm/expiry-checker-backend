@@ -10,6 +10,7 @@ import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
 import StoresRoutes from './stores.routes';
+import CategoriesRoutes from './categories.routes';
 
 const routes = Router({ mergeParams: true });
 
@@ -29,6 +30,7 @@ routes.get('/subscriptions', Subscription.index);
 routes.get('/subscriptions/recheck', Subscription.recheck);
 
 routes.use('/stores', StoresRoutes);
+routes.use('/categories', CategoriesRoutes);
 
 routes.get('/preferences', TeamPreferences.index);
 

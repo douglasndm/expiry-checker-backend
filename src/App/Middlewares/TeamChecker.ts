@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
-
 import UserRoles from '@models/UserRoles';
+
+import AppError from '@errors/AppError';
 
 export async function checkTeamId(
     req: Request,
@@ -19,7 +19,7 @@ export async function checkTeamId(
         await schema.validate(req.params);
     } catch (err) {
         throw new AppError({
-            message: err.message,
+            message: 'Team id is not valid',
             statusCode: 400,
             internalErrorCode: 1,
         });
