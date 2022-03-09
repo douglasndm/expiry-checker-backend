@@ -59,6 +59,12 @@ async function updateProduct({
     if (code) product.code = code;
     product.store = findedStore || null;
 
+    if (product.categories.length > 0) {
+        await cache.invalidade(
+            `products-from-category:${product.categories[0].category.id}`,
+        );
+    }
+
     // This invalidade the old brand products and the new one
     if (product.brand)
         await cache.invalidade(`products-from-brand:${product.brand.id}`);
