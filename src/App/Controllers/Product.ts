@@ -223,6 +223,7 @@ class ProductController {
 
         const prod = await productRepository
             .createQueryBuilder('prod')
+            .leftJoinAndSelect('prod.brand', 'brand')
             .leftJoinAndSelect('prod.team', 'prodTeam')
             .leftJoinAndSelect('prodTeam.team', 'team')
             .where('prod.id = :product_id', { product_id })
@@ -262,6 +263,7 @@ class ProductController {
             });
         }
 
+        await cache.invalidade(`products-from-brand:${prod.brand?.id}`);
         await cache.invalidade(`products-from-teams:${team.id}`);
         await cache.invalidade(`product:${team.id}:${prod.id}`);
 
