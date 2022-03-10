@@ -120,32 +120,37 @@ export async function dailyPushNotification(): Promise<void> {
 
     teamWithNotifications.forEach(team => {
         team.stores.forEach(store => {
-            store.users.forEach(user => {
-                if (user.device_id) {
-                    let message = '';
+            if (store.users) {
+                store.users.forEach(user => {
+                    if (user.device_id) {
+                        let message = '';
 
-                    if (store.expiredBatches && store.expiredBatches > 0) {
-                        if (store.nextExpBatches && store.nextExpBatches > 0) {
-                            message = `Você tem ${store.expiredBatches} lotes vencidos e ${store.nextExpBatches} lotes próximos ao vencimento`;
-                        } else {
-                            message = `Você tem ${store.expiredBatches} lotes vencidos`;
+                        if (store.expiredBatches && store.expiredBatches > 0) {
+                            if (
+                                store.nextExpBatches &&
+                                store.nextExpBatches > 0
+                            ) {
+                                message = `Você tem ${store.expiredBatches} lotes vencidos e ${store.nextExpBatches} lotes próximos ao vencimento`;
+                            } else {
+                                message = `Você tem ${store.expiredBatches} lotes vencidos`;
+                            }
+                        } else if (
+                            store.nextExpBatches &&
+                            store.nextExpBatches > 0
+                        ) {
+                            message = `Você tem ${store.nextExpBatches} lotes próximos ao vencimento`;
                         }
-                    } else if (
-                        store.nextExpBatches &&
-                        store.nextExpBatches > 0
-                    ) {
-                        message = `Você tem ${store.nextExpBatches} lotes próximos ao vencimento`;
-                    }
 
-                    messages.push({
-                        token: user.device_id,
-                        notification: {
-                            title: 'Seus produtos precisam de atenção',
-                            body: message,
-                        },
-                    });
-                }
-            });
+                        messages.push({
+                            token: user.device_id,
+                            notification: {
+                                title: 'Seus produtos precisam de atenção',
+                                body: message,
+                            },
+                        });
+                    }
+                });
+            }
         });
 
         team.noStore.users.forEach(user => {
