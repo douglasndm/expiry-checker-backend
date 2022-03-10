@@ -9,8 +9,9 @@ import {
 } from 'typeorm';
 
 import UserRoles from './UserRoles';
-import UserDevice from './UserDevice';
 import UsersStores from './UsersStores';
+import UserLogin from './UserLogin';
+import UserDevice from './UserDevice';
 
 @Entity({ name: 'users' })
 export default class User {
@@ -37,6 +38,9 @@ export default class User {
 
     @OneToMany(() => UsersStores, usersStores => usersStores.user)
     stores: Array<UsersStores>;
+
+    @OneToMany(() => UserLogin, userLogin => userLogin.user)
+    logins: Array<UserLogin>;
 
     @OneToOne(() => UserDevice)
     device: string;
