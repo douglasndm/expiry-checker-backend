@@ -1,20 +1,21 @@
 import { getRepository } from 'typeorm';
 
+import Cache from '@services/Cache';
+
 import Product from '@models/Product';
 import Category from '@models/Category';
 
 import { getAllBrands } from '@utils/Brand';
+import { getAllStoresFromTeam } from '@utils/Stores/List';
 
 import {
     addProductToCategory,
     removeAllCategoriesFromProduct,
 } from '@functions/Category/Products';
 import { getProductTeam } from '@functions/Product/Team';
-
-import Cache from '@services/Cache';
+import { getProduct } from '@functions/Product';
 
 import AppError from '@errors/AppError';
-import { getAllStoresFromTeam } from '@utils/Stores/List';
 
 interface updateProductProps {
     id: string;
@@ -34,7 +35,7 @@ async function updateProduct({
     categories,
 }: updateProductProps): Promise<Product> {
     const productRepository = getRepository(Product);
-    const product = await productRepository.findOne(id);
+    const product = await getProduct({ product_id: id });
 
     if (!product) {
         throw new AppError({
@@ -43,6 +44,8 @@ async function updateProduct({
             internalErrorCode: 8,
         });
     }
+
+    const cache = new Cache();
 
     const team = await getProductTeam(product);
 
@@ -54,8 +57,22 @@ async function updateProduct({
 
     if (name) product.name = name;
     if (code) product.code = code;
-    product.brand = findedBrand || null;
     product.store = findedStore || null;
+
+    if (product.categories.length > 0) {
+        await cache.invalidade(
+            `products-from-category:${product.categories[0].category.id}`,
+        );
+    }
+
+    // This invalidade the old brand products and the new one
+    if (product.brand)
+        await cache.invalidade(`products-from-brand:${product.brand.id}`);
+    // This update brand cache only if its have an update value
+    if (findedBrand)
+        await cache.invalidade(`products-from-brand:${findedBrand.id}`);
+
+    product.brand = findedBrand || null;
 
     const updatedProduct = await productRepository.save(product);
 
@@ -83,9 +100,10 @@ async function updateProduct({
             product_id: updatedProduct.id,
             category,
         });
+
+        await cache.invalidade(`products-from-category:${category.id}`);
     }
 
-    const cache = new Cache();
     await cache.invalidade(`products-from-teams:${team.id}`);
     await cache.invalidade(`product:${team.id}:${updatedProduct.id}`);
 
