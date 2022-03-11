@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 
 import { getAllTeamsExpiredProducts } from '@utils/Notifications/Teams';
-import { getAllUsersDevices } from '@utils/Notifications/Users';
+import { getAllLoginsFromAllUsers } from '@utils/User/Login';
 import { getAllStoreTeamsToNotificate } from './TeamStores';
 
 export async function dailyPushNotification(): Promise<void> {
@@ -46,7 +46,7 @@ export async function dailyPushNotification(): Promise<void> {
         });
     });
 
-    const usersDevices = await getAllUsersDevices();
+    const usersDevices = await getAllLoginsFromAllUsers();
 
     // busca o usuário na lista de times para enviar notificação
     // e atrui a ele o device id para enviar a notificação
@@ -59,7 +59,7 @@ export async function dailyPushNotification(): Promise<void> {
                     );
 
                     if (userDevice) {
-                        user.device_id = userDevice.device_id;
+                        user.device_id = userDevice.firebaseMessagingToken;
                     }
                 });
             }
@@ -69,7 +69,7 @@ export async function dailyPushNotification(): Promise<void> {
             const userDevice = usersDevices.find(u => u.user.id === user.id);
 
             if (userDevice) {
-                user.device_id = userDevice.device_id;
+                user.device_id = userDevice.firebaseMessagingToken;
             }
         });
     });
