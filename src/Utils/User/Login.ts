@@ -1,8 +1,21 @@
 import { getRepository } from 'typeorm';
 
+import Cache from '@services/Cache';
+
 import UserLogin from '@models/UserLogin';
 
 import { getUserById } from '@utils/User/Find';
+
+async function getAllLoginsFromAllUsers(): Promise<UserLogin[]> {
+    const loginRepository = getRepository(UserLogin);
+
+    const logins = await loginRepository
+        .createQueryBuilder('login')
+        .leftJoinAndSelect('login.user', 'user')
+        .getMany();
+
+    return logins;
+}
 
 interface registerDeviceProps {
     user_id: string;
@@ -42,7 +55,10 @@ async function registerDevice({
 
     const savedUserLogin = await userLoginRepository.save(userLogin);
 
+    const cache = new Cache();
+    await cache.invalidade('users_logins');
+
     return savedUserLogin;
 }
 
-export { registerDevice };
+export { registerDevice, getAllLoginsFromAllUsers };
