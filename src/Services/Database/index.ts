@@ -1,5 +1,6 @@
 import { createConnection, getConnectionOptions } from 'typeorm';
 
+import AppVersion from '@models/AppVersion';
 import Batch from '@models/Batch';
 import Category from '@models/Category';
 import Product from '@models/Product';
@@ -24,6 +25,7 @@ async function setConnection(): Promise<void> {
     createConnection(
         Object.assign(defaultOptions, {
             entities: [
+                AppVersion,
                 Batch,
                 Category,
                 Product,

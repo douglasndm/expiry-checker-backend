@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import AppVersionController from '@controllers/AppVersionController';
 import User from '@controllers/User';
 import Product from '@controllers/Product';
 import Products from '@controllers/Products';
@@ -22,6 +23,8 @@ import internalRoutes from './internal.routes';
 const routes = Router();
 
 routes.use('/internal', internalRoutes);
+
+routes.get('/version', AppVersionController.index);
 
 routes.post('/users', User.store);
 

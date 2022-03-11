@@ -1,5 +1,11 @@
 import Cache from '@services/Cache';
 
+async function clearVersionCache(): Promise<void> {
+    const cache = new Cache();
+
+    await cache.invalidade('latest_version');
+}
+
 async function clearAllCache(): Promise<void> {
     const cache = new Cache();
 
@@ -10,6 +16,8 @@ async function clearAllCache(): Promise<void> {
     await cache.invalidadePrefix('products-from-category');
     await cache.invalidadePrefix('products-from-brand');
     await cache.invalidadePrefix('users-from-teams');
+
+    await clearVersionCache();
 }
 
-export { clearAllCache };
+export { clearAllCache, clearVersionCache };
