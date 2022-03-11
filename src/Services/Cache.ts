@@ -48,4 +48,8 @@ export default class RedisCache {
 
         await pipeline.exec();
     }
+
+    public async invalidadeAllCache(): Promise<void> {
+        await this.client.flushall();
+    }
 }
