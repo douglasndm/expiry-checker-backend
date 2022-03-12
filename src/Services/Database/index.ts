@@ -13,6 +13,7 @@ import ProductTeams from '@models/ProductTeams';
 import ProductCategory from '@models/ProductCategory';
 import TeamSubscriptions from '@models/TeamSubscription';
 import ProductDetails from '@models/ProductDetails';
+import ProductRequest from '@models/ProductRequest';
 import UserDevice from '@models/UserDevice';
 import UsersStores from '@models/UsersStores';
 import UserLogin from '@models/UserLogin';
@@ -39,6 +40,7 @@ async function setConnection(): Promise<void> {
                 ProductCategory,
                 TeamSubscriptions,
                 ProductDetails,
+                ProductRequest,
                 UserDevice,
                 UsersStores,
                 TeamPreferences,
