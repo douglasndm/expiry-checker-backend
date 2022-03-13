@@ -85,20 +85,21 @@ class BatchNotificationController {
         const messageString = `${batch.product.name} tem um lote que vence em ${formatedDate}`;
 
         users.forEach(u => {
-            if (
-                u.firebaseUid !== req.userId &&
-                !!u.logins[0].firebaseMessagingToken
-            ) {
-                messages.push({
-                    notification: {
-                        title: 'Verifique esse produto',
-                        body: messageString,
-                    },
-                    data: {
-                        deeplinking: `expiryteams://product/${batch.product.id}`,
-                    },
-                    token: u.logins[0].firebaseMessagingToken,
-                });
+            if (u.firebaseUid !== req.userId) {
+                const firebaseToken = u.logins[0].firebaseMessagingToken;
+
+                if (firebaseToken && firebaseToken !== '') {
+                    messages.push({
+                        notification: {
+                            title: 'Verifique esse produto',
+                            body: messageString,
+                        },
+                        data: {
+                            deeplinking: `expiryteams://product/${batch.product.id}`,
+                        },
+                        token: firebaseToken,
+                    });
+                }
             }
         });
 
