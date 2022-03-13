@@ -50,7 +50,8 @@ async function registerDevice({
     userLogin.deviceId = device_id;
     userLogin.user = user;
     userLogin.ipAddress = ip_address;
-    userLogin.firebaseMessagingToken = firebaseToken;
+    userLogin.firebaseMessagingToken =
+        firebaseToken === '' ? undefined : firebaseToken;
     userLogin.oneSignalToken = oneSignalToken;
 
     const savedUserLogin = await userLoginRepository.save(userLogin);
