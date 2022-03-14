@@ -86,19 +86,21 @@ class BatchNotificationController {
 
         users.forEach(u => {
             if (u.firebaseUid !== req.userId) {
-                const firebaseToken = u.logins[0].firebaseMessagingToken;
+                if (u.logins[0].firebaseMessagingToken !== undefined) {
+                    const firebaseToken = u.logins[0].firebaseMessagingToken;
 
-                if (firebaseToken && firebaseToken !== '') {
-                    messages.push({
-                        notification: {
-                            title: 'Verifique esse produto',
-                            body: messageString,
-                        },
-                        data: {
-                            deeplinking: `expiryteams://product/${batch.product.id}`,
-                        },
-                        token: firebaseToken,
-                    });
+                    if (firebaseToken && firebaseToken !== '') {
+                        messages.push({
+                            notification: {
+                                title: 'Verifique esse produto',
+                                body: messageString,
+                            },
+                            data: {
+                                deeplinking: `expiryteams://product/${batch.product.id}`,
+                            },
+                            token: firebaseToken,
+                        });
+                    }
                 }
             }
         });
