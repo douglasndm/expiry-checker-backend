@@ -29,6 +29,9 @@ routes.get('/version', AppVersionController.index);
 
 routes.post('/users', User.store);
 
+// temp with out check for auth for expiry checker
+routes.get('/products/search', ProductSearch.index);
+
 // from now on all routes need authentication
 // routes.use(AuthMiddleware);
 routes.use(FirebaseAuth);
@@ -42,8 +45,6 @@ routes.put('/users', User.update);
 routes.delete('/users', User.delete);
 
 routes.get('/user/teams', UserTeams.index);
-
-routes.get('/products/search', ProductSearch.index);
 
 routes.get('/products/:product_id', Product.index);
 routes.post('/products', Product.create); // REMOVING SOON
