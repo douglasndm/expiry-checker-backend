@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 
 import UserRoles from '@models/UserRoles';
 
-import { recheckTemp } from '@functions/Subscriptions';
+import { recheckResponse, recheckTemp } from '@functions/Subscriptions';
 
 import AppError from '@errors/AppError';
 
@@ -30,16 +30,21 @@ class UserTeams {
             role => role.role.toLowerCase() === 'manager',
         );
 
-        const team_id = teamsManager[0].team.id;
+        let subscription: recheckResponse[] | null = null;
 
-        const subscription = await recheckTemp(team_id);
+        if (teamsManager.length > 0) {
+            const team_id = teamsManager[0].team.id;
+
+            subscription = await recheckTemp(team_id);
+        }
 
         const teams = userRoles.map(team => {
             if (team.role.toLowerCase() === 'manager') {
+                const sub = subscription;
                 return {
                     ...team.team,
                     role: team.role,
-                    subscription: subscription[0] || null,
+                    subscription: sub ? sub[0] : null,
                 };
             }
 

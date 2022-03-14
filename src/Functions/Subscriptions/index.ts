@@ -85,7 +85,7 @@ export async function createSubscription({
     await teamSubscriptionRepository.save(teamSubscription);
 }
 
-interface recheckResponse {
+export interface recheckResponse {
     name: string;
     subscription: RevenueCatSubscription;
 }
