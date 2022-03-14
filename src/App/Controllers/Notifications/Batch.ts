@@ -87,13 +87,14 @@ class BatchNotificationController {
         users.forEach(u => {
             if (u.firebaseUid !== req.userId) {
                 // check if user made at least one login and save its token
-                if (
-                    u.logins &&
-                    u.logins[0].firebaseMessagingToken !== undefined
-                ) {
-                    const firebaseToken = u.logins[0].firebaseMessagingToken;
+                if (u.logins[0]) {
+                    const token = u.logins[0].firebaseMessagingToken;
 
-                    if (firebaseToken && firebaseToken !== '') {
+                    if (
+                        token !== undefined &&
+                        token !== null &&
+                        token.trim() !== ''
+                    ) {
                         messages.push({
                             notification: {
                                 title: 'Verifique esse produto',
@@ -102,7 +103,7 @@ class BatchNotificationController {
                             data: {
                                 deeplinking: `expiryteams://product/${batch.product.id}`,
                             },
-                            token: firebaseToken,
+                            token,
                         });
                     }
                 }
