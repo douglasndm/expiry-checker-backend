@@ -1,18 +1,21 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import admin from 'firebase-admin';
 import { format } from 'date-fns';
 import * as Yup from 'yup';
-import * as Sentry from '@sentry/node';
 
 import Batch from '@models/Batch';
 
 import { getProductTeam } from '@functions/Product/Team';
 import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getUserByFirebaseId } from '@utils/User/Find';
+import { getAllUsersFromTeamWithDevices } from '@utils/Team/Users';
+import {
+    IOneSignalBatchPushNotification,
+    sendNotificationByFirebase,
+    sendNotificationByOneSignal,
+} from '@utils/Notifications/Push/Batch';
 
 import AppError from '@errors/AppError';
-import { getAllUsersFromTeamWithDevices } from '@utils/Team/Users';
 
 class BatchNotificationController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -81,13 +84,20 @@ class BatchNotificationController {
         const messages: TokenMessage[] = [];
 
         const formatedDate = format(batch.exp_date, 'dd-MM-yyyy');
-
         const messageString = `${batch.product.name} tem um lote que vence em ${formatedDate}`;
+        const deeplinking = `expiryteams://product/${batch.product.id}`;
+
+        const oneSignalUsers: IOneSignalBatchPushNotification = {
+            users_id: [],
+            batch,
+            message: messageString,
+        };
 
         users.forEach(u => {
             if (u.firebaseUid !== req.userId) {
                 // check if user made at least one login and save its token
                 if (u.logins[0]) {
+                    const login = u.logins[0];
                     const token = u.logins[0].firebaseMessagingToken;
 
                     if (
@@ -101,16 +111,18 @@ class BatchNotificationController {
                                 body: messageString,
                             },
                             data: {
-                                deeplinking: `expiryteams://product/${batch.product.id}`,
+                                deeplinking,
                             },
                             token,
                         });
+                    } else if (login.oneSignalToken) {
+                        oneSignalUsers.users_id.push(u.id);
                     }
                 }
             }
         });
 
-        if (messages.length <= 0) {
+        if (messages.length <= 0 && oneSignalUsers.users_id.length <= 0) {
             throw new AppError({
                 message: 'There are no users to send',
                 statusCode: 400,
@@ -118,11 +130,12 @@ class BatchNotificationController {
             });
         }
 
-        const messaging = admin.messaging();
-        const response = await messaging.sendAll(messages);
+        if (messages.length > 0) {
+            await sendNotificationByFirebase(messages);
+        }
 
-        if (response.failureCount > 0) {
-            Sentry.captureException(response);
+        if (oneSignalUsers.users_id.length > 0) {
+            await sendNotificationByOneSignal(oneSignalUsers);
         }
 
         return res.status(201).send();
