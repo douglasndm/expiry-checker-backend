@@ -17,6 +17,15 @@ class ProductDetails {
     @Column('varchar')
     code: string;
 
+    @Column()
+    brand?: string;
+
+    @Column()
+    thumbnail?: string;
+
+    @Column({ name: 'last_time_checked', type: 'timestamp' })
+    lastTimeChecked: Date | null;
+
     @CreateDateColumn()
     created_at: Date;
 
