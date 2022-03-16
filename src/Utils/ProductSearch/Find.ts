@@ -6,6 +6,11 @@ import ProductRequest from '@models/ProductRequest';
 
 import AppError from '@errors/AppError';
 
+import {
+    findProductByEANExternal,
+    findProductByEANExternalResponse,
+} from './ExternalQuery';
+
 interface findProductByEANProps {
     code: string;
 }
@@ -38,16 +43,50 @@ async function findProductByEAN({
             .where('request.code like :code', { code: `%${code}%` })
             .getOne();
 
-        if (request) {
-            request.rank += 1;
+        let externalProduct: null | findProductByEANExternalResponse = null;
 
-            await productRequestRepository.save(request);
-        } else {
+        try {
+            const externalSearch = await findProductByEANExternal(code);
+
+            if (externalSearch.name) {
+                externalProduct = externalSearch;
+            }
+        } catch (err) {
+            console.log(`Erro while search ${code} at Bluesoft`);
+            console.error(err);
+        }
+
+        if (request) {
+            if (externalProduct !== null) {
+                await productRequestRepository.remove(request);
+            } else {
+                request.rank += 1;
+
+                await productRequestRepository.save(request);
+            }
+        } else if (!externalProduct) {
             const productRequest = new ProductRequest();
             productRequest.code = code;
             productRequest.rank = 1;
 
             await productRequestRepository.save(productRequest);
+        } else if (externalProduct) {
+            const alreadyExists = await productRepository
+                .createQueryBuilder('product')
+                .where('product.code = :code', { code: externalProduct.code })
+                .getOne();
+
+            if (!alreadyExists) {
+                const newProduct = new ProductDetails();
+                newProduct.name = externalProduct.name;
+                newProduct.code = externalProduct.code;
+                newProduct.brand = externalProduct.brand;
+                newProduct.thumbnail = externalProduct.thumbnail;
+
+                const savedProduct = await productRepository.save(newProduct);
+
+                return savedProduct;
+            }
         }
     }
 
