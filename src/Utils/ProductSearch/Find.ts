@@ -33,6 +33,9 @@ async function findProductByEAN({
     const product = await productRepository
         .createQueryBuilder('product')
         .where('product.code like :code', { code: `%${code}%` })
+        .orWhere('product.code like :code', {
+            code: `%${code.replace(/^0+/, '')}%`, // Remove zero on begin
+        })
         .getOne();
 
     if (!product) {
@@ -41,6 +44,9 @@ async function findProductByEAN({
         const request = await productRequestRepository
             .createQueryBuilder('request')
             .where('request.code like :code', { code: `%${code}%` })
+            .orWhere('product.code like :code', {
+                code: `%${code.replace(/^0+/, '')}%`, // Remove zero on begin
+            })
             .getOne();
 
         let externalProduct: null | findProductByEANExternalResponse = null;
