@@ -44,7 +44,7 @@ async function findProductByEAN({
         const request = await productRequestRepository
             .createQueryBuilder('request')
             .where('request.code like :code', { code: `%${code}%` })
-            .orWhere('product.code like :code', {
+            .orWhere('request.code like :code', {
                 code: `%${code.replace(/^0+/, '')}%`, // Remove zero on begin
             })
             .getOne();
