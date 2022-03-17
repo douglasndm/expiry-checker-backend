@@ -19,23 +19,25 @@ async function findProductByEAN({
     code,
 }: findProductByEANProps): Promise<ProductDetails | null> {
     const schema = Yup.object().shape({
-        code: Yup.string().required(),
+        code: Yup.string().required().min(8),
     });
 
     try {
         await schema.validate({ code });
     } catch (err) {
-        throw new AppError({ message: 'Invalid product code' });
+        if (err instanceof Error) {
+            throw new AppError({ message: err.message });
+        }
     }
 
     const productRepository = getRepository(ProductDetails);
 
+    const queryWithoutLetters = code.replace(/\D/g, '');
+    const query = queryWithoutLetters.replace(/^0+/, ''); // Remove zero on begin
+
     const product = await productRepository
         .createQueryBuilder('product')
-        .where('product.code like :code', { code: `%${code}%` })
-        .orWhere('product.code like :code', {
-            code: `%${code.replace(/^0+/, '')}%`, // Remove zero on begin
-        })
+        .where('product.code = :code', { code: `${query}` })
         .getOne();
 
     if (!product) {
@@ -43,22 +45,19 @@ async function findProductByEAN({
 
         const request = await productRequestRepository
             .createQueryBuilder('request')
-            .where('request.code like :code', { code: `%${code}%` })
-            .orWhere('request.code like :code', {
-                code: `%${code.replace(/^0+/, '')}%`, // Remove zero on begin
-            })
+            .where('request.code = :code', { code: `${query}` })
             .getOne();
 
         let externalProduct: null | findProductByEANExternalResponse = null;
 
         try {
-            const externalSearch = await findProductByEANExternal(code);
+            const externalSearch = await findProductByEANExternal(query);
 
             if (externalSearch.name) {
                 externalProduct = externalSearch;
             }
         } catch (err) {
-            console.log(`Erro while search ${code} at Bluesoft`);
+            console.log(`Erro while search ${query} at Bluesoft`);
             console.error(err);
         }
 
@@ -72,7 +71,7 @@ async function findProductByEAN({
             }
         } else if (!externalProduct) {
             const productRequest = new ProductRequest();
-            productRequest.code = code;
+            productRequest.code = query;
             productRequest.rank = 1;
 
             await productRequestRepository.save(productRequest);
