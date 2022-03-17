@@ -52,7 +52,8 @@ async function findProductByEAN({
         let externalProduct: null | findProductByEANExternalResponse = null;
 
         try {
-            const externalSearch = await findProductByEANExternal(code);
+            const query = code.replace(/\D/g, '');
+            const externalSearch = await findProductByEANExternal(query);
 
             if (externalSearch.name) {
                 externalProduct = externalSearch;
