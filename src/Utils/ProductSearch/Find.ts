@@ -19,13 +19,15 @@ async function findProductByEAN({
     code,
 }: findProductByEANProps): Promise<ProductDetails | null> {
     const schema = Yup.object().shape({
-        code: Yup.string().required(),
+        code: Yup.string().required().min(8),
     });
 
     try {
         await schema.validate({ code });
     } catch (err) {
-        throw new AppError({ message: 'Invalid product code' });
+        if (err instanceof Error) {
+            throw new AppError({ message: err.message });
+        }
     }
 
     const productRepository = getRepository(ProductDetails);
@@ -35,7 +37,7 @@ async function findProductByEAN({
 
     const product = await productRepository
         .createQueryBuilder('product')
-        .where('product.code like :code', { code: `%${query}%` })
+        .where('product.code = :code', { code: `${query}` })
         .getOne();
 
     if (!product) {
@@ -43,7 +45,7 @@ async function findProductByEAN({
 
         const request = await productRequestRepository
             .createQueryBuilder('request')
-            .where('request.code like :code', { code: `%${query}%` })
+            .where('request.code = :code', { code: `${query}` })
             .getOne();
 
         let externalProduct: null | findProductByEANExternalResponse = null;
