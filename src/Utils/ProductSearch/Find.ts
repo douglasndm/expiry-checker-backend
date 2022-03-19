@@ -18,6 +18,7 @@ interface findProductByEANProps {
 async function findProductByEAN({
     code,
 }: findProductByEANProps): Promise<ProductDetails | null> {
+    return null;
     const schema = Yup.object().shape({
         code: Yup.string().required().min(8),
     });
