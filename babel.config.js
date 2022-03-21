@@ -13,6 +13,7 @@ module.exports = {
                 "@functions": "./src/Functions",
                 "@config": "./src/Config",
                 "@services": "./src/Services",
+                "@jobs": "./src/Jobs",
                 "@errors": "./src/Errors"
             }
         }],
