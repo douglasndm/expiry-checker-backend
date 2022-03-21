@@ -1,7 +1,10 @@
 import { getRepository } from 'typeorm';
+import axios from 'axios';
 
 import ProductRequest from '@models/ProductRequest';
 import ProductDetails from '@models/ProductDetails';
+
+import Cache from '@services/Cache';
 
 import {
     findProductByEANExternal,
@@ -27,15 +30,33 @@ async function handle({ data }: handleProps): Promise<void> {
 
     let externalProduct: null | findProductByEANExternalResponse = null;
 
-    try {
-        const externalSearch = await findProductByEANExternal(query);
+    const cache = new Cache();
+    const blockRequest = await cache.get<boolean>(
+        'stop_external_ean_api_request',
+    );
 
-        if (externalSearch.name) {
-            externalProduct = externalSearch;
+    if (blockRequest !== true) {
+        try {
+            const externalSearch = await findProductByEANExternal(query);
+
+            if (externalSearch.name) {
+                externalProduct = externalSearch;
+            }
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                // No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
+                // até o próximo dia
+                if (err.response?.status === 429) {
+                    console.log('Blocking for external api request');
+                    console.log(new Date());
+
+                    await cache.save('stop_external_ean_api_request', true);
+                }
+            } else if (err instanceof Error) {
+                console.log(`Erro while search ${query} at Bluesoft`);
+                console.error(err.message);
+            }
         }
-    } catch (err) {
-        console.log(`Erro while search ${query} at Bluesoft`);
-        console.error(err);
     }
 
     if (request) {
