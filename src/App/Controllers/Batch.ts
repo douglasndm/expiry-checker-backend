@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { parseISO, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
@@ -135,11 +134,9 @@ class BatchController {
             });
         }
 
-        const date = startOfDay(parseISO(exp_date));
-
         const batch = new Batch();
         batch.name = name;
-        batch.exp_date = date;
+        batch.exp_date = exp_date;
         batch.amount = amount;
         batch.price = price;
         batch.status = 'unchecked';
@@ -152,7 +149,7 @@ class BatchController {
         await cache.invalidade(`products-from-teams:${team.id}`);
         await cache.invalidade(`product:${team.id}:${product_id}`);
 
-        return res.status(200).json(savedBatch);
+        return res.status(201).json(savedBatch);
     }
 
     async update(req: Request, res: Response): Promise<Response> {
