@@ -47,7 +47,7 @@ routes.delete('/users', User.delete);
 routes.get('/user/teams', UserTeams.index);
 
 routes.get('/products/:product_id', Product.index);
-routes.post('/products', Product.create); // REMOVING SOON
+routes.post('/products', Product.create); // REMOVING SOON // REMOVING ON NEXT RELEASE
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
 

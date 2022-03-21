@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { parseISO, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
@@ -17,21 +16,6 @@ import AppError from '@errors/AppError';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            batch_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -135,11 +119,9 @@ class BatchController {
             });
         }
 
-        const date = startOfDay(parseISO(exp_date));
-
         const batch = new Batch();
         batch.name = name;
-        batch.exp_date = date;
+        batch.exp_date = exp_date;
         batch.amount = amount;
         batch.price = price;
         batch.status = 'unchecked';
@@ -152,7 +134,7 @@ class BatchController {
         await cache.invalidade(`products-from-teams:${team.id}`);
         await cache.invalidade(`product:${team.id}:${product_id}`);
 
-        return res.status(200).json(savedBatch);
+        return res.status(201).json(savedBatch);
     }
 
     async update(req: Request, res: Response): Promise<Response> {
@@ -164,12 +146,7 @@ class BatchController {
             status: Yup.string(),
         });
 
-        const schemaParams = Yup.object().shape({
-            batch_id: Yup.string().required().uuid(),
-        });
-
         try {
-            await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
             if (err instanceof Error)
@@ -242,21 +219,6 @@ class BatchController {
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            batch_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',

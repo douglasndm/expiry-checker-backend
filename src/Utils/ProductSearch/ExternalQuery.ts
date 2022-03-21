@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import Cache from '@services/Cache';
+
 interface BluesoftResponse {
     avg_price: number;
     brand: {
@@ -55,4 +57,16 @@ async function findProductByEANExternal(
     };
 }
 
-export { findProductByEANExternal, findProductByEANExternalResponse };
+async function allowExternalQuery(): Promise<void> {
+    console.log('Removing block for external api request');
+    console.log(new Date());
+
+    const cache = new Cache();
+    await cache.invalidade('stop_external_ean_api_request');
+}
+
+export {
+    findProductByEANExternal,
+    findProductByEANExternalResponse,
+    allowExternalQuery,
+};
