@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm';
 import axios from 'axios';
+import { formatInTimeZone } from 'date-fns-tz';
 
 import ProductRequest from '@models/ProductRequest';
 import ProductDetails from '@models/ProductDetails';
@@ -20,14 +21,6 @@ interface handleProps {
 async function handle({ data }: handleProps): Promise<void> {
     const query = data.code;
 
-    const productRepository = getRepository(ProductDetails);
-    const productRequestRepository = getRepository(ProductRequest);
-
-    const request = await productRequestRepository
-        .createQueryBuilder('request')
-        .where('request.code = :code', { code: ` ${query}` })
-        .getOne();
-
     let externalProduct: null | findProductByEANExternalResponse = null;
 
     const cache = new Cache();
@@ -47,17 +40,30 @@ async function handle({ data }: handleProps): Promise<void> {
                 // No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
                 // até o próximo dia
                 if (err.response?.status === 429) {
+                    const formatedDate = formatInTimeZone(
+                        new Date(),
+                        'America/Sao_Paulo',
+                        'dd-MM-yyyy HH:mm:ss zzzz',
+                    );
                     console.log('Blocking for external api request');
-                    console.log(new Date());
+                    console.log(formatedDate);
 
                     await cache.save('stop_external_ean_api_request', true);
                 }
             } else if (err instanceof Error) {
-                console.log(`Erro while search ${query} at Bluesoft`);
+                console.log(`Erro while searching ${query} at Bluesoft`);
                 console.error(err.message);
             }
         }
     }
+
+    const productRepository = getRepository(ProductDetails);
+    const productRequestRepository = getRepository(ProductRequest);
+
+    const request = await productRequestRepository
+        .createQueryBuilder('request')
+        .where('request.code = :code', { code: ` ${query}` })
+        .getOne();
 
     if (request) {
         if (externalProduct !== null) {

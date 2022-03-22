@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { formatInTimeZone } from 'date-fns-tz';
 
 import Cache from '@services/Cache';
 
@@ -58,8 +59,13 @@ async function findProductByEANExternal(
 }
 
 async function allowExternalQuery(): Promise<void> {
+    const formatedDate = formatInTimeZone(
+        new Date(),
+        'America/Sao_Paulo',
+        'dd-MM-yyyy HH:mm:ss zzzz',
+    );
     console.log('Removing block for external api request');
-    console.log(new Date());
+    console.log(formatedDate);
 
     const cache = new Cache();
     await cache.invalidade('stop_external_ean_api_request');
