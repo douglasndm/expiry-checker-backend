@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
-import { createCategory } from '@utils/Categories/Create';
 import { getAllCategoriesFromTeam } from '@utils/Categories/List';
+import { createCategory } from '@utils/Categories/Create';
 import { updateCategory } from '@utils/Categories/Update';
+import { deleteCategory } from '@utils/Categories/Delete';
 
 import { checkIfTeamIsActive } from '@functions/Team';
 
 import AppError from '@errors/AppError';
-import { deleteCategory } from '@utils/Categories/Delete';
 
 class CategoryController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -32,7 +32,6 @@ class CategoryController {
     async create(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             name: Yup.string().required(),
-            team_id: Yup.string().required().uuid(),
         });
 
         try {
@@ -45,8 +44,12 @@ class CategoryController {
                     internalErrorCode: 1,
                 });
         }
+        const { name } = req.body;
+        let { team_id } = req.body; // shoulb be removed soon
 
-        const { name, team_id } = req.body;
+        if (!team_id) {
+            team_id = req.params.team_id;
+        }
 
         const savedCategory = await createCategory({
             name,
