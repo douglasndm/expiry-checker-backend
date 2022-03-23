@@ -1,1 +1,1 @@
-export { default as FindProductByCodeExternal } from './FindProductByCodeExternal';
+export { default as HandleAfterProductSearch } from './handleAfterProductSearch';
