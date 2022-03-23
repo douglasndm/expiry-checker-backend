@@ -1,6 +1,8 @@
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import Cache from '@services/Cache';
+
 import Store from '@models/Store';
 
 import { isUserManager } from '@functions/Users/UserRoles';
@@ -58,6 +60,9 @@ async function createStore({
     store.team = team;
 
     const createdStore = await storeRepository.save(store);
+
+    const cache = new Cache();
+    await cache.invalidade(`stores_from_team:${team_id}`);
 
     return createdStore;
 }

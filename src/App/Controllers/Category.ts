@@ -1,32 +1,17 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { getAllCategoriesFromTeam } from '@utils/Categories/List';
+import { createCategory } from '@utils/Categories/Create';
+import { updateCategory } from '@utils/Categories/Update';
+import { deleteCategory } from '@utils/Categories/Delete';
+
+import { checkIfTeamIsActive } from '@functions/Team';
 
 import AppError from '@errors/AppError';
 
-import { createCategory } from '@functions/Category';
-import { checkIfTeamIsActive } from '@functions/Team';
-import { getAllUsersFromTeam } from '@functions/Team/Users';
-import { isUserManager } from '@functions/Users/UserRoles';
-
-import Category from '@models/Category';
-
 class CategoryController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            throw new AppError({
-                message: 'Check the team id',
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
-        }
-
         const { team_id } = req.params;
 
         const subscription = await checkIfTeamIsActive({ team_id });
@@ -39,24 +24,7 @@ class CategoryController {
             });
         }
 
-        const usersInTeam = await getAllUsersFromTeam({ team_id });
-
-        const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
-
-        if (isUserInTeam.length <= 0) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        const categoryRepository = getRepository(Category);
-        const categories = await categoryRepository.find({
-            where: {
-                team: { id: team_id },
-            },
-        });
+        const categories = await getAllCategoriesFromTeam({ team_id });
 
         return res.status(200).json(categories);
     }
@@ -64,41 +32,23 @@ class CategoryController {
     async create(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             name: Yup.string().required(),
-            team_id: Yup.string().required().uuid(),
         });
 
         try {
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
+        const { name } = req.body;
+        let { team_id } = req.body; // shoulb be removed soon
 
-        if (!req.userId) {
-            throw new AppError({
-                message: 'Provide the user id',
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        const { name, team_id } = req.body;
-
-        // Check if user has access and it is a manager on team
-        const isManager = await isUserManager({
-            user_id: req.userId,
-            team_id,
-        });
-
-        if (!isManager) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
+        if (!team_id) {
+            team_id = req.params.team_id;
         }
 
         const savedCategory = await createCategory({
@@ -111,7 +61,7 @@ class CategoryController {
 
     async update(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+            category_id: Yup.string().required().uuid(),
         });
 
         const schemaBody = Yup.object().shape({
@@ -122,11 +72,12 @@ class CategoryController {
             await schema.validate(req.params);
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
         if (!req.userId) {
@@ -137,93 +88,33 @@ class CategoryController {
             });
         }
 
-        const { id } = req.params;
+        const { category_id } = req.params;
         const { name } = req.body;
 
-        const categoryRepository = getRepository(Category);
-        const category = await categoryRepository.findOne(id, {
-            relations: ['team'],
-        });
+        const updatedCategory = await updateCategory({ category_id, name });
 
-        if (!category) {
-            throw new AppError({
-                message: 'Category was not found',
-                statusCode: 400,
-                internalErrorCode: 10,
-            });
-        }
-        // Check if user has access and it is a manager on team
-        const isManager = await isUserManager({
-            user_id: req.userId,
-            team_id: category.team.id,
-        });
-
-        if (!isManager) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        category.name = name;
-
-        const updatedCategory = await categoryRepository.save(category);
         return res.status(200).json(updatedCategory);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
+            category_id: Yup.string().required().uuid(),
         });
 
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({
-                message: err.message,
-                statusCode: 400,
-                internalErrorCode: 1,
-            });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    statusCode: 400,
+                    internalErrorCode: 1,
+                });
         }
 
-        if (!req.userId) {
-            throw new AppError({
-                message: 'Provide the user id',
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
+        const { category_id } = req.params;
 
-        const { id } = req.params;
-
-        const categoryRepository = getRepository(Category);
-        const category = await categoryRepository.findOne(id, {
-            relations: ['team'],
-        });
-
-        if (!category) {
-            throw new AppError({
-                message: 'Category was not found',
-                statusCode: 400,
-                internalErrorCode: 10,
-            });
-        }
-        // Check if user has access and it is a manager on team
-        const isManager = await isUserManager({
-            user_id: req.userId,
-            team_id: category.team.id,
-        });
-
-        if (!isManager) {
-            throw new AppError({
-                message: "You don't have authorization to do that",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        await categoryRepository.remove(category);
+        await deleteCategory({ category_id });
 
         return res.status(204).send();
     }

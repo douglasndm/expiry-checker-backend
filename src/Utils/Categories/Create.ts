@@ -1,18 +1,21 @@
 import { getRepository } from 'typeorm';
 
-import AppError from '@errors/AppError';
+import Cache from '@services/Cache';
 
 import Category from '@models/Category';
-import Team from '@models/Team';
+
+import { getTeam } from '@functions/Team';
+
+import AppError from '@errors/AppError';
 
 interface createCategoryProps {
-    name: string;
     team_id: string;
+    name: string;
 }
 
-export async function createCategory({
-    name,
+async function createCategory({
     team_id,
+    name,
 }: createCategoryProps): Promise<Category> {
     const categoryRepository = getRepository(Category);
     const alreadyExists = await categoryRepository
@@ -29,20 +32,7 @@ export async function createCategory({
         });
     }
 
-    const teamRepository = getRepository(Team);
-    const team = await teamRepository.findOne({
-        where: {
-            id: team_id,
-        },
-    });
-
-    if (!team) {
-        throw new AppError({
-            message: 'Team was not found',
-            statusCode: 400,
-            internalErrorCode: 6,
-        });
-    }
+    const team = await getTeam({ team_id });
 
     const category = new Category();
     category.name = name;
@@ -50,5 +40,10 @@ export async function createCategory({
 
     const savedCategory = await categoryRepository.save(category);
 
+    const cache = new Cache();
+    await cache.invalidade(`categories_from_team:${team_id}`);
+
     return savedCategory;
 }
+
+export { createCategory };

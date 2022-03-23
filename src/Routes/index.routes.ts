@@ -47,7 +47,6 @@ routes.delete('/users', User.delete);
 routes.get('/user/teams', UserTeams.index);
 
 routes.get('/products/:product_id', Product.index);
-routes.post('/products', Product.create); // REMOVING SOON // REMOVING ON NEXT RELEASE
 routes.put('/products/:product_id', Product.update);
 routes.delete('/products/:product_id', Product.delete);
 
@@ -55,19 +54,17 @@ routes.delete('/products', Products.delete);
 
 routes.use('/batches', batchRoutes);
 
-routes.get('/categories/team/:team_id', Category.index);
-routes.post('/categories', Category.create);
-routes.put('/categories/:id', Category.update);
-routes.delete('/categories/:id', Category.delete);
+routes.get('/categories/team/:team_id', Category.index); // REMOVING SOON
+routes.post('/categories', Category.create); // REMOVING SOON
+routes.put('/categories/:id', Category.update); // REMOVING SOON
+routes.delete('/categories/:id', Category.delete); // REMOVING SOON
 
 // REMOVE SOON, MOVING TO INSIDE TEAM
-routes.get('/brand/:brand_id', Brand.allProducts); // REMOVING SOON
 routes.get('/brands/team/:team_id', Brand.index);
 routes.post('/brand', Brand.store);
 routes.put('/brand', Brand.update);
 routes.delete(`/brand/:brand_id`, Brand.delete);
 
-routes.get('/categories/:category_id/products', ProductCategory.index); // REMOVING SOON
 routes.post('/categories/:id', ProductCategory.create);
 routes.delete('/categories/product/:id', ProductCategory.delete);
 // END
