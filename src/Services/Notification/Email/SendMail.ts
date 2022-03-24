@@ -1,13 +1,14 @@
-import axios from 'axios';
 import { addDays, format, isBefore } from 'date-fns';
 
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
-
-import { getAllUserRoles } from '@utils/UserRoles';
-import { getAllProductsFromManyTeams } from '@functions/Team/Products';
+import BackgroundJob from '@services/Background';
 
 import UserRoles from '@models/UserRoles';
 import Store from '@models/Store';
+
+import { getAllUserRoles } from '@utils/UserRoles';
+
+import { getAllProductsFromManyTeams } from '@functions/Team/Products';
 
 async function sendMail(): Promise<void> {
     const usersTeams = await getAllUserRoles();
@@ -131,7 +132,9 @@ async function sendMail(): Promise<void> {
 
     if (process.env.DEV_MODE === 'false')
         notificationsWithBatches.forEach(notification => {
-            axios.post(`${process.env.MAIL_SERVICE_URL}/send`, notification);
+            BackgroundJob.add('SendWeeklyMail', {
+                notification,
+            });
         });
 }
 
