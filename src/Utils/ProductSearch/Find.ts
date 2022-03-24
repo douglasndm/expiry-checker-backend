@@ -4,10 +4,9 @@ import * as Yup from 'yup';
 import { formatInTimeZone } from 'date-fns-tz';
 
 import Cache from '@services/Cache';
+import BackgroundJob from '@services/Background';
 
 import ProductDetails from '@models/ProductDetails';
-
-import BackgroundJob from '@services/Background';
 
 import AppError from '@errors/AppError';
 
