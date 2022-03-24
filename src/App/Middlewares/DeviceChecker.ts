@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
-import AppError from '@errors/AppError';
+import { getUserByFirebaseId } from '@utils/User/Find';
+import { getUserDevice } from '@utils/User/Login';
 
-import { getUserDeviceId } from '@functions/Users/Device';
+import AppError from '@errors/AppError';
 
 export default async function deviceChecker(
     req: Request,
@@ -22,9 +23,10 @@ export default async function deviceChecker(
         throw new AppError({ message: 'Provide the user id', statusCode: 401 });
     }
 
-    const userDevice = await getUserDeviceId({ user_id: req.userId });
+    const user = await getUserByFirebaseId(req.userId);
+    const userLogin = await getUserDevice({ user_id: user.id });
 
-    if (!userDevice || userDevice !== device_id) {
+    if (!userLogin || userLogin.deviceId !== device_id) {
         throw new AppError({
             message: 'Device is not allowed, please make login again',
             statusCode: 403,

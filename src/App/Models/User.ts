@@ -11,7 +11,6 @@ import {
 import UserRoles from './UserRoles';
 import UsersStores from './UsersStores';
 import UserLogin from './UserLogin';
-import UserDevice from './UserDevice';
 
 @Entity({ name: 'users' })
 export default class User {
@@ -39,11 +38,8 @@ export default class User {
     @OneToMany(() => UsersStores, usersStores => usersStores.user)
     stores: Array<UsersStores>;
 
-    @OneToMany(() => UserLogin, userLogin => userLogin.user)
-    logins: Array<UserLogin>;
-
-    @OneToOne(() => UserDevice)
-    device: string;
+    @OneToOne(() => UserLogin, userLogin => userLogin.user)
+    login: UserLogin;
 
     @CreateDateColumn()
     created_at: Date;
