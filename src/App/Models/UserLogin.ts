@@ -3,7 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -15,7 +15,7 @@ class UserLogin {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => User, user => user.device)
+    @OneToOne(() => User, user => user.login)
     @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
     user: User;
 

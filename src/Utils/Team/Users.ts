@@ -35,8 +35,8 @@ async function getAllUsersFromTeamWithDevices({
     const users = await userRepository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.roles', 'roles')
+        .leftJoinAndSelect('user.login', 'login')
         .leftJoinAndSelect('roles.team', 'team')
-        .leftJoinAndSelect('user.logins', 'logins')
         .where('team.id = :team_id', { team_id })
         .getMany();
 

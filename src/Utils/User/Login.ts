@@ -17,12 +17,17 @@ async function getAllLoginsFromAllUsers(): Promise<UserLogin[]> {
     return logins;
 }
 
-interface registerDeviceProps {
-    user_id: string;
-    device_id: string;
-    ip_address?: string;
-    firebaseToken?: string;
-    oneSignalToken?: string;
+async function getUserDevice({
+    user_id,
+}: getUserDeviceProps): Promise<UserLogin | null> {
+    const loginRepository = getRepository(UserLogin);
+    const login = await loginRepository
+        .createQueryBuilder('login')
+        .leftJoinAndSelect('login.user', 'user')
+        .where('user.id = :user_id', { user_id })
+        .getOne();
+
+    return login || null;
 }
 
 async function registerDevice({
@@ -62,4 +67,4 @@ async function registerDevice({
     return savedUserLogin;
 }
 
-export { registerDevice, getAllLoginsFromAllUsers };
+export { getUserDevice, registerDevice, getAllLoginsFromAllUsers };

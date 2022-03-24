@@ -2,10 +2,8 @@ import { Request, Response } from 'express';
 import * as admin from 'firebase-admin';
 
 import { getUserByFirebaseId } from '@utils/User/Find';
-import { createUser } from '@utils/User/Create';
 import { registerDevice } from '@utils/User/Login';
-
-import { addUserDevice } from '@functions/Users/Device';
+import { createUser } from '@utils/User/Create';
 
 import AppError from '@errors/AppError';
 
@@ -46,21 +44,15 @@ class SessionController {
 
                 req.userId = verifyToken.uid;
 
-                const { deviceId, firebaseToken, oneSignalToken } = req.body;
+                const { firebaseToken, oneSignalToken } = req.body;
 
-                await addUserDevice({
-                    user_id: verifyToken.uid,
-                    device_id: deviceId || String(device_id),
+                await registerDevice({
+                    user_id: user.id,
+                    device_id: String(device_id),
+                    ip_address: req.ip,
+                    firebaseToken,
+                    oneSignalToken,
                 });
-
-                if (deviceId)
-                    await registerDevice({
-                        user_id: user.id,
-                        device_id: deviceId,
-                        ip_address: req.ip,
-                        firebaseToken,
-                        oneSignalToken,
-                    });
 
                 return res.status(201).json(user);
             } catch (err) {

@@ -96,9 +96,9 @@ class BatchNotificationController {
         users.forEach(u => {
             if (u.firebaseUid !== req.userId) {
                 // check if user made at least one login and save its token
-                if (u.logins[0]) {
-                    const login = u.logins[0];
-                    const token = u.logins[0].firebaseMessagingToken;
+                if (u.login) {
+                    const { login } = u;
+                    const token = u.login.firebaseMessagingToken;
 
                     if (
                         token !== undefined &&
