@@ -1,0 +1,44 @@
+import { getRepository } from 'typeorm';
+import { parseISO, startOfDay } from 'date-fns';
+
+import TeamSubscription from '@models/TeamSubscription';
+
+import { getTeam } from '@functions/Team';
+
+interface setTeamSubscriptionProps {
+    team_id: string;
+    subscription: RevenueCatSubscription;
+    members: number;
+}
+
+async function setTeamSubscription({
+    team_id,
+    subscription,
+    members,
+}: setTeamSubscriptionProps): Promise<TeamSubscription> {
+    const repository = getRepository(TeamSubscription);
+
+    const subscriptions = await repository
+        .createQueryBuilder('teamSubs')
+        .leftJoinAndSelect('teamSubs.team', 'team')
+        .where('team.id = :team_id', { team_id })
+        .getMany();
+
+    if (subscriptions.length > 0) {
+        await repository.remove(subscriptions);
+    }
+
+    const team = await getTeam({ team_id });
+
+    const teamSubscription = new TeamSubscription();
+    teamSubscription.expireIn = startOfDay(parseISO(subscription.expires_date));
+    teamSubscription.isActive = true;
+    teamSubscription.membersLimit = members;
+    teamSubscription.team = team;
+
+    const savedSubscription = await repository.save(teamSubscription);
+
+    return savedSubscription;
+}
+
+export { setTeamSubscription };

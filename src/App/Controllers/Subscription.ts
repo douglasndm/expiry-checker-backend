@@ -1,31 +1,30 @@
 import { Request, Response } from 'express';
+import * as Yup from 'yup';
 
-import { getTeamSubscription } from '@utils/Subscription';
-import { recheckTemp } from '@functions/Subscriptions';
+import { getSubscription } from '@utils/Subscriptions/Subscription';
+
+import AppError from '@errors/AppError';
 
 class SubscriptionController {
     async index(req: Request, res: Response): Promise<Response> {
-        const { team_id } = req.params;
+        const schema = Yup.object().shape({
+            team_id: Yup.string().required().uuid(),
+        });
 
-        // this is temporary while an app update will be prepare to fix it
-        // Mobile app expect an empty response when no subscriptions are available
-        // new method will responde an error
         try {
-            const subscription = await getTeamSubscription(team_id);
-
-            return res.json(subscription);
-        } catch {
-            return res.send();
+            await schema.validate(req.params);
+        } catch (err) {
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                });
         }
-    }
 
-    // TEMP FOR LEGACY
-    async recheck(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
 
-        const subscriptions = await recheckTemp(team_id);
+        const subscription = await getSubscription(team_id);
 
-        return res.json(subscriptions);
+        return res.json(subscription);
     }
 }
 

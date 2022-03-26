@@ -3,11 +3,11 @@ import { compareAsc, startOfDay } from 'date-fns';
 
 import Team from '@models/Team';
 
-import { getTeamSubscription } from '@utils/Subscription';
+import { isUserManager } from '@functions/Users/UserRoles';
 
 import AppError from '@errors/AppError';
 
-import { isUserManager } from '@functions/Users/UserRoles';
+import { getSubscription } from '@utils/Subscriptions/Subscription';
 import { getAllUsersFromTeam } from './Users';
 import { deleteAllProducts } from './Products';
 
@@ -36,21 +36,13 @@ interface checkIfTeamIsActiveProps {
 export async function checkIfTeamIsActive({
     team_id,
 }: checkIfTeamIsActiveProps): Promise<boolean> {
-    const today = startOfDay(new Date());
+    try {
+        await getSubscription(team_id);
 
-    const subscriptions = await getTeamSubscription(team_id);
-
-    if (!subscriptions) {
+        return true;
+    } catch (err) {
         return false;
     }
-
-    const date = startOfDay(subscriptions.expireIn);
-
-    if (compareAsc(today, date) <= 0) {
-        return true;
-    }
-
-    return false;
 }
 
 interface checkMembersLimitProps {
@@ -65,15 +57,7 @@ interface checkMembersLimitResponse {
 export async function checkMembersLimit({
     team_id,
 }: checkMembersLimitProps): Promise<checkMembersLimitResponse> {
-    const sub = await getTeamSubscription(team_id);
-
-    if (!sub) {
-        throw new AppError({
-            message: "Team doesn't have any subscription",
-            statusCode: 400,
-            internalErrorCode: 5,
-        });
-    }
+    const sub = await getSubscription(team_id);
 
     if (compareAsc(startOfDay(new Date()), startOfDay(sub.expireIn)) <= 0) {
         const users = await getAllUsersFromTeam({ team_id });

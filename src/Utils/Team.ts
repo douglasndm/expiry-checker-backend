@@ -3,7 +3,6 @@ import { getRepository } from 'typeorm';
 import Team from '@models/Team';
 import UserRoles from '@models/UserRoles';
 import User from '@models/User';
-import TeamSubscription from '@models/TeamSubscription';
 
 import AppError from '@errors/AppError';
 
@@ -79,20 +78,4 @@ export async function createTeam({
     await userRolesRepository.save(userRole);
 
     return savedTeam;
-}
-
-export async function getAllSubscriptionsFromTeam(
-    team_id: string,
-): Promise<TeamSubscription[]> {
-    const repository = getRepository(TeamSubscription);
-
-    const subscriptions = await repository.find({
-        where: {
-            team: {
-                id: team_id,
-            },
-        },
-    });
-
-    return subscriptions;
 }
