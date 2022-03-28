@@ -131,6 +131,7 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
         }
 
         throw new AppError({
+            statusCode: 429,
             message: "Team or admin doesn't have an active subscription",
             internalErrorCode: 5,
         });
@@ -138,6 +139,7 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
 
     if (isExpired) {
         throw new AppError({
+            statusCode: 429,
             message: "Team or admin doesn't have an active subscription",
             internalErrorCode: 5,
         });
