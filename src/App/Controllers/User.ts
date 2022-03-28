@@ -44,9 +44,11 @@ class UserController {
         }
 
         const organizedUser = {
-            id: user.firebaseUid,
+            id: user.id,
             fid: user.firebaseUid,
             email: user.email,
+            name: user.name,
+            last_name: user.lastName,
 
             roles: user.roles.map(r => {
                 const subscriptions = r.team.subscriptions.filter(
