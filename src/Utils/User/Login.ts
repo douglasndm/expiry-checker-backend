@@ -43,6 +43,10 @@ async function registerDevice({
         .createQueryBuilder('login')
         .leftJoinAndSelect('login.user', 'user')
         .where('user.id = :user_id', { user_id })
+        .orWhere('login.firebaseMessagingToken = :firebaseToken', {
+            firebaseToken,
+        })
+        .orWhere('login.oneSignalToken = :oneSignalToken', { oneSignalToken })
         .getMany();
 
     if (prevLogin.length > 0) {
