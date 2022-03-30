@@ -1,12 +1,12 @@
-import Redis, { Redis as RedisClient } from 'ioredis';
+import { Redis as RedisClient } from 'ioredis';
 
-import cacheConfig from '@config/Cache';
+import { redisClient } from '@services/Redis';
 
 export default class RedisCache {
     private client: RedisClient;
 
     constructor() {
-        this.client = new Redis(cacheConfig.config.redis);
+        this.client = redisClient;
     }
 
     public async get<T>(key: any): Promise<T | null> {
