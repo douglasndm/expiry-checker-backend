@@ -92,26 +92,41 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
             );
         }
 
-        if (externalSubscription.length > 0) {
-            // sort subscriptions by exp date
-            const sortedSubscriptions = externalSubscription.sort(
-                (sub1, sub2) => {
-                    const date1 = endOfDay(
-                        parseISO(sub1.subscription.expires_date),
-                    );
-                    const date2 = endOfDay(
-                        parseISO(sub2.subscription.expires_date),
-                    );
+        const subscriptions = externalSubscription.map(sub =>
+            handleMembersLimit(sub),
+        );
 
-                    if (compareAsc(date1, date2) < 0) {
+        if (subscriptions.length > 0) {
+            // sort subscriptions by exp date
+            const sortedSubscriptions = subscriptions.sort((sub1, sub2) => {
+                const date1 = endOfDay(
+                    parseISO(sub1.subscription.expires_date),
+                );
+                const date2 = endOfDay(
+                    parseISO(sub2.subscription.expires_date),
+                );
+
+                if (compareAsc(date1, date2) < 0) {
+                    return 1;
+                }
+                // nesse caso as assinaturas foram realizads no mesmo dia, e serão consideradas ativas até
+                // meia noite, então, o app vai chegar qual assinatura tem a maior quantidade
+                // de membros disponíveis e retornar ela
+                if (compareAsc(date1, date2) === 0) {
+                    const members1 = sub1.members || 0;
+                    const members2 = sub2.members || 0;
+
+                    if (members1 < members2) {
                         return 1;
                     }
-                    if (compareAsc(date1, date2) === 0) {
-                        return 0;
+                    if (members1 > members2) {
+                        return -1;
                     }
-                    return -1;
-                },
-            );
+
+                    return 0;
+                }
+                return -1;
+            });
 
             const sub = handleMembersLimit(sortedSubscriptions[0]);
 
