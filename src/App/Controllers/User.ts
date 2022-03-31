@@ -115,7 +115,10 @@ class UserController {
         const existsUser = await repository.findOne({ where: { email } });
 
         if (existsUser) {
-            throw new AppError({ message: 'User already exists' });
+            throw new AppError({
+                message: 'User already exists',
+                internalErrorCode: 40,
+            });
         }
 
         const cache = new Cache();
