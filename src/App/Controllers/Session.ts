@@ -49,7 +49,7 @@ class SessionController {
                 await registerDevice({
                     user_id: user.id,
                     device_id: String(device_id),
-                    ip_address: req.ip,
+                    ip_address: req.socket.remoteAddress,
                     firebaseToken,
                     oneSignalToken,
                 });

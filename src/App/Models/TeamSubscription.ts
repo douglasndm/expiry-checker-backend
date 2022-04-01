@@ -15,7 +15,7 @@ class TeamSubscription {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => Team, team => team.subscriptions)
+    @ManyToOne(() => Team, team => team.subscriptions)
     @JoinColumn({ name: 'team_id' })
     team: Team;
 

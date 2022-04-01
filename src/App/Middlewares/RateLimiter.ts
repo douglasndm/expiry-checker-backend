@@ -1,17 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import redis from 'redis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import dotenv from 'dotenv';
+
+import { redisClient } from '@services/Redis';
 
 import AppError from '@errors/AppError';
 
 dotenv.config();
-
-const redisClient = redis.createClient({
-    host: process.env.REDIS_HOST,
-    port: Number(process.env.REDIS_PORT),
-    password: process.env.REDIS_PASS,
-});
 
 const limiter = new RateLimiterRedis({
     storeClient: redisClient,

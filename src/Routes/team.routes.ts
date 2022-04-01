@@ -28,9 +28,7 @@ routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
 
 routes.get('/subscriptions', Subscription.index);
-
-// temp route
-routes.get('/subscriptions/recheck', Subscription.recheck);
+routes.delete('/subscriptions', Subscription.delete);
 
 routes.use('/products', ProductsRoutes);
 

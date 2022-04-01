@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
 import UserRoles from '@models/UserRoles';
+import TeamSubscription from '@models/TeamSubscription';
 
-import { recheckResponse, recheckTemp } from '@functions/Subscriptions';
+import { getSubscription } from '@utils/Subscriptions/Subscription';
 
 import AppError from '@errors/AppError';
 
@@ -30,12 +31,18 @@ class UserTeams {
             role => role.role.toLowerCase() === 'manager',
         );
 
-        let subscription: recheckResponse[] | null = null;
+        let subscription: TeamSubscription | null = null;
 
         if (teamsManager.length > 0) {
             const team_id = teamsManager[0].team.id;
 
-            subscription = await recheckTemp(team_id);
+            try {
+                const sub = await getSubscription(team_id);
+
+                subscription = sub;
+            } catch (err) {
+                subscription = null;
+            }
         }
 
         const teams = userRoles.map(team => {
@@ -44,7 +51,7 @@ class UserTeams {
                 return {
                     ...team.team,
                     role: team.role,
-                    subscription: sub ? sub[0] : null,
+                    subscription: sub || null,
                 };
             }
 

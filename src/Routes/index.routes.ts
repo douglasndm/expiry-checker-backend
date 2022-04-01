@@ -6,7 +6,6 @@ import Product from '@controllers/Product';
 import Products from '@controllers/Products';
 import ProductSearch from '@controllers/ProductSearch';
 import Brand from '@controllers/Brand';
-import Category from '@controllers/Category';
 import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
@@ -53,11 +52,6 @@ routes.delete('/products/:product_id', Product.delete);
 routes.delete('/products', Products.delete);
 
 routes.use('/batches', batchRoutes);
-
-routes.get('/categories/team/:team_id', Category.index); // REMOVING SOON
-routes.post('/categories', Category.create); // REMOVING SOON
-routes.put('/categories/:id', Category.update); // REMOVING SOON
-routes.delete('/categories/:id', Category.delete); // REMOVING SOON
 
 // REMOVE SOON, MOVING TO INSIDE TEAM
 routes.get('/brands/team/:team_id', Brand.index);

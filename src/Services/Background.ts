@@ -1,12 +1,14 @@
 import Queue from 'bull';
 import * as Sentry from '@sentry/node';
 
-import redisConfig from '@config/Cache';
+import { redisOptions } from '@services/Redis';
 
 import * as Jobs from '@jobs/Index';
 
 const queues = Object.values(Jobs).map(job => ({
-    bull: new Queue(job.key, redisConfig.config),
+    bull: new Queue(job.key, {
+        redis: redisOptions,
+    }),
     name: job.key,
     handle: job.handle,
 }));
