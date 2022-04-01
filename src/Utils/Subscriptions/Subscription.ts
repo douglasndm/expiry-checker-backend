@@ -68,6 +68,23 @@ function checkExpiredSubscription(expire_date: Date): boolean {
     return true;
 }
 
+async function getExternalSubscriptionByTeamIdOrAdminId(
+    id: string,
+): Promise<IRevenueCatSubscription[]> {
+    let externalSubscription = await getExternalSubscription(id);
+
+    // Check if subscriptions object is empty for TEAM ID, if true
+    // check for subscription for the manager id
+    if (externalSubscription.length <= 0) {
+        const teamAdmin = await getTeamAdmin(id);
+
+        externalSubscription = await getExternalSubscription(
+            teamAdmin.firebaseUid,
+        );
+    }
+    return externalSubscription;
+}
+
 async function getSubscription(team_id: string): Promise<TeamSubscription> {
     let teamSubscription: TeamSubscription | null = null;
 
@@ -80,17 +97,9 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
     }
 
     if (!teamSubscription || isExpired) {
-        let externalSubscription = await getExternalSubscription(team_id);
-
-        // Check if subscriptions object is empty for TEAM ID, if true
-        // check for subscription for the manager id
-        if (externalSubscription.length <= 0) {
-            const teamAdmin = await getTeamAdmin(team_id);
-
-            externalSubscription = await getExternalSubscription(
-                teamAdmin.firebaseUid,
-            );
-        }
+        const externalSubscription = await getExternalSubscriptionByTeamIdOrAdminId(
+            team_id,
+        );
 
         const subscriptions = externalSubscription.map(sub =>
             handleMembersLimit(sub),
@@ -163,4 +172,4 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
     return teamSubscription;
 }
 
-export { getSubscription };
+export { getSubscription, getExternalSubscriptionByTeamIdOrAdminId };
