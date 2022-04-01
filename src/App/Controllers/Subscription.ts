@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 
-import { getSubscription } from '@utils/Subscriptions/Subscription';
+import {
+    getExternalSubscriptionByTeamIdOrAdminId,
+    getSubscription,
+} from '@utils/Subscriptions/Subscription';
 import { deleteSubscription } from '@utils/Subscriptions/Delete';
 
 class SubscriptionController {
@@ -18,6 +21,16 @@ class SubscriptionController {
         await deleteSubscription(team_id);
 
         return res.send();
+    }
+
+    async storeData(req: Request, res: Response): Promise<Response> {
+        const { team_id } = req.params;
+
+        const response = await getExternalSubscriptionByTeamIdOrAdminId(
+            team_id,
+        );
+
+        return res.json(response);
     }
 }
 

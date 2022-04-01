@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import Team from '@controllers/Team';
 import TeamUsers from '@controllers/TeamUsers';
-import Subscription from '@controllers/Subscription';
 import UserManager from '@controllers/UserManager';
 import TeamPreferences from '@controllers/TeamPreferences';
 
@@ -10,6 +9,8 @@ import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
 
 import ProductsRoutes from './products.routes';
+
+import SubscriptionsRoutes from './team/subscriptions.routes';
 
 import BrandsRoutes from './brands.routes';
 import CategoriesRoutes from './categories.routes';
@@ -27,14 +28,13 @@ routes.put('', Team.update);
 routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
 
-routes.get('/subscriptions', Subscription.index);
-routes.delete('/subscriptions', Subscription.delete);
-
 routes.use('/products', ProductsRoutes);
 
 routes.use('/brands', BrandsRoutes);
 routes.use('/categories', CategoriesRoutes);
 routes.use('/stores', StoresRoutes);
+
+routes.use('/subscriptions', SubscriptionsRoutes);
 
 routes.get('/preferences', TeamPreferences.index);
 
