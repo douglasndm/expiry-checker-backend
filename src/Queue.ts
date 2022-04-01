@@ -1,7 +1,9 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import * as Sentry from '@sentry/node';
 
 import './Functions/Auth/Firebase';
+
+dotenv.config();
 
 if (process.env.DEV_MODE === 'false') {
     Sentry.init({

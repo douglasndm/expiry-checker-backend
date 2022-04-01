@@ -130,12 +130,13 @@ async function sendMail(): Promise<void> {
         notification => notification.batches.length > 0,
     );
 
-    if (process.env.DEV_MODE === 'false')
-        notificationsWithBatches.forEach(notification => {
-            BackgroundJob.add('SendWeeklyMail', {
+    if (process.env.DEV_MODE === 'false') {
+        notificationsWithBatches.forEach(async notification => {
+            await BackgroundJob.add('SendWeeklyMail', {
                 notification,
             });
         });
+    }
 }
 
 export { sendMail };

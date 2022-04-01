@@ -7,7 +7,13 @@ interface weeklyMailProps {
 }
 
 async function weeklyMail({ data }: weeklyMailProps): Promise<void> {
-    axios.post(`${process.env.MAIL_SERVICE_URL}/send`, data.notification);
+    try {
+        axios.post(`${process.env.MAIL_SERVICE_URL}/send`, data.notification);
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error(err.message);
+        }
+    }
 }
 
 export default {
