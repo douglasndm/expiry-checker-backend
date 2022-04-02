@@ -7,6 +7,7 @@ import UserRoles from '@models/UserRoles';
 import Store from '@models/Store';
 
 import { getAllUserRoles } from '@utils/UserRoles';
+import { getTeamsWithActiveSubscriptions } from '@utils/Subscriptions/Actives';
 
 import { getAllProductsFromManyTeams } from '@functions/Team/Products';
 
@@ -37,7 +38,21 @@ async function sendMail(): Promise<void> {
         }
     });
 
-    const teamsIds = teams.map(team => team.team.id);
+    const teamsWithSubscriptions = await getTeamsWithActiveSubscriptions();
+
+    const activeTeams = teams.filter(userRole => {
+        const finded = teamsWithSubscriptions.find(teamSub => {
+            if (teamSub.team.id === userRole.team.id) {
+                return true;
+            }
+
+            return false;
+        });
+
+        return finded;
+    });
+
+    const teamsIds = activeTeams.map(team => team.team.id);
 
     // avoid cron crash if nobody wants email notification
     if (teamsIds.length <= 0) {
