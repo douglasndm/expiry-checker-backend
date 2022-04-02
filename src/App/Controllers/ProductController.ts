@@ -4,8 +4,6 @@ import * as Yup from 'yup';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { createProduct } from '@utils/Product/Create';
 
-import { getAllUsersFromTeam } from '@functions/Team/Users';
-
 import AppError from '@errors/AppError';
 
 class ProductController {
@@ -39,18 +37,6 @@ class ProductController {
 
         const { team_id } = req.params;
         const { name, code, brand_id, category_id, store_id } = req.body;
-
-        const usersInTeam = await getAllUsersFromTeam({ team_id });
-
-        const isUserInTeam = usersInTeam.filter(ut => ut.id === req.userId);
-
-        if (isUserInTeam.length <= 0) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
 
         const user = await getUserByFirebaseId(req.userId);
 

@@ -35,7 +35,6 @@ class TeamController {
                     internalErrorCode: 1,
                 });
         }
-
         const { team_id } = req.params;
         const { removeCheckedBatches, sortByBatches } = req.query;
 
