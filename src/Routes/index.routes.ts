@@ -1,5 +1,7 @@
 import { Router } from 'express';
 
+import Auth from '@controllers/Auth';
+
 import AppVersionController from '@controllers/AppVersionController';
 import User from '@controllers/User';
 import Product from '@controllers/Product';
@@ -27,6 +29,8 @@ routes.use('/internal', internalRoutes);
 routes.get('/version', AppVersionController.index);
 
 routes.post('/users', User.store);
+
+routes.post('/auth', Auth.store);
 
 // temp with out check for auth for expiry checker
 routes.get('/products/search', ProductSearch.index);
