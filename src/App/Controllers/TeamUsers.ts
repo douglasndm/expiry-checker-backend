@@ -12,21 +12,11 @@ import Cache from '@services/Cache';
 
 class TeamUsersController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            throw new AppError({ message: 'Check team id' });
-        }
-
         const { team_id } = req.params;
 
         const usersInTeam = await getAllUsersFromTeam({ team_id });
 
-        const isUserInTeam = usersInTeam.find(user => user.id === req.userId);
+        const isUserInTeam = usersInTeam.find(user => user.fid === req.userId);
 
         if (!isUserInTeam) {
             throw new AppError({
@@ -41,9 +31,10 @@ class TeamUsersController {
         if (isUserInTeam.role.toLowerCase() !== 'manager') {
             usersInTeam.forEach(user => {
                 usersResponse.push({
-                    uuid: user.id,
-                    id: user.id,
+                    uuid: user.uuid,
                     fid: user.fid,
+                    name: user.name,
+                    lastName: user.lastName,
                     email: user.email,
                     role: user.role,
                     status: user.status,
