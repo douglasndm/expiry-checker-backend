@@ -11,8 +11,9 @@ interface getAllUsersFromTeamProps {
 
 export interface UserResponse {
     uuid: string;
-    id: string;
     fid?: string;
+    name?: string;
+    lastName?: string;
     email: string;
     role: string;
     status: string;
@@ -51,8 +52,6 @@ export async function getAllUsersFromTeam({
     }
 
     const users: Array<UserResponse> = usersFromTeam.map(u => {
-        const { firebaseUid } = u.user;
-
         const stores: Store[] = [];
 
         if (u.user.stores && u.user.stores.length > 0) {
@@ -63,8 +62,9 @@ export async function getAllUsersFromTeam({
 
         return {
             uuid: u.user.id,
-            id: firebaseUid,
-            fid: firebaseUid,
+            fid: u.user.firebaseUid,
+            name: u.user.name,
+            lastName: u.user.lastName,
             email: u.user.email,
             role: u.role,
             stores,

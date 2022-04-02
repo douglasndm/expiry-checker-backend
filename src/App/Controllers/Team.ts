@@ -20,17 +20,12 @@ import AppError from '@errors/AppError';
 
 class TeamController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
         const schemaQuerys = Yup.object().shape({
             removeCheckedBatches: Yup.string(),
             sortByBatches: Yup.string(),
         });
 
         try {
-            await schema.validate(req.params);
             await schemaQuerys.validate(req.query);
         } catch (err) {
             if (err instanceof Error)
@@ -58,7 +53,9 @@ class TeamController {
 
         const usersInTeam = await getAllUsersFromTeam({ team_id });
 
-        const isUserInTeam = usersInTeam.filter(user => user.id === req.userId);
+        const isUserInTeam = usersInTeam.filter(
+            user => user.fid === req.userId,
+        );
 
         if (isUserInTeam.length <= 0) {
             throw new AppError({
