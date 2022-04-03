@@ -11,6 +11,7 @@ interface getAllUsersFromTeamProps {
 
 export interface UserResponse {
     uuid: string;
+    id: string;
     fid?: string;
     name?: string;
     lastName?: string;
@@ -62,9 +63,10 @@ export async function getAllUsersFromTeam({
 
         return {
             uuid: u.user.id,
+            id: u.user.id,
+
             fid: u.user.firebaseUid,
-            id: u.user.firebaseUid,
-        
+
             name: u.user.name,
             lastName: u.user.lastName,
             email: u.user.email,

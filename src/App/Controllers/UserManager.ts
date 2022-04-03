@@ -2,15 +2,17 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import AppError from '@errors/AppError';
+import Cache from '@services/Cache';
 
 import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 import User from '@models/User';
 
+import { updateRole } from '@utils/Team/Roles/User';
+
 import { checkMembersLimit } from '@functions/Team';
 
-import Cache from '@services/Cache';
+import AppError from '@errors/AppError';
 
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
@@ -21,7 +23,8 @@ class UserManagerController {
         try {
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            if (err instanceof Error)
+                throw new AppError({ message: err.message });
         }
 
         const { team_id } = req.params;
@@ -117,7 +120,11 @@ class UserManagerController {
         try {
             await schemaBody.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message, internalErrorCode: 1 });
+            if (err instanceof Error)
+                throw new AppError({
+                    message: err.message,
+                    internalErrorCode: 1,
+                });
         }
 
         const { team_id } = req.params;
@@ -131,56 +138,13 @@ class UserManagerController {
             });
         }
 
-        if (role.toLowerCase() !== 'supervisor') {
-            if (role.toLowerCase() !== 'repositor') {
-                throw new AppError({
-                    message: 'Role is invalid',
-                    internalErrorCode: 21,
-                });
-            }
-        }
-
-        const cache = new Cache();
-
-        const userRolesRepository = getRepository(UserRoles);
-
-        const userRoles = await userRolesRepository.findOne({
-            where: {
-                user: { firebaseUid: req.userId },
-                team: { id: team_id },
-            },
+        const updatedRole = await updateRole({
+            role,
+            team_id,
+            user_id,
         });
 
-        if (userRoles?.role.toLowerCase() !== 'manager') {
-            throw new AppError({
-                message: 'You dont have authorization to do that',
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        const userRole = await userRolesRepository.findOne({
-            where: {
-                user: { firebaseUid: user_id },
-                team: { id: team_id },
-            },
-            relations: ['user'],
-        });
-
-        if (!userRole) {
-            throw new AppError({
-                message: 'User in team was not found',
-                statusCode: 400,
-                internalErrorCode: 17,
-            });
-        }
-
-        userRole.role = role.toLowerCase();
-
-        const updateRole = await userRolesRepository.save(userRole);
-        await cache.invalidade(`users-from-teams:${team_id}`);
-
-        return res.json(updateRole);
+        return res.json(updatedRole);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
@@ -191,7 +155,9 @@ class UserManagerController {
         try {
             await schema.validate(req.params);
         } catch (err) {
-            throw new AppError({ message: err.message });
+            if (err instanceof Error) {
+                throw new AppError({ message: err.message });
+            }
         }
 
         const { team_id, user_id } = req.params;

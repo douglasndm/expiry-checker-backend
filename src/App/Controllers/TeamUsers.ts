@@ -31,6 +31,7 @@ class TeamUsersController {
         if (isUserInTeam.role.toLowerCase() !== 'manager') {
             usersInTeam.forEach(user => {
                 usersResponse.push({
+                    id: user.id,
                     uuid: user.uuid,
                     fid: user.fid,
                     name: user.name,
