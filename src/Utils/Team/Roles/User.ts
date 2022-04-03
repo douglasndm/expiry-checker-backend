@@ -6,6 +6,8 @@ import UserRoles from '@models/UserRoles';
 
 import AppError from '@errors/AppError';
 
+import { getUserRole } from './Find';
+
 interface updateRoleProps {
     role: string;
     user_id: string;
@@ -32,20 +34,7 @@ async function updateRole({
 
     const roleRepository = getRepository(UserRoles);
 
-    const findedRole = await roleRepository
-        .createQueryBuilder('role')
-        .leftJoinAndSelect('role.user', 'user')
-        .leftJoinAndSelect('role.team', 'team')
-        .where('team.id = :team_id', { team_id })
-        .andWhere('user.id = :user_id', { user_id })
-        .getOne();
-
-    if (!findedRole) {
-        throw new AppError({
-            message: 'User does not have a role in team',
-            internalErrorCode: 17,
-        });
-    }
+    const findedRole = await getUserRole({ user_id, team_id });
 
     findedRole.role = fixedRole;
 
@@ -57,4 +46,21 @@ async function updateRole({
     return updatedRole;
 }
 
-export { updateRole };
+interface removeUserProps {
+    user_id: string;
+    team_id: string;
+}
+
+async function removeUser({
+    user_id,
+    team_id,
+}: removeUserProps): Promise<void> {
+    const roleRepository = getRepository(UserRoles);
+    const role = await getUserRole({ user_id, team_id });
+
+    await roleRepository.remove(role);
+
+    const cache = new Cache();
+    await cache.invalidade(`users-from-teams:${team_id}`);
+}
+export { updateRole, removeUser };

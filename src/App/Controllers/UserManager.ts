@@ -8,7 +8,7 @@ import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 import User from '@models/User';
 
-import { updateRole } from '@utils/Team/Roles/User';
+import { removeUser, updateRole } from '@utils/Team/Roles/User';
 
 import { checkMembersLimit } from '@functions/Team';
 
@@ -149,7 +149,7 @@ class UserManagerController {
 
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
-            user_id: Yup.string().required('Provide the user id'),
+            user_id: Yup.string().uuid().required('Provide the user id'),
         });
 
         try {
@@ -169,28 +169,7 @@ class UserManagerController {
             });
         }
 
-        const cache = new Cache();
-
-        const repository = getRepository(UserRoles);
-
-        const role = await repository
-            .createQueryBuilder('role')
-            .leftJoinAndSelect('role.user', 'user')
-            .leftJoinAndSelect('role.team', 'team')
-            .where('user.firebaseUid = :user_id', { user_id })
-            .andWhere('team.id = :team_id', { team_id })
-            .getOne();
-
-        if (!role) {
-            throw new AppError({
-                message: 'User is not in team',
-                statusCode: 400,
-                internalErrorCode: 17,
-            });
-        }
-
-        await repository.remove(role);
-        await cache.invalidade(`users-from-teams:${team_id}`);
+        await removeUser({ user_id, team_id });
 
         return res.status(204).send();
     }
