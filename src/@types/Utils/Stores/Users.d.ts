@@ -1,5 +1,3 @@
-import Store from '@models/Store';
-
 interface getAllUsersFromStoreProps {
     store_id: string;
 }
@@ -13,7 +11,6 @@ interface getAllUsersFromStoreResponse {
     email: string;
     password?: string | undefined;
     roles: UserRoles[];
-    device: string;
     created_at: Date;
     updated_at: Date;
 }
