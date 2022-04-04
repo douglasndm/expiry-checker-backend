@@ -34,7 +34,7 @@ async function findProductByEAN({
         }
     }
 
-    const queryWithoutLetters = code.replace(/\D/g, '');
+    const queryWithoutLetters = code.replace(/\D/g, '').trim();
     const query = queryWithoutLetters.replace(/^0+/, ''); // Remove zero on begin
 
     const productRepository = getRepository(ProductDetails);

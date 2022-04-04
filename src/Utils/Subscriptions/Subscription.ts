@@ -172,4 +172,9 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
     return teamSubscription;
 }
 
-export { getSubscription, getExternalSubscriptionByTeamIdOrAdminId };
+export {
+    getSubscription,
+    getExternalSubscriptionByTeamIdOrAdminId,
+    checkExpiredSubscription,
+    handleMembersLimit,
+};

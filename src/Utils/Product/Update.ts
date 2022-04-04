@@ -8,14 +8,12 @@ import Category from '@models/Category';
 import { getAllBrands } from '@utils/Brand';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
 
-import {
-    addProductToCategory,
-    removeAllCategoriesFromProduct,
-} from '@functions/Category/Products';
+import { removeAllCategoriesFromProduct } from '@functions/Category/Products';
 import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
 import AppError from '@errors/AppError';
+import { addToCategory } from './Category/AddToCategory';
 
 interface updateProductProps {
     id: string;
@@ -96,9 +94,9 @@ async function updateProduct({
             });
         }
 
-        await addProductToCategory({
+        await addToCategory({
             product_id: updatedProduct.id,
-            category,
+            category_id: category.id,
         });
 
         await cache.invalidade(`products-from-category:${category.id}`);

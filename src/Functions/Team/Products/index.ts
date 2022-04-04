@@ -3,25 +3,6 @@ import { getRepository } from 'typeorm';
 import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
 
-interface getAllProductsProps {
-    team_id: string;
-}
-
-export async function getAllProducts({
-    team_id,
-}: getAllProductsProps): Promise<ProductTeams[]> {
-    const productTeamsRepo = getRepository(ProductTeams);
-
-    const products = await productTeamsRepo
-        .createQueryBuilder('prods')
-        .leftJoinAndSelect('prods.batches', 'batches')
-        .leftJoinAndSelect('prods.team', 'team')
-        .where('team.id = :team_id', { team_id })
-        .getMany();
-
-    return products;
-}
-
 interface getAllProductsFromManyTeams {
     teams: string[];
 }

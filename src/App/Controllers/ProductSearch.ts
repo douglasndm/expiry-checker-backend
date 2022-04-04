@@ -12,7 +12,7 @@ class ProductSearchController {
             throw new AppError({ message: 'Query is missing' });
         }
 
-        const products = await findProductByEAN({ code: query });
+        const products = await findProductByEAN({ code: String(query) });
 
         return res.json(products);
     }

@@ -5,10 +5,8 @@ import * as Yup from 'yup';
 import Product from '@models/Product';
 
 import { updateProduct } from '@utils/Product/Update';
-import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getUserByFirebaseId } from '@utils/User/Find';
 
-import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getAllUsersFromTeam } from '@functions/Team/Users';
 import { getProductTeam } from '@functions/Product/Team';
 import { createProduct, getProduct } from '@functions/Product';
@@ -16,6 +14,7 @@ import { createProduct, getProduct } from '@functions/Product';
 import Cache from '@services/Cache';
 
 import AppError from '@errors/AppError';
+import { getUserRole } from '@utils/Team/Roles/Find';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -42,24 +41,11 @@ class ProductController {
             });
         }
 
-        const { product_id } = req.params;
-
-        const userHasAccessToProduct = await checkIfUserHasAccessToAProduct({
-            product_id,
-            user_id: req.userId,
-        });
-
-        if (!userHasAccessToProduct.hasAccess) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
+        const { product_id, team_id } = req.params;
 
         const product = await getProduct({
             product_id,
-            team_id: userHasAccessToProduct.team?.id,
+            team_id,
         });
 
         const productWithFixCat = {
@@ -166,19 +152,6 @@ class ProductController {
         const { product_id } = req.params;
         const { name, code, brand, store_id, categories } = req.body;
 
-        const userHasAccessToProduct = await checkIfUserHasAccessToAProduct({
-            product_id,
-            user_id: req.userId,
-        });
-
-        if (!userHasAccessToProduct) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
         const updatedProduct = await updateProduct({
             id: product_id,
             name,
@@ -217,7 +190,7 @@ class ProductController {
 
         const cache = new Cache();
 
-        const { product_id } = req.params;
+        const { product_id, team_id } = req.params;
 
         const productRepository = getRepository(Product);
 
@@ -242,21 +215,11 @@ class ProductController {
         const team = await getProductTeam(prod);
         const user = await getUserByFirebaseId(req.userId);
 
-        const userHasAccess = await checkIfUserHasAccessToAProduct({
-            product_id: prod.id,
-            user_id: req.userId,
-        });
-
-        const userRole = await getUserRoleInTeam({
-            user_id: user.id,
-            team_id: team.id,
-        });
+        const { role } = await getUserRole({ user_id: user.id, team_id });
 
         if (
-            !userHasAccess ||
-            (userHasAccess &&
-                userRole !== 'manager' &&
-                userRole !== 'supervisor')
+            role.toLowerCase() !== 'manager' &&
+            role.toLowerCase() !== 'supervisor'
         ) {
             throw new AppError({
                 message: "You don't have authorization to be here",

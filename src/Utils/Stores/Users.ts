@@ -132,7 +132,7 @@ async function addUserToStore({
     }
 
     const onTeam = await checkIfUserIsOnTeam({
-        user_id: user.firebaseUid, // temp
+        user_id: user.id,
         team_id: store.team.id,
     });
 

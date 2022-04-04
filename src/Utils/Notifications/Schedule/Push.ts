@@ -116,7 +116,15 @@ export async function dailyPushNotification(): Promise<void> {
         return true;
     });
 
-    const messages: TokenMessage[] = [];
+    interface ITokenMessage {
+        token: string;
+        notification: {
+            title: string;
+            body: string;
+        };
+    }
+
+    const messages: ITokenMessage[] = [];
 
     teamWithNotifications.forEach(team => {
         team.stores.forEach(store => {

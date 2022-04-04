@@ -8,7 +8,6 @@ import Product from '@controllers/Product';
 import Products from '@controllers/Products';
 import ProductSearch from '@controllers/ProductSearch';
 import Brand from '@controllers/Brand';
-import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
@@ -49,22 +48,19 @@ routes.delete('/users', User.delete);
 
 routes.get('/user/teams', UserTeams.index);
 
-routes.get('/products/:product_id', Product.index);
-routes.put('/products/:product_id', Product.update);
-routes.delete('/products/:product_id', Product.delete);
+routes.get('/products/:product_id', Product.index); // MIGRATED, REMOVING SOON
+routes.put('/products/:product_id', Product.update); // MIGRATED, REMOVING SOON
+routes.delete('/products/:product_id', Product.delete); // MIGRATED, REMOVING SOON
 
-routes.delete('/products', Products.delete);
+routes.delete('/products', Products.delete); // MIGRATED, REMOVING SOON
 
 routes.use('/batches', batchRoutes);
 
 // REMOVE SOON, MOVING TO INSIDE TEAM
-routes.get('/brands/team/:team_id', Brand.index);
-routes.post('/brand', Brand.store);
-routes.put('/brand', Brand.update);
-routes.delete(`/brand/:brand_id`, Brand.delete);
-
-routes.post('/categories/:id', ProductCategory.create);
-routes.delete('/categories/product/:id', ProductCategory.delete);
+routes.get('/brands/team/:team_id', Brand.index); // MIGRATED, REMOVING SOON
+routes.post('/brand', Brand.store); // MIGRATED, REMOVING SOON
+routes.put('/brand', Brand.update); // MIGRATED, REMOVING SOON
+routes.delete(`/brand/:brand_id`, Brand.delete); // MIGRATED, REMOVING SOON
 // END
 
 routes.post('/team', Team.store);
