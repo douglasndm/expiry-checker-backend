@@ -8,7 +8,6 @@ import Product from '@controllers/Product';
 import Products from '@controllers/Products';
 import ProductSearch from '@controllers/ProductSearch';
 import Brand from '@controllers/Brand';
-import ProductCategory from '@controllers/ProductCategory';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
@@ -62,9 +61,6 @@ routes.get('/brands/team/:team_id', Brand.index); // MIGRATED, REMOVING SOON
 routes.post('/brand', Brand.store); // MIGRATED, REMOVING SOON
 routes.put('/brand', Brand.update); // MIGRATED, REMOVING SOON
 routes.delete(`/brand/:brand_id`, Brand.delete); // MIGRATED, REMOVING SOON
-
-routes.post('/categories/:id', ProductCategory.create); // MIGRATED, REMOVING SOON
-routes.delete('/categories/product/:id', ProductCategory.delete); // MIGRATED, REMOVING SOON
 // END
 
 routes.post('/team', Team.store);
