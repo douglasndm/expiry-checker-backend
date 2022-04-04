@@ -11,11 +11,11 @@ import { getAllProductsFromCategory } from '@utils/Categories/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 
-import { checkIfUserHasAccessToTeam } from '@functions/Security/UserAccessTeam';
-import { addProductToCategory } from '@functions/Category/Products';
 import { getProductTeam } from '@functions/Product/Team';
 
 import AppError from '@errors/AppError';
+import { getUserRole } from '@utils/Team/Roles/Find';
+import { addToCategory } from '@utils/Product/Category/AddToCategory';
 
 class ProductCategoryController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -91,25 +91,6 @@ class ProductCategoryController {
     }
 
     async create(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            id: Yup.string().required().uuid(),
-        });
-        const schemaBody = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-            await schemaBody.validate(req.body);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -118,45 +99,15 @@ class ProductCategoryController {
             });
         }
 
-        const { id } = req.params;
+        const { id, category_id } = req.params;
         const { product_id } = req.body;
 
-        const categoryRepository = getRepository(Category);
-
-        const category = await categoryRepository.findOne({
-            where: { id },
-            relations: ['team'],
-        });
-
-        if (!category) {
-            throw new AppError({
-                message: 'Category was not found',
-                statusCode: 400,
-                internalErrorCode: 10,
-            });
-        }
-
-        const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: category.team.id,
-            user_id: req.userId,
-        });
-
-        if (!userHasAccess) {
-            throw new AppError({
-                message: "You don't have authorization to do this",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        const savedProductCategory = await addProductToCategory({
-            category,
+        await addToCategory({
             product_id,
+            category_id: category_id || id,
         });
-        const cache = new Cache();
-        await cache.invalidadePrefix(`product:${category.team.id}`);
 
-        return res.status(200).json(savedProductCategory);
+        return res.status(201).send();
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
@@ -187,7 +138,7 @@ class ProductCategoryController {
             });
         }
 
-        const { id } = req.params;
+        const { id, category_id } = req.params;
         const { product_id } = req.body;
 
         const repository = getRepository(ProductCategory);
@@ -199,7 +150,9 @@ class ProductCategoryController {
             .leftJoinAndSelect('product.team', 'team')
             .leftJoinAndSelect('team.team', 'temObj')
             .where('product.id = :product_id', { product_id })
-            .andWhere('category.id = :category_id', { category_id: id })
+            .andWhere('category.id = :category_id', {
+                category_id: category_id || id,
+            })
             .getOne();
 
         if (!exists) {
@@ -211,23 +164,14 @@ class ProductCategoryController {
         }
 
         const team = await getProductTeam(exists.product);
+        const user = await getUserByFirebaseId(req.userId);
 
-        const userHasAccess = await checkIfUserHasAccessToTeam({
-            team_id: team.id,
-            user_id: req.userId,
-        });
-
-        if (!userHasAccess) {
-            throw new AppError({
-                message: "You don't have authorization to do this",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
+        // This will throw an error if user isn't on team
+        await getUserRole({ user_id: user.id, team_id: team.id });
 
         // This remove all products from team from cache cause categories could be changed
         const cache = new Cache();
-        await cache.invalidadePrefix(`product:${team.id}`);
+        await cache.invalidadePrefix(`product:${team.id}:${product_id}`);
 
         await repository.remove(exists);
 

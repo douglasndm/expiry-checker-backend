@@ -8,7 +8,6 @@ import Product from '@models/Product';
 import Batch from '@models/Batch';
 
 import { getUserRoleInTeam } from '@utils/UserRoles';
-import { getUserByFirebaseId } from '@utils/User/Find';
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
 
@@ -16,7 +15,7 @@ import AppError from '@errors/AppError';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
-        if (!req.userId) {
+        if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
                 statusCode: 401,
@@ -43,7 +42,7 @@ class BatchController {
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch.product.id,
-            user_id: req.userId,
+            user_id: req.userUUID,
         });
 
         if (!userHasAccess) {
@@ -77,7 +76,7 @@ class BatchController {
                 });
         }
 
-        if (!req.userId) {
+        if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
                 statusCode: 401,
@@ -91,7 +90,7 @@ class BatchController {
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id,
-            user_id: req.userId,
+            user_id: req.userUUID,
         });
 
         if (!userHasAccess) {
@@ -157,7 +156,7 @@ class BatchController {
                 });
         }
 
-        if (!req.userId) {
+        if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
                 statusCode: 401,
@@ -188,7 +187,7 @@ class BatchController {
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch.product.id,
-            user_id: req.userId,
+            user_id: req.userUUID,
         });
 
         if (!userHasAccess) {
@@ -219,7 +218,7 @@ class BatchController {
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        if (!req.userId) {
+        if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
                 statusCode: 401,
@@ -250,14 +249,13 @@ class BatchController {
         }
 
         const team = await getProductTeam(batch.product);
-        const user = await getUserByFirebaseId(req.userId);
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch.product.id,
-            user_id: req.userId,
+            user_id: req.userUUID,
         });
         const userRole = await getUserRoleInTeam({
-            user_id: user.id,
+            user_id: req.userUUID,
             team_id: team.id,
         });
 

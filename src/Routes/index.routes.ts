@@ -63,8 +63,8 @@ routes.post('/brand', Brand.store); // MIGRATED, REMOVING SOON
 routes.put('/brand', Brand.update); // MIGRATED, REMOVING SOON
 routes.delete(`/brand/:brand_id`, Brand.delete); // MIGRATED, REMOVING SOON
 
-routes.post('/categories/:id', ProductCategory.create);
-routes.delete('/categories/product/:id', ProductCategory.delete);
+routes.post('/categories/:id', ProductCategory.create); // MIGRATED, REMOVING SOON
+routes.delete('/categories/product/:id', ProductCategory.delete); // MIGRATED, REMOVING SOON
 // END
 
 routes.post('/team', Team.store);

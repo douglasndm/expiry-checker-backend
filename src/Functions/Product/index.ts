@@ -9,7 +9,6 @@ import { getAllStoresFromTeam } from '@utils/Stores/List';
 
 import { checkIfProductAlreadyExists } from '@functions/Products';
 import { sortBatchesByExpDate } from '@functions/Batches';
-import { addProductToCategory } from '@functions/Category/Products';
 
 import Product from '@models/Product';
 import Category from '@models/Category';
@@ -20,6 +19,7 @@ import ProductCategory from '@models/ProductCategory';
 import ProductTeams from '@models/ProductTeams';
 
 import AppError from '@errors/AppError';
+import { addToCategory } from '@utils/Product/Category/AddToCategory';
 
 interface getProductProps {
     product_id: string;
@@ -188,9 +188,9 @@ export async function createProduct({
             });
         }
 
-        await addProductToCategory({
+        await addToCategory({
             product_id: prod.id,
-            category,
+            category_id: category.id,
         });
     }
 

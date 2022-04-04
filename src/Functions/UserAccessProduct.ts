@@ -1,26 +1,21 @@
 import { getRepository } from 'typeorm';
 
-import AppError from '@errors/AppError';
-
 import Team from '@models/Team';
 import ProductTeam from '@models/ProductTeams';
 
-import { checkIfUserHasAccessToTeam } from './Security/UserAccessTeam';
+import { getUserRole } from '@utils/Team/Roles/Find';
+
+import AppError from '@errors/AppError';
 
 interface checkIfUserHasAccessToAProductProps {
     product_id: string;
     user_id: string;
 }
 
-interface checkIfUserHasAccessToAProductResponse {
-    team?: Team;
-    hasAccess: boolean;
-}
-
 export async function checkIfUserHasAccessToAProduct({
     user_id,
     product_id,
-}: checkIfUserHasAccessToAProductProps): Promise<checkIfUserHasAccessToAProductResponse> {
+}: checkIfUserHasAccessToAProductProps): Promise<Team> {
     const productTeamRepository = getRepository(ProductTeam);
 
     const productTeam = await productTeamRepository
@@ -36,20 +31,8 @@ export async function checkIfUserHasAccessToAProduct({
             statusCode: 400,
         });
     }
+    // This will throw an error if user isn't on team
+    await getUserRole({ user_id, team_id: productTeam.team.id });
 
-    const userHasAccess = await checkIfUserHasAccessToTeam({
-        user_id,
-        team_id: productTeam.team.id,
-    });
-
-    if (userHasAccess) {
-        return {
-            team: productTeam.team,
-            hasAccess: true,
-        };
-    }
-
-    return {
-        hasAccess: false,
-    };
+    return productTeam.team;
 }

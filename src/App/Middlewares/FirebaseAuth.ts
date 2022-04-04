@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import * as admin from 'firebase-admin';
 
+import { getUserByFirebaseId } from '@utils/User/Find';
+
 import AppError from '@errors/AppError';
 
 export default async function checkFirebaseAuth(
@@ -15,6 +17,9 @@ export default async function checkFirebaseAuth(
             const auth = admin.auth();
             const verifyToken = await auth.verifyIdToken(token);
 
+            const user = await getUserByFirebaseId(verifyToken.uid);
+
+            req.userUUID = user.id;
             req.userId = verifyToken.uid;
             req.userEmail = verifyToken.email;
 

@@ -4,7 +4,6 @@ import Cache from '@services/Cache';
 
 import Product from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
-import Category from '@models/Category';
 import Store from '@models/Store';
 
 import { getAllStoresFromTeam } from '@utils/Stores/List';
@@ -12,11 +11,11 @@ import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getAllBrands } from '@utils/Brand';
 import { getUserStoreOnTeam } from '@utils/Stores/Team';
 
-import { addProductToCategory } from '@functions/Category/Products';
 import { checkIfProductAlreadyExists } from '@functions/Products';
 import { getTeam } from '@functions/Team';
 
 import AppError from '@errors/AppError';
+import { addToCategory } from './Category/AddToCategory';
 
 interface createProductProps {
     name: string;
@@ -104,24 +103,9 @@ async function createProduct({
     await productTeamRepository.save(productTeam);
 
     if (category_id !== undefined) {
-        const categoryRepository = getRepository(Category);
-        const category = await categoryRepository.findOne({
-            where: {
-                id: category_id,
-            },
-        });
-
-        if (!category) {
-            throw new AppError({
-                message: 'Category was not found',
-                statusCode: 400,
-                internalErrorCode: 10,
-            });
-        }
-
-        await addProductToCategory({
+        await addToCategory({
             product_id: prod.id,
-            category,
+            category_id,
         });
 
         await cache.invalidade(`products-from-category:${category_id}`);
