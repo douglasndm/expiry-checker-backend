@@ -7,6 +7,7 @@ import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getAllUsersFromTeamWithDevices } from '@utils/Team/Users';
 import {
     IOneSignalBatchPushNotification,
+    ITokenMessagePush,
     sendNotificationByFirebase,
     sendNotificationByOneSignal,
 } from '@utils/Notifications/Push/Batch';
@@ -63,7 +64,7 @@ async function batchNotification({
         team_id: team.id,
     });
 
-    const messages: TokenMessage[] = [];
+    const messages: ITokenMessagePush[] = [];
 
     const formatedDate = format(batch.exp_date, 'dd-MM-yyyy');
     const messageString = `${batch.product.name} tem um lote que vence em ${formatedDate}`;

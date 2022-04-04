@@ -19,10 +19,11 @@ async function getExternalSubscription(
     // This transform this object in an array and put the old name of object
     // into a property name inside a array of subscriptions
     Object.entries(data.subscriber.subscriptions).forEach(([key, value]) => {
-        subscriptions.push({
-            name: key,
-            subscription: value,
-        });
+        if (value)
+            subscriptions.push({
+                name: key,
+                subscription: value,
+            });
     });
 
     return subscriptions;

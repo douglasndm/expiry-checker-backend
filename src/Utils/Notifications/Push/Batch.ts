@@ -37,8 +37,19 @@ async function sendNotificationByOneSignal({
     }
 }
 
+export interface ITokenMessagePush {
+    notification: {
+        title: string;
+        body: string;
+    };
+    data: {
+        deeplinking: string;
+    };
+    token: string;
+}
+
 async function sendNotificationByFirebase(
-    messages: TokenMessage[],
+    messages: ITokenMessagePush[],
 ): Promise<void> {
     const messaging = Firebase.messaging();
     const response = await messaging.sendAll(messages);

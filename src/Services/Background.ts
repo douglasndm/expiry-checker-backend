@@ -15,7 +15,7 @@ const queues = Object.values(Jobs).map(job => ({
 
 export default {
     queues,
-    add(name: string, data: any): Promise<void> {
+    add(name: string, data: any): Promise<Queue.Job<any>> | undefined {
         const queue = this.queues.find(q => q.name === name);
 
         return queue?.bull.add(data);
