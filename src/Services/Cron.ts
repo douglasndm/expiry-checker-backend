@@ -2,6 +2,7 @@ import schedule from 'node-schedule';
 
 import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
 import { allowExternalQuery } from '@utils/ProductSearch/ExternalQuery';
+import { callRemainingDailyAPICalls } from '@utils/ProductSearch/ProductRequest';
 import { sendMail } from './Notification/Email/SendMail';
 
 // every monday -> friday at 8
@@ -16,3 +17,6 @@ schedule.scheduleJob(
 
 // schedule for reset daily block for request for external ean search
 schedule.scheduleJob('0 3 * * *', allowExternalQuery);
+
+// if API is not block it will call remaning call to complete db
+schedule.scheduleJob('0 2 * * *', callRemainingDailyAPICalls);
