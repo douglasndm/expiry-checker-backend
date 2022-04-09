@@ -3,8 +3,6 @@ import { getRepository } from 'typeorm';
 import ProductDetails from '@models/ProductDetails';
 import ProductRequest from '@models/ProductRequest';
 
-import { findProductByEANExternalResponse } from '@utils/ProductSearch/ExternalQuery';
-
 interface handleAfterProductSearchProps {
     data: { response: findProductByEANExternalResponse | null; code: string };
 }
@@ -31,11 +29,13 @@ async function handleAfterProductSearch({
             await productRequestRepository.save(request);
         }
     } else if (!response) {
-        const productRequest = new ProductRequest();
-        productRequest.code = code;
-        productRequest.rank = 1;
+        if (code.trim().length >= 8) {
+            const productRequest = new ProductRequest();
+            productRequest.code = code.trim();
+            productRequest.rank = 1;
 
-        await productRequestRepository.save(productRequest);
+            await productRequestRepository.save(productRequest);
+        }
     } else if (response) {
         const alreadyExists = await productRepository
             .createQueryBuilder('product')

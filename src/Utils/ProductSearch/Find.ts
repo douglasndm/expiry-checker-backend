@@ -10,10 +10,7 @@ import ProductDetails from '@models/ProductDetails';
 
 import AppError from '@errors/AppError';
 
-import {
-    findProductByEANExternal,
-    findProductByEANExternalResponse,
-} from './ExternalQuery';
+import { findProductByEANExternal } from './ExternalQuery';
 
 interface findProductByEANProps {
     code: string;
@@ -36,6 +33,14 @@ async function findProductByEAN({
 
     const queryWithoutLetters = code.replace(/\D/g, '').trim();
     const query = queryWithoutLetters.replace(/^0+/, ''); // Remove zero on begin
+
+    let formatedDate = formatInTimeZone(
+        new Date(),
+        'America/Sao_Paulo',
+        'dd-MM-yyyy HH:mm:ss zzzz',
+    );
+    console.log(`Requesting code: ${query}`);
+    console.log(formatedDate);
 
     const productRepository = getRepository(ProductDetails);
     const product = await productRepository
@@ -63,7 +68,7 @@ async function findProductByEAN({
                     // No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
                     // até o próximo dia
                     if (err.response?.status === 429) {
-                        const formatedDate = formatInTimeZone(
+                        formatedDate = formatInTimeZone(
                             new Date(),
                             'America/Sao_Paulo',
                             'dd-MM-yyyy HH:mm:ss zzzz',
