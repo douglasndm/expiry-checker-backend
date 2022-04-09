@@ -10,10 +10,7 @@ import ProductDetails from '@models/ProductDetails';
 
 import AppError from '@errors/AppError';
 
-import {
-    findProductByEANExternal,
-    findProductByEANExternalResponse,
-} from './ExternalQuery';
+import { findProductByEANExternal } from './ExternalQuery';
 
 interface findProductByEANProps {
     code: string;
