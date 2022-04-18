@@ -26,6 +26,9 @@ class ProductDetails {
     @Column({ name: 'last_time_checked', type: 'timestamp' })
     lastTimeChecked: Date | null;
 
+    @Column({ name: 'data_from', type: 'varchar' })
+    dataFrom?: string;
+
     @CreateDateColumn()
     created_at: Date;
 
