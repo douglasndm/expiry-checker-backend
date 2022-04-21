@@ -7,10 +7,11 @@ export interface IJSON {
     codbar: string;
     produto_upper: string;
     marca: string;
+    foto_png: string;
 }
 
 async function addProductIfNotExists(data: IJSON): Promise<void> {
-    const { codbar, produto_upper, marca } = data;
+    const { codbar, produto_upper, marca, foto_png } = data;
 
     const requestRepository = getRepository(ProductRequest);
 
@@ -30,11 +31,16 @@ async function addProductIfNotExists(data: IJSON): Promise<void> {
         .getOne();
 
     if (!product) {
+        console.log(`Adding ${codbar.trim()}`);
+
         const prod = new ProductDetails();
         prod.code = codbar.trim();
         prod.name = produto_upper;
-        prod.thumbnail = codbar.trim();
         prod.dataFrom = 'local';
+
+        if (foto_png.trim() !== '') {
+            prod.thumbnail = codbar.trim();
+        }
 
         if (marca.trim() !== '') {
             prod.brand = marca;

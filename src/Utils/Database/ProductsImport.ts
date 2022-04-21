@@ -18,10 +18,10 @@ async function copyProductsToDatabase(): Promise<void> {
 
                 // console.log(key, value);
 
-                console.log(`${value.codbar} copied`);
+                // console.log(`${value.codbar} copied`);
                 // Runs one at a time, need to use a callback for that part to work
                 callback();
-            }, 1000);
+            }, 50);
         },
         // Don't skip this, as we need to operate with objects, not buffers
         objectMode: true,
