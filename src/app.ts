@@ -6,8 +6,7 @@ import rateLimiter from './App/Middlewares/RateLimiter';
 
 import Routes from './Routes/index.routes';
 
-import './Functions/Auth/Firebase';
-
+import './Services/Firebase';
 import './Services/Redis';
 import './Services/Database';
 import './Services/Cron';
