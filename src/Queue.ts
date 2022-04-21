@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import * as Sentry from '@sentry/node';
 
-import './Functions/Auth/Firebase';
+import './Services/Firebase';
 
 dotenv.config();
 
