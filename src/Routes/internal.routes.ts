@@ -4,7 +4,6 @@ import { sendMail } from '@services/Notification/Email/SendMail';
 
 import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
 import { clearAllCache, clearVersionCache } from '@utils/Admin/Cache';
-import { copyProductsToDatabase } from '@utils/Database/ProductsImport';
 
 import InternalCheck from '@middlewares/InternalCheck';
 
@@ -29,12 +28,6 @@ routes.post('/rc', InternalCheck, async (req, res) => {
 
 routes.post('/rcav', InternalCheck, async (req, res) => {
     await clearVersionCache();
-
-    return res.send('Done');
-});
-
-routes.post('/copy', InternalCheck, async (req, res) => {
-    await copyProductsToDatabase();
 
     return res.send('Done');
 });

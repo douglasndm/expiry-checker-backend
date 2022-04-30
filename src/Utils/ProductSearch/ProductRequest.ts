@@ -19,8 +19,6 @@ async function getProductsRequestsByRank(
         .limit(limit)
         .getMany();
 
-    console.log(products);
-
     return products;
 }
 
