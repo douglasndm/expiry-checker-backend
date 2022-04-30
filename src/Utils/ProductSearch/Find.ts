@@ -39,8 +39,6 @@ async function findProductByEAN({
         'America/Sao_Paulo',
         'dd-MM-yyyy HH:mm:ss zzzz',
     );
-    console.log(`Requesting code: ${query}`);
-    console.log(formatedDate);
 
     const productRepository = getRepository(ProductDetails);
     const product = await productRepository
