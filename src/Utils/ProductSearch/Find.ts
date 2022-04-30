@@ -78,7 +78,7 @@ async function findProductByEAN({
                     }
                 } else if (err instanceof Error) {
                     console.log(`Erro while searching ${query} at Bluesoft`);
-                    console.error(err.message);
+                    console.error(err);
                 }
             }
         }
