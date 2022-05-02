@@ -16,10 +16,13 @@ async function findProductByEANExternal(
 
     const response = await api.get<BluesoftResponse>(`/gtins/${code}`);
 
+    console.log('External API response');
+    console.log(response.data);
+
     return {
         name: response.data.description,
         code: String(response.data.gtin),
-        brand: response.data.brand.name,
+        brand: response.data?.brand?.name,
         thumbnail: response.data.thumbnail,
     };
 }
