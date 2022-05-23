@@ -15,13 +15,15 @@ beforeEach(async () => {
 });
 
 describe('Create user process', () => {
-    it('should create an user', () => {
-        return createUser({
+    it('should create an user', async () => {
+        const createdUser = await createUser({
             firebaseUid: '123456789asd',
             name: 'Douglas',
             lastName: 'Mattos',
             email: 'mail@mail.com',
             password: '123456789',
         });
+
+        expect(createdUser.id).not.toBe(null);
     });
 });
