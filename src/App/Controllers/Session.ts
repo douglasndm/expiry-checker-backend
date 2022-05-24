@@ -17,13 +17,17 @@ class SessionController {
             });
         }
 
-        const user = await getUserByFirebaseId(req.userId);
-
-        if (!user) {
-            await createUser({
-                firebaseUid: req.userId,
-                email: req.userEmail,
-            });
+        try {
+            await getUserByFirebaseId(req.userId);
+        } catch (err) {
+            if (err instanceof AppError) {
+                if (err.errorCode === 7) {
+                    await createUser({
+                        firebaseUid: req.userId,
+                        email: req.userEmail,
+                    });
+                }
+            }
         }
 
         if (!req.headers.deviceid) {
@@ -45,6 +49,8 @@ class SessionController {
                 req.userId = verifyToken.uid;
 
                 const { firebaseToken, oneSignalToken } = req.body;
+
+                const user = await getUserByFirebaseId(req.userId);
 
                 await registerDevice({
                     user_id: user.id,

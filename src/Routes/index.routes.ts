@@ -12,6 +12,7 @@ import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
+import HandleSetUserId from '@middlewares/UserIdHandler';
 
 import batchRoutes from './batch.routes';
 import teamRoutes from './team.routes';
@@ -32,11 +33,11 @@ routes.post('/auth', Auth.store);
 routes.get('/products/search', ProductSearch.index);
 
 // from now on all routes need authentication
-// routes.use(AuthMiddleware);
 routes.use(FirebaseAuth);
 
 routes.post('/sessions', SessionController.store);
 
+routes.use(HandleSetUserId);
 routes.use(DeviceChecker);
 
 routes.get('/users', User.index);
