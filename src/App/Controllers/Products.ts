@@ -11,7 +11,6 @@ class ProductsController {
     async delete(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             productsIds: Yup.array().of(Yup.string()).required(),
-            team_id: Yup.string().uuid().required(),
         });
 
         try {
@@ -24,7 +23,8 @@ class ProductsController {
                 });
         }
 
-        const { productsIds, team_id } = req.body;
+        const { productsIds } = req.body;
+        const { team_id } = req.params;
 
         const user = await getUserByFirebaseId(req.userId || '');
 
