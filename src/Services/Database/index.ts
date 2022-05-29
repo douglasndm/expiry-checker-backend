@@ -20,31 +20,33 @@ import UserLogin from '@models/UserLogin';
 import TeamPreferences from '@models/TeamPreferences';
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
+export const entities = [
+    AppVersion,
+    Batch,
+    Category,
+    Product,
+    Brand,
+    Team,
+    Store,
+    User,
+    UserRoles,
+    ProductTeams,
+    ProductCategory,
+    TeamSubscriptions,
+    ProductDetails,
+    ProductRequest,
+    UsersStores,
+    TeamPreferences,
+    NotificationsPreferences,
+    UserLogin,
+];
+
 async function setConnection(): Promise<void> {
     const defaultOptions = await getConnectionOptions();
 
     createConnection(
         Object.assign(defaultOptions, {
-            entities: [
-                AppVersion,
-                Batch,
-                Category,
-                Product,
-                Brand,
-                Team,
-                Store,
-                User,
-                UserRoles,
-                ProductTeams,
-                ProductCategory,
-                TeamSubscriptions,
-                ProductDetails,
-                ProductRequest,
-                UsersStores,
-                TeamPreferences,
-                NotificationsPreferences,
-                UserLogin,
-            ],
+            entities,
         }),
     );
 }

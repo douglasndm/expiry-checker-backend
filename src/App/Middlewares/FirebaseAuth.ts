@@ -17,9 +17,6 @@ export default async function checkFirebaseAuth(
             const auth = admin.auth();
             const verifyToken = await auth.verifyIdToken(token);
 
-            const user = await getUserByFirebaseId(verifyToken.uid);
-
-            req.userUUID = user.id;
             req.userId = verifyToken.uid;
             req.userEmail = verifyToken.email;
 
