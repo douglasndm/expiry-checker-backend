@@ -40,6 +40,7 @@ async function createProduct({
         name,
         code,
         team_id,
+        store_id,
     });
 
     if (productAlreadyExists) {
@@ -68,6 +69,11 @@ async function createProduct({
 
         if (store) {
             userStore = store;
+        } else {
+            throw new AppError({
+                message: 'Store was not found',
+                internalErrorCode: 37,
+            });
         }
     } else {
         const uStore = await getUserStoreOnTeam({ team_id, user_id });
