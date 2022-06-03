@@ -42,9 +42,15 @@ export async function checkIfProductAlreadyExists({
             return false;
         }
 
-        if (products.length > 0) {
+        const productsWithoutStores = products.filter(
+            prod => !prod.product.store,
+        );
+
+        if (productsWithoutStores.length > 0) {
             return true;
         }
+
+        return false;
     }
 
     const products = await productTeamRepository
@@ -67,7 +73,9 @@ export async function checkIfProductAlreadyExists({
         return false;
     }
 
-    return products.length > 0;
+    const productsWithoutStores = products.filter(prod => !prod.product.store);
+
+    return productsWithoutStores.length > 0;
 }
 
 export function sortProductsByBatchesExpDate(
