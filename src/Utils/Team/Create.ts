@@ -6,10 +6,7 @@ import User from '@models/User';
 
 import AppError from '@errors/AppError';
 
-export async function createTeam({
-    name,
-    admin_id,
-}: createTeamProps): Promise<Team> {
+async function createTeam({ name, admin_id }: createTeamProps): Promise<Team> {
     const teamRepository = getRepository(Team);
     const userRolesRepository = getRepository(UserRoles);
     const userRepository = getRepository(User);
@@ -79,3 +76,5 @@ export async function createTeam({
 
     return savedTeam;
 }
+
+export { createTeam };

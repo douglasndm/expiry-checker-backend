@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
 
-import { createTeam } from '@utils/Team';
+import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
 
