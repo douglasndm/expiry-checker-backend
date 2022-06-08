@@ -36,23 +36,6 @@ async function createProduct({
     category_id,
     store_id,
 }: createProductProps): Promise<Product> {
-    const productAlreadyExists = await checkIfProductAlreadyExists({
-        name,
-        code,
-        team_id,
-        store_id,
-    });
-
-    if (productAlreadyExists) {
-        throw new AppError({
-            message: 'This product already exists. Try add a new batch',
-            statusCode: 400,
-            internalErrorCode: 11,
-        });
-    }
-
-    const cache = new Cache();
-
     const repository = getRepository(Product);
     const productTeamRepository = getRepository(ProductTeams);
 
@@ -83,12 +66,29 @@ async function createProduct({
         }
     }
 
+    const productAlreadyExists = await checkIfProductAlreadyExists({
+        name,
+        code,
+        team_id,
+        store_id: store_id || userStore?.id,
+    });
+
+    if (productAlreadyExists) {
+        throw new AppError({
+            message: 'This product already exists. Try add a new batch',
+            statusCode: 400,
+            internalErrorCode: 11,
+        });
+    }
+
     const allBrands = await getAllBrands({ team_id });
     const findedBrand = allBrands.find(b => b.id === brand_id);
 
     const prod: Product = new Product();
     prod.name = name;
     prod.code = code || null;
+
+    const cache = new Cache();
 
     if (findedBrand) {
         prod.brand = findedBrand;
