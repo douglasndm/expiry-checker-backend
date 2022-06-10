@@ -47,6 +47,7 @@
     "resolveJsonModule": true,
     "baseUrl": "./src",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
+        "@types/*": ["@types/*"],
         "@controllers/*": ["App/Controllers/*"],
         "@middlewares/*": ["App/Middlewares/*"],
         "@models/*": ["App/Models/*"],

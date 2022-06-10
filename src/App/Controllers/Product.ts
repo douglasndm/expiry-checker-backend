@@ -4,17 +4,20 @@ import * as Yup from 'yup';
 
 import Product from '@models/Product';
 
+import { createProduct } from '@utils/Product/Create';
 import { updateProduct } from '@utils/Product/Update';
 import { getUserByFirebaseId } from '@utils/User/Find';
+import { getUserRole } from '@utils/Team/Roles/Find';
 
-import { getAllUsersFromTeam } from '@functions/Team/Users';
 import { getProductTeam } from '@functions/Product/Team';
-import { createProduct, getProduct } from '@functions/Product';
+import { getProduct } from '@functions/Product';
 
 import Cache from '@services/Cache';
+import BackgroundJob from '@services/Background';
 
 import AppError from '@errors/AppError';
-import { getUserRole } from '@utils/Team/Roles/Find';
+
+import { IAction, ITarget } from '@types/UserLogs';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -62,10 +65,9 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string().required(),
             code: Yup.string(),
-            brand: Yup.string().uuid(),
-            categories: Yup.array().of(Yup.string()),
-            store_id: Yup.string().uuid(),
-            team_id: Yup.string().required().uuid(),
+            brand_id: Yup.string().uuid().nullable(),
+            category_id: Yup.string().uuid().nullable(),
+            store_id: Yup.string().uuid().nullable(),
         });
 
         try {
@@ -87,30 +89,28 @@ class ProductController {
             });
         }
 
-        const { name, code, brand, categories, store_id, team_id } = req.body;
-
-        const usersInTeam = await getAllUsersFromTeam({ team_id });
-
-        const isUserInTeam = usersInTeam.filter(ut => ut.id === req.userId);
-
-        if (isUserInTeam.length <= 0) {
-            throw new AppError({
-                message: "You don't have authorization to be here",
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
+        const { team_id } = req.params;
+        const { name, code, brand_id, category_id, store_id } = req.body;
 
         const user = await getUserByFirebaseId(req.userId);
 
         const createdProd = await createProduct({
             name,
             code,
-            brand,
+            brand_id,
             team_id,
             user_id: user.id,
             store_id,
-            categories,
+            category_id,
+        });
+
+        await BackgroundJob.add('LogChange', {
+            user_id: user.id,
+            team_id,
+            target: ITarget.Product,
+            target_id: createdProd.id,
+            action: IAction.Create,
+            new_value: createdProd.name,
         });
 
         return res.status(201).json(createdProd);
@@ -149,8 +149,11 @@ class ProductController {
             });
         }
 
+        const { team_id } = req.params;
         const { product_id } = req.params;
         const { name, code, brand, store_id, categories } = req.body;
+
+        const user = await getUserByFirebaseId(req.userId);
 
         const updatedProduct = await updateProduct({
             id: product_id,
@@ -159,6 +162,15 @@ class ProductController {
             brand_id: brand,
             store_id,
             categories,
+        });
+
+        await BackgroundJob.add('LogChange', {
+            user_id: user.id,
+            team_id,
+            target: ITarget.Product,
+            target_id: updatedProduct.id,
+            action: IAction.Update,
+            new_value: updatedProduct.name,
         });
 
         return res.status(201).json(updatedProduct);
@@ -239,6 +251,15 @@ class ProductController {
         await cache.invalidade(`product:${team.id}:${prod.id}`);
 
         await productRepository.remove(prod);
+
+        await BackgroundJob.add('LogChange', {
+            user_id: user.id,
+            team_id,
+            target: ITarget.Product,
+            action: IAction.Delete,
+            new_value: null,
+            old_value: prod.name,
+        });
 
         return res.status(204).send();
     }
