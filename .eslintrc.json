@@ -19,6 +19,7 @@
         "prettier"
     ],
     "rules": {
+        "consistent-return": "off",
         "camelcase": "off",
         "no-console": "off",
         "class-methods-use-this": "off",
