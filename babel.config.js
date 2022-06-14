@@ -6,7 +6,7 @@ module.exports = {
     plugins: [
         ["module-resolver", {
             alias: {
-                "@types": "./src/@types",
+                "~types": "./src/@types",
                 "@controllers": "./src/App/Controllers",
                 "@middlewares": "./src/App/Middlewares",
                 "@models": "./src/App/Models",
