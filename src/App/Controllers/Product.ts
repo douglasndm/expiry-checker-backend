@@ -17,7 +17,7 @@ import BackgroundJob from '@services/Background';
 
 import AppError from '@errors/AppError';
 
-import { IAction, ITarget } from '@types/UserLogs';
+import { IAction, ITarget } from '~types/UserLogs';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {

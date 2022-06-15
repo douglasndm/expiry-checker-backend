@@ -5,7 +5,7 @@ import UserLog from '@models/UserLogs';
 import { getUserById } from '@utils/User/Find';
 import { getTeamById } from '@utils/Team/Find';
 
-import { IAction, ITarget } from '@types/UserLogs';
+import { IAction, ITarget } from '~types/UserLogs';
 
 interface logChangeProps {
     data: {
