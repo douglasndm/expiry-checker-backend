@@ -1,22 +1,20 @@
-import User from '@models/User';
-import Team from '@models/Team';
-
 import { createCategory } from '@utils/Categories/Create';
+import { deleteCategory } from '@utils/Categories/Delete';
+
+import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
 import connection from '../../Services/Database';
 import { setup } from '../../setup';
 
-describe('Creation of category proccess', () => {
-    let user: User | null = null;
+describe('Delete of category process', () => {
     let team: Team | null = null;
     beforeAll(async () => {
         await connection.create();
 
         const init = await setup(2);
 
-        user = init.user;
         team = init.team;
     });
 
@@ -28,42 +26,34 @@ describe('Creation of category proccess', () => {
         await connection.clear();
     });
 
-    it('Should create a category', async () => {
-        if (!team || !user) {
-            return;
-        }
+    it('should delete a category', async () => {
+        if (!team) return;
+
         const category = await createCategory({
             team_id: team.id,
-            name: 'Food',
-        });
-
-        expect(category.id).not.toBe(null);
-        expect(category.name).toBe('Food');
-        expect(category.team.id).toBe(team.id);
-    });
-
-    it("Shouldn't create a duplicate category", async () => {
-        if (!team || !user) {
-            return;
-        }
-
-        await createCategory({
-            team_id: team.id,
-            name: 'Drink',
+            name: 'food',
         });
 
         try {
-            await createCategory({
-                team_id: team.id,
-                name: 'drink',
+            await deleteCategory({
+                category_id: category.id,
             });
+        } catch (err) {
+            expect(true).toBe(false);
+        }
+    });
 
+    it('should not delete an invalid category', async () => {
+        try {
+            await deleteCategory({
+                category_id: '3a9eed9a-4171-47d9-9ced-233838836bf7',
+            });
             expect(true).toBe(false);
         } catch (err) {
             expect(err).toBeInstanceOf(AppError);
             if (err instanceof AppError) {
                 expect(err.statusCode).toBe(400);
-                expect(err.errorCode).toBe(13);
+                expect(err.errorCode).toBe(10);
             }
         }
     });
