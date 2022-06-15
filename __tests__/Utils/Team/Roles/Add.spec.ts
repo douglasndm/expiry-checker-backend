@@ -104,13 +104,19 @@ describe('Test adition of user in a team', () => {
             password: '123456',
         });
 
-        addUserToTeam({
-            user_id: User3.id,
-            team_id: team.id,
-        }).catch(err => {
+        try {
+            await addUserToTeam({
+                user_id: User3.id,
+                team_id: team.id,
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.errorCode).toBe(16);
-            expect(err.statusCode).toBe(401);
-        });
+            if (err instanceof AppError) {
+                expect(err.errorCode).toBe(16);
+                expect(err.statusCode).toBe(401);
+            }
+        }
     });
 });

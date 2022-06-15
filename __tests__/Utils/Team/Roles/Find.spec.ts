@@ -39,12 +39,18 @@ describe('Find user role proccess', () => {
     it('should not find the user role for invalid user', async () => {
         if (!team) return;
 
-        return getUserRole({
-            user_id: '33714a2a-80b5-4bee-8383-c090636f303f',
-            team_id: team.id,
-        }).catch(err => {
+        try {
+            await getUserRole({
+                user_id: '33714a2a-80b5-4bee-8383-c090636f303f',
+                team_id: team.id,
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.errorCode).toBe(17);
-        });
+            if (err instanceof AppError) {
+                expect(err.errorCode).toBe(17);
+            }
+        }
     });
 });
