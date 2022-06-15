@@ -94,6 +94,13 @@ export async function updateBrand({
         });
     }
 
+    if (!brand.team) {
+        throw new AppError({
+            message: 'Team not found',
+            internalErrorCode: 6,
+        });
+    }
+
     const userRole = await getUserRoleInTeam({
         user_id,
         team_id: brand.team.id,
@@ -157,6 +164,12 @@ export async function deleteBrand({
         throw new AppError({
             message: 'Brand not found',
             internalErrorCode: 32,
+        });
+    }
+    if (!brand.team) {
+        throw new AppError({
+            message: 'Team not found',
+            internalErrorCode: 6,
         });
     }
 
