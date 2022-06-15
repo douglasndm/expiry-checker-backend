@@ -1,12 +1,12 @@
 import { createUser } from '@utils/User/Create';
 import { addUserToTeam } from '@utils/Team/Roles/Create';
+import { getUserByEmail } from '@utils/User/Find';
 
 import User from '@models/User';
 import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
-import { getUserByEmail } from '@utils/User/Find';
 import connection from '../../../Services/Database';
 import { setup } from '../../../setup';
 
