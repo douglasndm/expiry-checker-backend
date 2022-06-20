@@ -13,11 +13,8 @@ import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
 import Cache from '@services/Cache';
-import BackgroundJob from '@services/Background';
 
 import AppError from '@errors/AppError';
-
-import { IAction, ITarget } from '~types/UserLogs';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -104,15 +101,6 @@ class ProductController {
             category_id,
         });
 
-        await BackgroundJob.add('LogChange', {
-            user_id: user.id,
-            team_id,
-            target: ITarget.Product,
-            target_id: createdProd.id,
-            action: IAction.Create,
-            new_value: createdProd.name,
-        });
-
         return res.status(201).json(createdProd);
     }
 
@@ -149,11 +137,8 @@ class ProductController {
             });
         }
 
-        const { team_id } = req.params;
         const { product_id } = req.params;
         const { name, code, brand, store_id, categories } = req.body;
-
-        const user = await getUserByFirebaseId(req.userId);
 
         const updatedProduct = await updateProduct({
             id: product_id,
@@ -163,16 +148,6 @@ class ProductController {
             store_id,
             categories,
         });
-
-        await BackgroundJob.add('LogChange', {
-            user_id: user.id,
-            team_id,
-            target: ITarget.Product,
-            target_id: updatedProduct.id,
-            action: IAction.Update,
-            new_value: updatedProduct.name,
-        });
-
         return res.status(201).json(updatedProduct);
     }
 
@@ -251,15 +226,6 @@ class ProductController {
         await cache.invalidade(`product:${team.id}:${prod.id}`);
 
         await productRepository.remove(prod);
-
-        await BackgroundJob.add('LogChange', {
-            user_id: user.id,
-            team_id,
-            target: ITarget.Product,
-            action: IAction.Delete,
-            new_value: null,
-            old_value: prod.name,
-        });
 
         return res.status(204).send();
     }

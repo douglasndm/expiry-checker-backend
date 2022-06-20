@@ -6,7 +6,7 @@ import BatchNotification from '@controllers/Notifications/Batch';
 
 import BatchChecker from '@middlewares/BatchChecker';
 
-const routes = Router();
+const routes = Router({ mergeParams: true });
 
 routes.post('', Batch.store);
 routes.get('/:batch_id', BatchChecker, Batch.index);

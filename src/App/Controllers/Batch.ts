@@ -3,15 +3,18 @@ import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
+import BackgroundJob from '@services/Background';
 
 import Batch from '@models/Batch';
 
 import { getUserRoleInTeam } from '@utils/UserRoles';
+import { createBatch } from '@utils/Product/Batch/Create';
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
 
 import AppError from '@errors/AppError';
-import { createBatch } from '@utils/Product/Batch/Create';
+
+import { IAction } from '~types/UserLogs';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -65,6 +68,7 @@ class BatchController {
             });
         }
 
+        const { team_id } = req.params;
         const { product_id, name, exp_date, amount, price } = req.body;
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
@@ -87,6 +91,16 @@ class BatchController {
             amount,
             price,
         });
+
+        if (team_id)
+            await BackgroundJob.add('LogChange', {
+                user_id: req.userUUID,
+                team_id,
+                product_id,
+                batch_id: createdBatch.id,
+                action: IAction.Create_Batch,
+                new_value: createdBatch.name,
+            });
 
         return res.status(201).json(createdBatch);
     }

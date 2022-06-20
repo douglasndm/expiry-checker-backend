@@ -4,15 +4,18 @@ import UserLog from '@models/UserLogs';
 
 import { getUserById } from '@utils/User/Find';
 import { getTeamById } from '@utils/Team/Find';
+import { findProductById } from '@utils/Product/Find';
+import { findBatchById } from '@utils/Product/Batch/Find';
 
-import { IAction, ITarget } from '~types/UserLogs';
+import { IAction } from '~types/UserLogs';
 
 interface logChangeProps {
     data: {
         user_id: string;
         team_id: string;
-        target: ITarget;
-        target_id: string;
+        product_id?: string;
+        batch_id?: string;
+        category_id?: string;
         action: IAction;
         new_value: string;
         old_value?: string;
@@ -26,11 +29,22 @@ async function logChange({ data }: logChangeProps): Promise<void> {
 
         const repository = getRepository(UserLog);
 
+        let product;
+        let batch;
+        let category;
+        if (data.product_id) {
+            product = await findProductById(data.product_id);
+        }
+        if (data.batch_id) {
+            batch = await findBatchById(data.batch_id);
+        }
+
         const log = new UserLog();
         log.user = user;
         log.team = team;
-        log.target = ITarget[data.target];
-        log.target_id = data.target_id;
+        log.product = product;
+        log.batch = batch;
+        log.category = category;
         log.action = IAction[data.action];
         log.new_value = data.new_value;
         log.old_value = data.old_value;

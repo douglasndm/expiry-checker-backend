@@ -12,6 +12,7 @@ import ProductsRoutes from './products.routes';
 
 import SubscriptionsRoutes from './team/subscriptions.routes';
 
+import batchesRoutes from './batch.routes';
 import BrandsRoutes from './brands.routes';
 import CategoriesRoutes from './categories.routes';
 import StoresRoutes from './stores.routes';
@@ -29,7 +30,7 @@ routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
 
 routes.use('/products', ProductsRoutes);
-
+routes.use('/batches', batchesRoutes);
 routes.use('/brands', BrandsRoutes);
 routes.use('/categories', CategoriesRoutes);
 routes.use('/stores', StoresRoutes);

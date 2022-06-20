@@ -10,9 +10,12 @@ import {
 
 import User from './User';
 import Team from './Team';
+import Product from './Product';
+import Batch from './Batch';
+import Category from './Category';
 
 @Entity({ name: 'users_logs' })
-class UserLogin {
+class UserLogs {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -24,11 +27,17 @@ class UserLogin {
     @JoinColumn({ name: 'team_id', referencedColumnName: 'id' })
     team: Team;
 
-    @Column({ name: 'target' })
-    target: string;
+    @OneToOne(() => Product, product => product.logs)
+    @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
+    product?: Product;
 
-    @Column({ name: 'target_id' })
-    target_id?: string;
+    @OneToOne(() => Batch, batch => batch.logs)
+    @JoinColumn({ name: 'batch_id', referencedColumnName: 'id' })
+    batch?: Batch;
+
+    @OneToOne(() => Category, category => category.logs)
+    @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
+    category?: Category;
 
     @Column({ name: 'action' })
     action: string;
@@ -46,4 +55,4 @@ class UserLogin {
     updated_at: Date;
 }
 
-export default UserLogin;
+export default UserLogs;
