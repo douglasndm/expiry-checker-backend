@@ -4,7 +4,7 @@ import { compareAsc, startOfDay, parseISO } from 'date-fns';
 import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
 
-import { sortBatchesByExpDate } from './Batches';
+import { sortBatchesByExpDate } from '@utils/Product/Batch/Sort';
 
 interface checkIfProductAlreadyExistsProps {
     name: string;
