@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
 
-import Product from '@models/Product';
 import Batch from '@models/Batch';
 
 import { getUserRoleInTeam } from '@utils/UserRoles';
@@ -12,6 +11,7 @@ import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
 
 import AppError from '@errors/AppError';
+import { createBatch } from '@utils/Product/Batch/Create';
 
 class BatchController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -57,25 +57,6 @@ class BatchController {
     }
 
     async store(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-            name: Yup.string(),
-            exp_date: Yup.date().required(),
-            amount: Yup.number(),
-            price: Yup.number(),
-        });
-
-        try {
-            await schema.validate(req.body);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -83,8 +64,6 @@ class BatchController {
                 internalErrorCode: 2,
             });
         }
-
-        const cache = new Cache();
 
         const { product_id, name, exp_date, amount, price } = req.body;
 
@@ -101,39 +80,15 @@ class BatchController {
             });
         }
 
-        const productRepository = getRepository(Product);
-        const batchReposity = getRepository(Batch);
+        const createdBatch = await createBatch({
+            product_id,
+            name,
+            exp_date,
+            amount,
+            price,
+        });
 
-        const product = await productRepository
-            .createQueryBuilder('product')
-            .leftJoinAndSelect('product.team', 'team')
-            .where('product.id = :product_id', { product_id })
-            .getOne();
-
-        if (!product) {
-            throw new AppError({
-                message: 'Product not found',
-                statusCode: 400,
-                internalErrorCode: 8,
-            });
-        }
-
-        const batch = new Batch();
-        batch.name = name;
-        batch.exp_date = exp_date;
-        batch.amount = amount;
-        batch.price = price;
-        batch.status = 'unchecked';
-        batch.product = product;
-
-        const savedBatch = await batchReposity.save(batch);
-
-        const team = await getProductTeam(product);
-
-        await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${team.id}:${product_id}`);
-
-        return res.status(201).json(savedBatch);
+        return res.status(201).json(createdBatch);
     }
 
     async update(req: Request, res: Response): Promise<Response> {
