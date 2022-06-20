@@ -7,8 +7,8 @@ import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
-import connection from '../../Services/Database';
-import { setup } from '../../setup';
+import connection from '~tests/Services/Database';
+import { setup } from '~tests/setup';
 
 describe('Update of brand proccess', () => {
     let user: User | null = null;
@@ -31,9 +31,8 @@ describe('Update of brand proccess', () => {
     });
 
     it('Should update a brand', async () => {
-        if (!team || !user) {
-            return;
-        }
+        if (!team || !user) return;
+
         const brand = await createBrand({
             team_id: team.id,
             user_id: user.id,
@@ -51,9 +50,7 @@ describe('Update of brand proccess', () => {
     });
 
     it('Should not update a brand with invalid id', async () => {
-        if (!team || !user) {
-            return;
-        }
+        if (!team || !user) return;
 
         try {
             await updateBrand({
@@ -72,9 +69,7 @@ describe('Update of brand proccess', () => {
     });
 
     it('A repositor should not be able to update a brand', async () => {
-        if (!team || !user) {
-            return;
-        }
+        if (!team || !user) return;
 
         try {
             const brand = await createBrand({
