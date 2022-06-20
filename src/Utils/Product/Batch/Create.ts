@@ -27,7 +27,7 @@ async function createBatch({
 }: createBatchProps): Promise<Batch> {
     const schema = Yup.object().shape({
         product_id: Yup.string().required().uuid(),
-        name: Yup.string(),
+        name: Yup.string().required(),
         exp_date: Yup.date().required(),
         amount: Yup.number(),
         price: Yup.number(),

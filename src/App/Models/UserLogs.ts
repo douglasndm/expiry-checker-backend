@@ -27,15 +27,15 @@ class UserLogs {
     @JoinColumn({ name: 'team_id', referencedColumnName: 'id' })
     team: Team;
 
-    @OneToOne(() => Product, product => product.logs)
+    @OneToOne(() => Product)
     @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
     product?: Product;
 
-    @OneToOne(() => Batch, batch => batch.logs)
+    @OneToOne(() => Batch)
     @JoinColumn({ name: 'batch_id', referencedColumnName: 'id' })
     batch?: Batch;
 
-    @OneToOne(() => Category, category => category.logs)
+    @OneToOne(() => Category)
     @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
     category?: Category;
 
