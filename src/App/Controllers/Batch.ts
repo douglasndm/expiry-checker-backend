@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
 import BackgroundJob from '@services/Background';
 
 import Batch from '@models/Batch';
 
-import { getUserRoleInTeam } from '@utils/UserRoles';
+import { findBatchById } from '@utils/Product/Batch/Find';
 import { createBatch } from '@utils/Product/Batch/Create';
+import { updateBatch } from '@utils/Product/Batch/Update';
+import { getUserRoleInTeam } from '@utils/UserRoles';
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
 
@@ -106,25 +107,6 @@ class BatchController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            name: Yup.string(),
-            exp_date: Yup.date(),
-            amount: Yup.number(),
-            price: Yup.number(),
-            status: Yup.string(),
-        });
-
-        try {
-            await schema.validate(req.body);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -133,26 +115,10 @@ class BatchController {
             });
         }
 
-        const cache = new Cache();
-
-        const { batch_id } = req.params;
+        const { batch_id, team_id } = req.params;
         const { name, exp_date, amount, price, status } = req.body;
 
-        const batchReposity = getRepository(Batch);
-
-        const batch = await batchReposity
-            .createQueryBuilder('batch')
-            .leftJoinAndSelect('batch.product', 'product')
-            .where('batch.id = :batch_id', { batch_id })
-            .getOne();
-
-        if (!batch) {
-            throw new AppError({
-                message: 'Batch was not found',
-                statusCode: 400,
-                internalErrorCode: 9,
-            });
-        }
+        const batch = await findBatchById(batch_id);
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch.product.id,
@@ -167,21 +133,28 @@ class BatchController {
             });
         }
 
-        batch.name = name;
-        batch.exp_date = exp_date;
-        batch.amount = amount;
-        batch.price = price;
-        batch.status =
-            String(status).toLowerCase() === 'checked'
-                ? 'checked'
-                : 'unchecked';
+        const updatedBatch = await updateBatch({
+            batch_id,
+            name,
+            exp_date,
+            amount,
+            price,
+            status,
+        });
 
-        const updatedBatch = await batchReposity.save(batch);
-
-        const team = await getProductTeam(batch.product);
-
-        await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
+        if (team_id) {
+            if (!!status && status !== batch.status) {
+                await BackgroundJob.add('LogChange', {
+                    user_id: req.userUUID,
+                    team_id,
+                    product_id: batch.product.id,
+                    batch_id: batch.id,
+                    action: IAction.Set_Batch_Checked,
+                    new_value: status,
+                    old_value: batch.status,
+                });
+            }
+        }
 
         return res.status(200).json(updatedBatch);
     }
