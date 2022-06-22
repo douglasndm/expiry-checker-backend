@@ -67,12 +67,11 @@ async function updateBatch({
     if (exp_date) batch.exp_date = exp_date;
     if (amount) batch.amount = amount;
     if (price) batch.price = price;
+    if (price_tmp) batch.price_tmp = price_tmp;
     batch.status =
         String(status).toLowerCase() === 'checked' ? 'checked' : 'unchecked';
 
     const updatedBatch = await batchReposity.save(batch);
-
-    console.log(batch);
 
     const team = await getProductTeam(batch.product);
 

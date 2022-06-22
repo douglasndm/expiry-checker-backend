@@ -1,3 +1,5 @@
+import { addDays } from 'date-fns';
+
 import User from '@models/User';
 import Team from '@models/Team';
 import Product from '@models/Product';
@@ -39,7 +41,7 @@ describe('Update of a batch process', () => {
         await connection.clear();
     });
 
-    it('should update a batch name', async () => {
+    it('should update a batch', async () => {
         if (!team || !user || !product) return;
 
         try {
@@ -52,17 +54,43 @@ describe('Update of a batch process', () => {
                 price: 3.99,
             });
 
+            const newDate = addDays(batch.exp_date, 7);
+
             const updatedBatch = await updateBatch({
                 batch_id: batch.id,
                 name: 'new name',
+                exp_date: newDate,
+                amount: 30,
+                price: 1.99,
+                price_tmp: 1.49,
+                status: 'checked',
             });
 
             expect(updatedBatch.name).toBe('new name');
-            expect(batch.exp_date).toBe(exp_date);
-            expect(batch.amount).toBe(15);
-            expect(batch.price).toBe(3.99);
+            expect(updatedBatch.exp_date).toBe(newDate);
+            expect(updatedBatch.amount).toBe(30);
+            expect(updatedBatch.price).toBe(1.99);
+            expect(updatedBatch.status).toBe('checked');
         } catch (err) {
             expect(false).toBeTruthy();
+        }
+    });
+
+    it('should not update a batch with invalid batch id', async () => {
+        if (!team || !user || !product) return;
+
+        try {
+            await updateBatch({
+                batch_id: 'ASODpka-12as4c8',
+                name: 'new name',
+            });
+            expect(false).toBeTruthy();
+        } catch (err) {
+            expect(err).toBeInstanceOf(AppError);
+
+            if (err instanceof AppError) {
+                expect(err.errorCode).toBe(1);
+            }
         }
     });
 });
