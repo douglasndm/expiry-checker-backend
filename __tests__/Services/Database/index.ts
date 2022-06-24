@@ -1,11 +1,16 @@
 import { createConnection, getConnection, getConnectionOptions } from 'typeorm';
 
+import { entities } from '@services/Database/index';
+
 const connection = {
     async create(): Promise<void> {
         const defaultOptions = await getConnectionOptions('test');
 
         const conn = {
             ...defaultOptions,
+            dropSchema: true,
+            migrationsRun: true,
+            entities,
             name: 'default',
         };
 
@@ -27,4 +32,5 @@ const connection = {
         await Promise.all(entityDeletionPromises);
     },
 };
+
 export default connection;

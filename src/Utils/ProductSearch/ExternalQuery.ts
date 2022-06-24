@@ -16,9 +16,6 @@ async function findProductByEANExternal(
 
     const response = await api.get<BluesoftResponse>(`/gtins/${code}`);
 
-    console.log('External API response');
-    console.log(response.data);
-
     return {
         name: response.data.description,
         code: String(response.data.gtin),

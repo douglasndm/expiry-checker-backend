@@ -16,6 +16,7 @@ import ProductDetails from '@models/ProductDetails';
 import ProductRequest from '@models/ProductRequest';
 import UsersStores from '@models/UsersStores';
 import UserLogin from '@models/UserLogin';
+import UserLogs from '@models/UserLogs';
 
 import TeamPreferences from '@models/TeamPreferences';
 import NotificationsPreferences from '@models/NotificationsPreferences';
@@ -39,6 +40,7 @@ export const entities = [
     TeamPreferences,
     NotificationsPreferences,
     UserLogin,
+    UserLogs,
 ];
 
 async function setConnection(): Promise<void> {

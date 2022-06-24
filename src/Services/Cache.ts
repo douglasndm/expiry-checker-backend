@@ -42,6 +42,7 @@ export default class RedisCache {
 
         const pipeline = this.client.pipeline();
 
+        if (!keys) return;
         keys.forEach(key => {
             pipeline.del(key);
         });

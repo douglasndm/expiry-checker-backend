@@ -1,13 +1,12 @@
 import User from '@models/User';
 import Team from '@models/Team';
 
-import { createUser } from '@utils/User/Create';
-import { createTeam } from '@utils/Team/Create';
+import { createCategory } from '@utils/Categories/Create';
 
 import AppError from '@errors/AppError';
 
-import { createCategory } from '@utils/Categories/Create';
 import connection from '../../Services/Database';
+import { setup } from '../../setup';
 
 describe('Creation of category proccess', () => {
     let user: User | null = null;
@@ -15,18 +14,10 @@ describe('Creation of category proccess', () => {
     beforeAll(async () => {
         await connection.create();
 
-        user = await createUser({
-            firebaseUid: '123456789asd',
-            name: 'Douglas',
-            lastName: 'Mattos',
-            email: 'mail@mail.com',
-            password: '123456789',
-        });
+        const init = await setup(2);
 
-        team = await createTeam({
-            name: 'Team 01',
-            admin_id: '123456789asd',
-        });
+        user = init.user;
+        team = init.team;
     });
 
     afterAll(async () => {
@@ -61,12 +52,19 @@ describe('Creation of category proccess', () => {
             name: 'Drink',
         });
 
-        createCategory({
-            team_id: team.id,
-            name: 'drink',
-        }).catch(err => {
+        try {
+            await createCategory({
+                team_id: team.id,
+                name: 'drink',
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.errorCode).toBe(13);
-        });
+            if (err instanceof AppError) {
+                expect(err.statusCode).toBe(400);
+                expect(err.errorCode).toBe(13);
+            }
+        }
     });
 });

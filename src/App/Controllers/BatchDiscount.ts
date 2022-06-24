@@ -29,7 +29,11 @@ class BatchDiscount {
 
             await schema.validate(req.body);
         } catch (err) {
-            throw new AppError({ message: err.message, internalErrorCode: 1 });
+            if (err instanceof AppError)
+                throw new AppError({
+                    message: err.message,
+                    internalErrorCode: 1,
+                });
         }
 
         const { batch_id, temp_price } = req.body;

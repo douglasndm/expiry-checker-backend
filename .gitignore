@@ -9,3 +9,8 @@ yarn-error.log
 
 .env
 ormconfig.json
+
+.DS_Store
+
+newrelic.js
+newrelic_agent.log

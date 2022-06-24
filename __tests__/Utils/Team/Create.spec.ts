@@ -44,23 +44,37 @@ describe('Create of a team', () => {
     });
 
     it('Should NOT create a team with an invalid user id', async () => {
-        await createTeam({
-            name: 'Team 01',
-            admin_id: 'ASDKPO!(@!#',
-        }).catch(err => {
+        try {
+            await createTeam({
+                name: 'Team 01',
+                admin_id: 'ASDKPO!(@!#',
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.errorCode).toBe(7);
-        });
+
+            if (err instanceof AppError) {
+                expect(err.errorCode).toBe(7);
+            }
+        }
     });
 
     it('Should NOT create a team if user is already a manager of another team', async () => {
-        await createTeam({
-            name: 'Team 02',
-            admin_id: '123456789asd',
-        }).catch(err => {
+        try {
+            await createTeam({
+                name: 'Team 02',
+                admin_id: '123456789asd',
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.statusCode).toBe(400);
-        });
+
+            if (err instanceof AppError) {
+                expect(err.statusCode).toBe(400);
+            }
+        }
     });
 
     it('Should NOT create a team if user is in a team with the same name', async () => {
@@ -105,13 +119,20 @@ describe('Create of a team', () => {
             team_id: team.id,
         });
 
-        await createTeam({
-            name: 'Team Amanda',
-            admin_id: 'testThiago',
-        }).catch(err => {
+        try {
+            await createTeam({
+                name: 'Team Amanda',
+                admin_id: 'testThiago',
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.statusCode).toBe(400);
-            expect(err.errorCode).toBe(14);
-        });
+
+            if (err instanceof AppError) {
+                expect(err.statusCode).toBe(400);
+                expect(err.errorCode).toBe(14);
+            }
+        }
     });
 });

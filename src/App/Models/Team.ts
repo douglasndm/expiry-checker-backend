@@ -12,6 +12,7 @@ import Category from './Category';
 import ProductTeams from './ProductTeams';
 import Store from './Store';
 import TeamSubscription from './TeamSubscription';
+import UserLogs from './UserLogs';
 import UserRoles from './UserRoles';
 
 @Entity({ name: 'teams' })
@@ -39,6 +40,9 @@ export default class Team {
 
     @OneToMany(() => TeamSubscription, subscriptions => subscriptions.team)
     subscriptions: Array<TeamSubscription>;
+
+    @OneToMany(() => UserLogs, userLogs => userLogs.team)
+    logs: Array<UserLogs>;
 
     @CreateDateColumn()
     created_at: Date;

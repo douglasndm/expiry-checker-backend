@@ -6,5 +6,5 @@ interface checkAndSaveTeamSubscriptionProps {
 interface revenueSubscriptionsProps {
     expires_date: Date;
     purchase_date: Date;
-    membersLimit: 1 | 2 | 3 | 5 | 10 | 15 | 30 | 45 | 60;
+    membersLimit: 1 | 2 | 3 | 5 | 10 | 15 | 20 | 30 | 45 | 60;
 }

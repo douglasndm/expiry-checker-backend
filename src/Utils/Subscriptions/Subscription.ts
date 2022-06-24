@@ -34,6 +34,9 @@ function handleMembersLimit(
         case 'expirybusiness_monthly_default_15people':
             members = 15;
             break;
+        case 'expiryteams_monthly_default_20people':
+            members = 20;
+            break;
         case 'expiryteams_monthly_default_30people':
             members = 30;
             break;
