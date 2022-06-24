@@ -11,3 +11,6 @@ yarn-error.log
 ormconfig.json
 
 .DS_Store
+
+newrelic.js
+newrelic_agent.log

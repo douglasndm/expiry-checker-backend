@@ -8,6 +8,7 @@ import rateLimiter from './App/Middlewares/RateLimiter';
 
 import Routes from './Routes/index.routes';
 
+import './Services/NewRelic';
 import './Services/Firebase';
 import './Services/Redis';
 import './Services/Database';
