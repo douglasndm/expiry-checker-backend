@@ -1,4 +1,5 @@
-import { createUser } from '@utils/User/Create';
+import User from '@models/User';
+
 import {
     getUserByFirebaseId,
     getUserById,
@@ -7,55 +8,69 @@ import {
 
 import AppError from '@errors/AppError';
 
-import connection from '../../Services/Database';
-
-beforeAll(async () => {
-    await connection.create();
-
-    await createUser({
-        firebaseUid: '123456789asd',
-        name: 'Douglas',
-        lastName: 'Mattos',
-        email: 'mail@mail.com',
-        password: '123456789',
-    });
-});
-
-afterAll(async () => {
-    await connection.close();
-});
-
-beforeEach(async () => {
-    await connection.clear();
-});
+import { createUser } from '@utils/User/Create';
+import connection from '~tests/Services/Database';
+import { setup } from '~tests/setup';
 
 describe('Find user process', () => {
-    it('should find an user by firebase id', async () => {
-        const user = await getUserByFirebaseId('123456789asd');
+    let user: User | null = null;
 
-        expect(user).not.toBe(null);
-        expect(user.name).toBe('Douglas');
+    beforeAll(async () => {
+        await connection.create();
+
+        const init = await setup(2);
+
+        user = init.user;
+    });
+
+    afterAll(async () => {
+        await connection.close();
+    });
+
+    beforeEach(async () => {
+        await connection.clear();
+    });
+
+    it('should find an user by firebase id', async () => {
+        if (!user) return;
+        const findedUser = await getUserByFirebaseId(user.firebaseUid);
+
+        expect(findedUser).not.toBe(null);
+        expect(findedUser.name).toBe('Douglas');
     });
 
     it('should find an user by id', async () => {
-        // This is for get ID and then search for it
-        const user = await getUserByFirebaseId('123456789asd');
+        if (!user) return;
 
         const userById = await getUserById(user.id);
 
-        expect(user).not.toBe(null);
+        expect(userById).not.toBe(null);
         expect(userById.id).toBe(user.id);
     });
 
     it('should find an user by email', async () => {
-        const user = await getUserByEmail('mail@mail.com');
+        if (!user) return;
 
-        expect(user).not.toBe(null);
-        expect(user.name).toBe('Douglas');
+        const findedUser = await getUserByEmail(user.email);
+
+        expect(findedUser).not.toBe(null);
+        expect(findedUser.name).toBe('Douglas');
+    });
+
+    it('should find an user by email by case insentive', async () => {
+        await createUser({
+            firebaseUid: 'terst123',
+            email: 'CaseInsentive@mail.com',
+        });
+
+        const findedUser = await getUserByEmail('caseinsentive@mail.com');
+
+        expect(findedUser).not.toBe(null);
+        expect(findedUser.email).toBe('CaseInsentive@mail.com');
     });
 
     // EXPECT ERRORS
-    it('should NOT find an user by firebase id', async () => {
+    it('should NOT find an user by invalid firebase id', async () => {
         try {
             await getUserByFirebaseId('123');
         } catch (err) {
@@ -66,7 +81,7 @@ describe('Find user process', () => {
         }
     });
 
-    it('should NOT find an user by id', async () => {
+    it('should NOT find an user by not existent id', async () => {
         try {
             await getUserById('08792baf-8264-4b1e-bd09-af922815e803');
         } catch (err) {
@@ -77,7 +92,7 @@ describe('Find user process', () => {
         }
     });
 
-    it('should NOT find an user by email', async () => {
+    it('should NOT find an user by not existents email', async () => {
         try {
             await getUserByEmail('invalid@mail.com');
         } catch (err) {
