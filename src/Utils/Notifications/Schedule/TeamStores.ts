@@ -47,6 +47,8 @@ async function getAllStoreTeamsToNotificate(): Promise<
                     return;
                 }
 
+                if (!teamsToNotificate[teamWhereStoreIs].stores) return;
+
                 const storeIndex = teamsToNotificate[
                     teamWhereStoreIs
                 ].stores.findIndex(sto => sto.id === store.id);
