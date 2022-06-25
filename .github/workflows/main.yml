@@ -50,13 +50,11 @@ jobs:
         env:
           FIREBASE_FILE: ${{ secrets.FIREBASE_ACCOUNT_KEY }}          
           FIREBASE_EXPIRYCHECKER_FILE: ${{ secrets.EXPIRY_CHECKER_FIREBASE_ACCOUNT_KEY }}
-          NEW_RELIC_CONFIG_FILE: $${{ secrets.NEW_RELIC_CONFIG_FILE }}
         run: |
           yarn build
           ls
           echo $FIREBASE_FILE > ./dist/Config/Firebase/ServiceAccountKey.json          
           echo $FIREBASE_EXPIRYCHECKER_FILE > ./dist/Config/Firebase/ExpiryCheckerServiceAccountKey.json
-          echo $NEW_RELIC_CONFIG_FILE > ./newrelic.js
           
         
       - name: Copy code to Digital Ocean
