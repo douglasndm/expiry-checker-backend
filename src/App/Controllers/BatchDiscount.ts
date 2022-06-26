@@ -13,20 +13,20 @@ import AppError from '@errors/AppError';
 
 class BatchDiscount {
     async store(req: Request, res: Response): Promise<Response> {
+        if (!req.userUUID) {
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 2,
+            });
+        }
+
         const schema = Yup.object().shape({
             batch_id: Yup.string().uuid().required(),
             temp_price: Yup.number(),
         });
 
         try {
-            if (!req.userId) {
-                throw new AppError({
-                    message: 'Provide the user id',
-                    statusCode: 401,
-                    internalErrorCode: 2,
-                });
-            }
-
             await schema.validate(req.body);
         } catch (err) {
             if (err instanceof AppError)
@@ -54,7 +54,7 @@ class BatchDiscount {
 
         const userHasAccess = await checkIfUserHasAccessToAProduct({
             product_id: batch?.product.id,
-            user_id: req.userId,
+            user_id: req.userUUID,
         });
 
         if (!userHasAccess) {
