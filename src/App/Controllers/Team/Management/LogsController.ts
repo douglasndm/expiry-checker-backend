@@ -6,7 +6,7 @@ class LogsController {
     async index(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
 
-        const logs = await getTeamLogs({ team_id });
+        const logs = await getTeamLogs({ team_id, limit: 50 });
 
         return res.json(logs);
     }

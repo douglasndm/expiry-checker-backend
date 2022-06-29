@@ -38,6 +38,8 @@ async function getTeamLogs({
         .leftJoinAndSelect('logs.batch', 'batch')
         .leftJoinAndSelect('logs.category', 'category')
         .where('team.id = :team_id', { team_id })
+        .orderBy('logs.created_at', 'DESC')
+        .take(limit)
         .getMany();
 
     return logs;
