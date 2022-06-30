@@ -11,6 +11,7 @@ import ManagerChecker from '@middlewares/ManagerChecker';
 import ProductsRoutes from './products.routes';
 
 import SubscriptionsRoutes from './team/subscriptions.routes';
+import ManagementRoutes from './team/management.routes';
 
 import batchesRoutes from './batch.routes';
 import BrandsRoutes from './brands.routes';
@@ -45,6 +46,8 @@ routes.delete('', Team.delete);
 routes.post('/manager/user', UserManager.create);
 routes.put('/manager/user', UserManager.update);
 routes.delete('/manager/user/:user_id', UserManager.delete);
+
+routes.use('/management', ManagementRoutes);
 
 routes.put('/preferences', TeamPreferences.update);
 
