@@ -32,6 +32,8 @@ async function getAllStoreTeamsToNotificate(): Promise<
                 id: role.user.id,
             });
         } else {
+            if (!role.user.stores) return;
+
             role.user.stores.forEach(userStore => {
                 const { store } = userStore;
 
