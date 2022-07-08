@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import { compareAsc, startOfDay, parseISO } from 'date-fns';
+import { compareAsc, parseISO } from 'date-fns';
 
 import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
@@ -97,13 +97,16 @@ export function sortProductsByBatchesExpDate(
             return 1;
         }
 
-        // batches1[x].exp_date was coming as string
-        const batch1ExpDate = startOfDay(
-            parseISO(String(batches1[0].exp_date)),
-        );
-        const batch2ExpDate = startOfDay(
-            parseISO(String(batches2[0].exp_date)),
-        );
+        let date1 = parseISO(String(batches1[0].exp_date));
+        let date2 = parseISO(String(batches2[0].exp_date));
+
+        if (
+            batches1[0].exp_date instanceof Date &&
+            batches2[0].exp_date instanceof Date
+        ) {
+            date1 = batches1[0].exp_date;
+            date2 = batches2[0].exp_date;
+        }
 
         if (
             batches1[0].status === 'unchecked' &&
@@ -115,7 +118,7 @@ export function sortProductsByBatchesExpDate(
             batches1[0].status === 'checked' &&
             batches2[0].status === 'checked'
         ) {
-            return compareAsc(batch1ExpDate, batch2ExpDate);
+            return compareAsc(date1, date2);
         }
         if (
             batches1[0].status === 'checked' &&
@@ -124,7 +127,7 @@ export function sortProductsByBatchesExpDate(
             return 1;
         }
 
-        return compareAsc(batch1ExpDate, batch2ExpDate);
+        return compareAsc(date1, date2);
     });
 
     return prodsWithSortedBatchs;
