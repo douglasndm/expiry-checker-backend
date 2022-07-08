@@ -32,8 +32,6 @@ async function getAllStoreTeamsToNotificate(): Promise<
                 id: role.user.id,
             });
         } else {
-            if (!role.user.stores) return;
-
             role.user.stores.forEach(userStore => {
                 const { store } = userStore;
 
@@ -41,6 +39,11 @@ async function getAllStoreTeamsToNotificate(): Promise<
                 const teamWhereStoreIs = teamsToNotificate.findIndex(
                     team => team.team_id === store.team.id,
                 );
+
+                // For some reasons in production we have stores without a team
+                if (teamWhereStoreIs < 0) {
+                    return;
+                }
 
                 if (!store) {
                     teamsToNotificate[teamWhereStoreIs].noStore.users.push({
