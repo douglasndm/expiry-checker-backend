@@ -7,10 +7,10 @@ import Cache from '@services/Cache';
 import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
+import { getTeamById } from '@utils/Team/Find';
 
 import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
 import { deleteAllProducts } from '@functions/Team/Products';
-import { getAllUsersFromTeam } from '@functions/Team/Users';
 import { sortProductsByBatchesExpDate } from '@functions/Products';
 
 import UserRoles from '@models/UserRoles';
@@ -38,8 +38,6 @@ class TeamController {
         const { team_id } = req.params;
         const { removeCheckedBatches, sortByBatches } = req.query;
 
-        const teamRepository = getRepository(Team);
-
         const subscription = await checkIfTeamIsActive({ team_id });
 
         if (!subscription) {
@@ -50,21 +48,7 @@ class TeamController {
             });
         }
 
-        const usersInTeam = await getAllUsersFromTeam({ team_id });
-
-        const isUserInTeam = usersInTeam.filter(
-            user => user.fid === req.userId,
-        );
-
-        if (isUserInTeam.length <= 0) {
-            throw new AppError({
-                message: 'You dont have permission to be here',
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
-        const team = await teamRepository.findOne(team_id);
+        const team = await getTeamById(team_id);
 
         const user = await getUserByFirebaseId(req.userId || '');
 
