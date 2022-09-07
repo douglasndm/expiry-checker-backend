@@ -10,6 +10,7 @@ import {
 } from '@utils/Brand';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
+import { isUserManager } from '@functions/Users/UserRoles';
 
 import AppError from '@errors/AppError';
 
@@ -148,7 +149,13 @@ class BrandController {
         const user = await getUserByFirebaseId(req.userId);
         const userStores = await getAllStoresFromUser({ user_id: user.id });
 
-        if (userStores.length > 0) {
+        const isManager = await isUserManager({
+            user_id: user.id,
+            team_id: req.params.team_id,
+            useInternalId: true,
+        });
+
+        if (userStores.length > 0 && !isManager) {
             const products = productsInBrands.filter(
                 prod => prod.store?.id === userStores[0].store.id,
             );

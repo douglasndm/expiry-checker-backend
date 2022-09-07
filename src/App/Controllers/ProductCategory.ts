@@ -7,6 +7,7 @@ import Category from '@models/Category';
 import { getAllProductsFromCategory } from '@utils/Categories/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
+import { isUserManager } from '@functions/Users/UserRoles';
 
 import AppError from '@errors/AppError';
 
@@ -66,7 +67,14 @@ class ProductCategoryController {
         const user = await getUserByFirebaseId(req.userId);
         const userStores = await getAllStoresFromUser({ user_id: user.id });
 
-        if (userStores.length > 0) {
+        const isManager = await isUserManager({
+            user_id: user.id,
+            team_id: req.params.team_id,
+            useInternalId: true,
+        });
+
+        // Filter stores when is not manager
+        if (userStores.length > 0 && !isManager) {
             const products = productsInCategory.products.filter(
                 prod => prod.store?.id === userStores[0].store.id,
             );
