@@ -8,6 +8,7 @@ import {
     getAllProductsFromBrand,
     updateBrand,
 } from '@utils/Brand';
+import { sortBrands } from '@utils/Brands/Sort';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 import { isUserManager } from '@functions/Users/UserRoles';
@@ -34,7 +35,7 @@ class BrandController {
 
         const brands = await getAllBrands({ team_id });
 
-        return res.status(200).json(brands);
+        return res.status(200).json(sortBrands(brands));
     }
 
     async store(req: Request, res: Response): Promise<Response> {

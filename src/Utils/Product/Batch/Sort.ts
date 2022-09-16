@@ -16,6 +16,16 @@ export function sortBatchesByExpDate(batches: Array<Batch>): Array<Batch> {
                 date2 = batch2.exp_date;
             }
 
+            if (batch1.status === 'unchecked' && batch2.status === 'checked') {
+                return -1;
+            }
+            if (batch1.status === 'checked' && batch2.status === 'checked') {
+                return compareAsc(date1, date2);
+            }
+            if (batch1.status === 'checked' && batch2.status === 'unchecked') {
+                return 1;
+            }
+
             if (compareAsc(date1, date2) > 0) return 1;
             if (compareAsc(date1, date2) < 0) return -1;
             return 0;

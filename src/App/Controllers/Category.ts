@@ -5,6 +5,7 @@ import { getAllCategoriesFromTeam } from '@utils/Categories/List';
 import { createCategory } from '@utils/Categories/Create';
 import { updateCategory } from '@utils/Categories/Update';
 import { deleteCategory } from '@utils/Categories/Delete';
+import { sortCategories } from '@utils/Categories/Sort';
 
 import { checkIfTeamIsActive } from '@functions/Team';
 
@@ -26,7 +27,7 @@ class CategoryController {
 
         const categories = await getAllCategoriesFromTeam({ team_id });
 
-        return res.status(200).json(categories);
+        return res.status(200).json(sortCategories(categories));
     }
 
     async create(req: Request, res: Response): Promise<Response> {
