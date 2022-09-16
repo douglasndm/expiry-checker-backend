@@ -8,6 +8,7 @@ import { getAllProductsFromCategory } from '@utils/Categories/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 import { isUserManager } from '@functions/Users/UserRoles';
+import { sortProductsByBatchesExpDate } from '@functions/Products';
 
 import AppError from '@errors/AppError';
 
@@ -40,6 +41,10 @@ class ProductCategoryController {
         const productsInCategory = await getAllProductsFromCategory({
             category_id,
         });
+
+        const sortedProducts = sortProductsByBatchesExpDate(
+            productsInCategory.products,
+        );
 
         let categoryName = productsInCategory.category_name;
 
@@ -75,7 +80,7 @@ class ProductCategoryController {
 
         // Filter stores when is not manager
         if (userStores.length > 0 && !isManager) {
-            const products = productsInCategory.products.filter(
+            const products = sortedProducts.filter(
                 prod => prod.store?.id === userStores[0].store.id,
             );
 
@@ -84,10 +89,9 @@ class ProductCategoryController {
                 products,
             });
         }
-
         return res.json({
             category_name: categoryName,
-            products: productsInCategory.products,
+            products: sortedProducts,
         });
     }
 }
