@@ -46,6 +46,38 @@ function handleMembersLimit(
         case 'expiryteams_monthly_default_60people':
             members = 60;
             break;
+
+        // Revenuecat dashboard code
+        case 'rc_promo_TeamFor1_monthly':
+            members = 1;
+            break;
+        case 'rc_promo_TeamFor2_monthly':
+            members = 2;
+            break;
+        case 'rc_promo_TeamFor3_monthly':
+            members = 3;
+            break;
+        case 'rc_promo_TeamFor5_monthly':
+            members = 5;
+            break;
+        case 'rc_promo_TeamFor10_monthly':
+            members = 10;
+            break;
+        case 'rc_promo_TeamFor15_monthly':
+            members = 15;
+            break;
+        case 'rc_promo_TeamOf20_monthly':
+            members = 20;
+            break;
+        case 'rc_promo_TeamWith30_monthly':
+            members = 30;
+            break;
+        case 'rc_promo_TeamWith45_monthly':
+            members = 45;
+            break;
+        case 'rc_promo_TeamWith60_monthly':
+            members = 60;
+            break;
         default:
             members = 0;
             break;
