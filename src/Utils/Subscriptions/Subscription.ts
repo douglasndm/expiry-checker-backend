@@ -53,15 +53,7 @@ function handleMembersLimit(
 
     // Revenuecat dashboard code
     if (members <= 0) {
-        if (subscription.name.includes('TeamFor1')) {
-            members = 1;
-        } else if (subscription.name.includes('TeamFor2')) {
-            members = 2;
-        } else if (subscription.name.includes('TeamFor3')) {
-            members = 3;
-        } else if (subscription.name.includes('TeamFor5')) {
-            members = 5;
-        } else if (subscription.name.includes('TeamFor10')) {
+        if (subscription.name.includes('TeamFor10')) {
             members = 10;
         } else if (subscription.name.includes('TeamFor15')) {
             members = 15;
@@ -73,6 +65,14 @@ function handleMembersLimit(
             members = 45;
         } else if (subscription.name.includes('TeamWith60')) {
             members = 60;
+        } else if (subscription.name.includes('TeamFor1')) {
+            members = 1;
+        } else if (subscription.name.includes('TeamFor2')) {
+            members = 2;
+        } else if (subscription.name.includes('TeamFor3')) {
+            members = 3;
+        } else if (subscription.name.includes('TeamFor5')) {
+            members = 5;
         }
     }
 

@@ -57,7 +57,7 @@ class TeamController {
             user_id: user.id,
         });
 
-        if (removeCheckedBatches) {
+        if (removeCheckedBatches === 'true') {
             const checkedRemoved = products.map(prod => {
                 const batches = prod.batches.filter(
                     batch => batch.status !== 'checked',
@@ -72,7 +72,7 @@ class TeamController {
             products = checkedRemoved;
         }
 
-        if (sortByBatches) {
+        if (sortByBatches === 'true') {
             products = sortProductsByBatchesExpDate(products);
         }
 
