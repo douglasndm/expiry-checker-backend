@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
+import User from '@models/User';
+
 import { removeUser, updateRole } from '@utils/Team/Roles/User';
 import { addUserToTeam } from '@utils/Team/Roles/Create';
 import { getUserByEmail } from '@utils/User/Find';
@@ -23,9 +25,33 @@ class UserManagerController {
         const { team_id } = req.params;
         const { email } = req.body;
 
-        const user = await getUserByEmail(email);
+        let user: User | null = null;
 
-        const savedRole = await addUserToTeam({ user_id: user.id, team_id });
+        try {
+            user = await getUserByEmail(email);
+        } catch (err) {
+            if (err instanceof AppError) {
+                if (err.errorCode === 7)
+                    throw new AppError({
+                        message: 'There is no user with this e-mail',
+                        internalErrorCode: 18,
+                    });
+            } else {
+                throw err;
+            }
+        }
+
+        if (!user) {
+            throw new AppError({
+                message: 'There is no user with this e-mail',
+                internalErrorCode: 18,
+            });
+        }
+
+        const savedRole = await addUserToTeam({
+            user_id: user.id,
+            team_id,
+        });
 
         return res.json(savedRole);
     }
