@@ -14,3 +14,5 @@ ormconfig.json
 
 newrelic.js
 newrelic_agent.log
+
+*.pkg

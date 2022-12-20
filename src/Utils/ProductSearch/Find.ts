@@ -5,6 +5,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 
 import Cache from '@services/Cache';
 import BackgroundJob from '@services/Background';
+import { getProductImageURL } from '@services/AWS';
 
 import ProductDetails from '@models/ProductDetails';
 
@@ -103,7 +104,22 @@ async function findProductByEAN({
         }
     }
 
-    return product || null;
+    let photo: undefined | string;
+
+    if (product?.thumbnail) {
+        if (product.thumbnail.startsWith('http')) {
+            photo = product.thumbnail;
+        }
+    }
+
+    if (!photo && product) {
+        photo = getProductImageURL(product.code);
+    }
+
+    return {
+        ...product,
+        thumbnail: photo,
+    };
 }
 
 export { findProductByEAN };

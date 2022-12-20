@@ -13,6 +13,7 @@ import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
 import Cache from '@services/Cache';
+import { getProductImageURL } from '@services/AWS';
 
 import AppError from '@errors/AppError';
 
@@ -48,11 +49,18 @@ class ProductController {
             team_id,
         });
 
+        let thumbnail: string | null = null;
+
+        if (product.code) {
+            thumbnail = getProductImageURL(product.code);
+        }
+
         const productWithFixCat = {
             ...product,
             brand: product.brand?.id,
             store: product.store?.id,
             categories: product.categories.map(cat => cat.category),
+            thumbnail,
         };
 
         return res.status(200).json(productWithFixCat);

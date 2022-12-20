@@ -5,11 +5,13 @@ import Auth from '@controllers/Auth';
 import AppVersionController from '@controllers/AppVersionController';
 import User from '@controllers/User';
 import ProductSearch from '@controllers/ProductSearch';
+import ProductInformation from '@controllers/ProductInformation';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
 import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
+import AppCheck from '@middlewares/AppChecker';
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
 import HandleSetUserId from '@middlewares/UserIdHandler';
@@ -31,6 +33,7 @@ routes.post('/auth', Auth.store);
 
 // temp with out check for auth for expiry checker
 routes.get('/products/search', ProductSearch.index);
+routes.get('/product/:ean', AppCheck, ProductInformation.index);
 
 // from now on all routes need authentication
 routes.use(FirebaseAuth);

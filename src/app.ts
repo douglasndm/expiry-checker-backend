@@ -13,6 +13,7 @@ import './Services/Firebase';
 import './Services/Redis';
 import './Services/Database';
 import './Services/Cron';
+import './Services/AWS';
 
 import AppError from './Errors/AppError';
 
