@@ -3,6 +3,7 @@ import { Router } from 'express';
 import Team from '@controllers/Team';
 import TeamUsers from '@controllers/TeamUsers';
 import UserManager from '@controllers/UserManager';
+import UserTeam from '@controllers/Team/User';
 import TeamPreferences from '@controllers/TeamPreferences';
 
 import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
@@ -29,6 +30,8 @@ routes.use(checkIfUserIsPending);
 routes.put('', Team.update);
 routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
+
+routes.delete('/user', UserTeam.delete);
 
 routes.use('/products', ProductsRoutes);
 routes.use('/batches', batchesRoutes);
