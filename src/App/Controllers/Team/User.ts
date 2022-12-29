@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { removeUserFromTeam } from '@utils/Team/Roles/Remove';
+import { removeUser } from '@utils/Team/Roles/User';
 
 import AppError from '@errors/AppError';
 
@@ -15,7 +15,7 @@ class UserController {
             });
         }
 
-        await removeUserFromTeam({ user_id, team_id });
+        await removeUser({ user_id, team_id });
 
         return res.send();
     }

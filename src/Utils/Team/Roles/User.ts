@@ -4,6 +4,8 @@ import Cache from '@services/Cache';
 
 import UserRoles from '@models/UserRoles';
 
+import { removeFromALlStores } from '@utils/Stores/Users';
+
 import AppError from '@errors/AppError';
 
 import { getUserRole } from './Find';
@@ -66,6 +68,7 @@ async function removeUser({
         });
     }
 
+    await removeFromALlStores(user_id);
     await roleRepository.remove(role);
 
     const cache = new Cache();

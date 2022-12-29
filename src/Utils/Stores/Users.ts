@@ -188,9 +188,21 @@ async function removeUserFromStore({
     await userStoresRepository.remove(userStore);
 }
 
+async function removeFromALlStores(user_id: string): Promise<void> {
+    const storeRepository = getRepository(UserStores);
+    const stores = await storeRepository
+        .createQueryBuilder('stores')
+        .leftJoinAndSelect('stores.user', 'user')
+        .where('user.id = :user_id', { user_id })
+        .getMany();
+
+    await storeRepository.remove(stores);
+}
+
 export {
     getAllUsersFromStore,
     getAllStoresFromUser,
     addUserToStore,
     removeUserFromStore,
+    removeFromALlStores,
 };
