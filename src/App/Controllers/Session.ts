@@ -48,7 +48,7 @@ class SessionController {
 
                 req.userId = verifyToken.uid;
 
-                const { firebaseToken, oneSignalToken } = req.body;
+                const { firebaseToken } = req.body;
 
                 const user = await getUserByFirebaseId(req.userId);
 
@@ -57,7 +57,6 @@ class SessionController {
                     device_id: String(device_id),
                     ip_address: req.socket.remoteAddress,
                     firebaseToken,
-                    oneSignalToken,
                 });
 
                 return res.status(201).json(user);

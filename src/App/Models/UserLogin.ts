@@ -31,9 +31,6 @@ class UserLogin {
     @Column({ name: 'firebase_messaging' })
     firebaseMessagingToken?: string;
 
-    @Column({ name: 'onesignal_token' })
-    oneSignalToken?: string;
-
     @CreateDateColumn()
     created_at: Date;
 

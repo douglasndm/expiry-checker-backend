@@ -7,5 +7,4 @@ interface registerDeviceProps {
     device_id: string;
     ip_address?: string;
     firebaseToken?: string;
-    oneSignalToken?: string;
 }
