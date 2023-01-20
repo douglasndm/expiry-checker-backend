@@ -13,11 +13,13 @@ import AppError from '@errors/AppError';
 interface addUserToTeamProps {
     user_id: string;
     team_id: string;
+    bypassCode?: boolean;
 }
 
 async function addUserToTeam({
     user_id,
     team_id,
+    bypassCode,
 }: addUserToTeamProps): Promise<UserRoles> {
     const userRolesRepository = getRepository(UserRoles);
 
@@ -90,7 +92,12 @@ async function addUserToTeam({
     teamUser.team = team;
     teamUser.role = 'Repositor';
     teamUser.code = Math.random().toString(36).substring(7);
-    teamUser.status = 'Pending';
+
+    if (!bypassCode) {
+        teamUser.status = 'Pending';
+    } else {
+        teamUser.status = 'Completed';
+    }
 
     const savedRole = await userRolesRepository.save(teamUser);
     await cache.invalidade(`users-from-teams:${team_id}`);
