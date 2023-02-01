@@ -99,13 +99,16 @@ export async function convertExportFile({
 
         const batches: Array<Batch> = [];
 
-        prod.lotes.forEach(bat => {
+        prod.batches.forEach(bat => {
             const batch = batchRepository.create();
-            batch.name = bat.lote;
+            batch.name = bat.name;
             batch.exp_date = startOfDay(parseISO(bat.exp_date));
             batch.amount = bat.amount;
             batch.price = bat.price;
-            batch.status = bat.status === 'Tratado' ? 'checked' : 'unchecked';
+            batch.status =
+                bat.status.toLowerCase() === 'tratado'
+                    ? 'checked'
+                    : 'unchecked';
             batch.product = product;
 
             batches.push(batch);

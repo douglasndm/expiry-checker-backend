@@ -1,6 +1,6 @@
-interface CVLote {
+interface CVBatch {
     id: number;
-    lote: string;
+    name: string;
     exp_date: string;
     amount: number;
     price: number;
@@ -15,7 +15,7 @@ interface CVProduct {
     photo?: string;
     store?: string;
     categories: Array<string>;
-    lotes: Array<CVLote>;
+    batches: Array<CVBatch>;
 }
 
 interface CVCategory {
