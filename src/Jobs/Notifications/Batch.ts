@@ -6,10 +6,8 @@ import Batch from '@models/Batch';
 import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getAllUsersFromTeamWithDevices } from '@utils/Team/Users';
 import {
-    IOneSignalBatchPushNotification,
     ITokenMessagePush,
     sendNotificationByFirebase,
-    sendNotificationByOneSignal,
 } from '@utils/Notifications/Push/Batch';
 
 import { getProductTeam } from '@functions/Product/Team';
@@ -70,17 +68,10 @@ async function batchNotification({
     const messageString = `${batch.product.name} tem um lote que vence em ${formatedDate}`;
     const deeplinking = `expiryteams://product/${batch.product.id}`;
 
-    const oneSignalUsers: IOneSignalBatchPushNotification = {
-        users_id: [],
-        batch,
-        message: messageString,
-    };
-
     users.forEach(u => {
         if (u.id !== user_id) {
             // check if user made at least one login and save its token
             if (u.login) {
-                const { login } = u;
                 const token = u.login.firebaseMessagingToken;
 
                 if (
@@ -98,14 +89,12 @@ async function batchNotification({
                         },
                         token,
                     });
-                } else if (login.oneSignalToken) {
-                    oneSignalUsers.users_id.push(u.id);
                 }
             }
         }
     });
 
-    if (messages.length <= 0 && oneSignalUsers.users_id.length <= 0) {
+    if (messages.length <= 0) {
         throw new AppError({
             message: 'There are no users to send',
             statusCode: 400,
@@ -116,10 +105,6 @@ async function batchNotification({
     try {
         if (messages.length > 0) {
             await sendNotificationByFirebase(messages);
-        }
-
-        if (oneSignalUsers.users_id.length > 0) {
-            await sendNotificationByOneSignal(oneSignalUsers);
         }
     } catch (err) {
         if (err instanceof Error) {

@@ -35,7 +35,6 @@ async function registerDevice({
     device_id,
     ip_address,
     firebaseToken,
-    oneSignalToken,
 }: registerDeviceProps): Promise<UserLogin> {
     const userLoginRepository = getRepository(UserLogin);
 
@@ -46,7 +45,6 @@ async function registerDevice({
         .orWhere('login.firebaseMessagingToken = :firebaseToken', {
             firebaseToken,
         })
-        .orWhere('login.oneSignalToken = :oneSignalToken', { oneSignalToken })
         .getMany();
 
     if (prevLogin.length > 0) {
@@ -61,7 +59,6 @@ async function registerDevice({
     userLogin.ipAddress = ip_address;
     userLogin.firebaseMessagingToken =
         firebaseToken === '' ? undefined : firebaseToken;
-    userLogin.oneSignalToken = oneSignalToken;
 
     const savedUserLogin = await userLoginRepository.save(userLogin);
 

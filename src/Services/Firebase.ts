@@ -6,13 +6,15 @@ import expiryAccountCredentials from '@config/Firebase/ExpiryCheckerServiceAccou
 const serviceAccount = accountCredentials as admin.ServiceAccount;
 const expiryServiceAccount = expiryAccountCredentials as admin.ServiceAccount;
 
-admin.initializeApp({
+const firebaseApp = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
 
-admin.initializeApp(
+const firebaseAppExpiryChecker = admin.initializeApp(
     {
         credential: admin.credential.cert(expiryServiceAccount),
     },
     'expiry_checker',
 );
+
+export { firebaseApp, firebaseAppExpiryChecker };
