@@ -32,7 +32,7 @@ routes.post('/users', User.store);
 routes.post('/auth', Auth.store);
 
 // temp with out check for auth for expiry checker
-routes.get('/products/search', ProductSearch.index);
+// routes.get('/products/search', ProductSearch.index);
 routes.get('/product/:ean', AppCheck, ProductInformation.index);
 
 // from now on all routes need authentication
