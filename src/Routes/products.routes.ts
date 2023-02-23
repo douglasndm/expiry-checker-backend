@@ -2,11 +2,14 @@ import { Router } from 'express';
 
 import Product from '@controllers/Product';
 import Products from '@controllers/Products';
+import ProductsImages from '@controllers/Products/ImagesController';
 
 import ExtraInfo from '@controllers/ExtraInfo';
 import FindDuplicate from '@controllers/Product/FindDuplicate';
 
 const routes = Router({ mergeParams: true });
+
+routes.get('/images', ProductsImages.index);
 
 routes.get('/extrainfo', ExtraInfo.index);
 routes.post('/duplicate', FindDuplicate.index);
