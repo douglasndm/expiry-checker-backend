@@ -13,8 +13,8 @@
     "test:watch": "jest --watch --verbose=true"
   },
   "dependencies": {
-    "@sentry/node": "^7.12.1",
-    "@sentry/tracing": "^7.12.1",
+    "@sentry/node": "^7.38.0",
+    "@sentry/tracing": "^7.38.0",
     "aws-sdk": "^2.1265.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
