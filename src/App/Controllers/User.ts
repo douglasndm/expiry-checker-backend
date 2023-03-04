@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { compareAsc, startOfDay } from 'date-fns';
+import { compareAsc, endOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
 import User from '@models/User';
@@ -8,6 +8,7 @@ import User from '@models/User';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { createUser } from '@utils/User/Create';
 import { updateUser } from '@utils/User/Update';
+import { getSubscription } from '@utils/Subscriptions/Subscription';
 
 import { deleteUser } from '@functions/Users';
 
@@ -43,32 +44,37 @@ class UserController {
             });
         }
 
+        const roles = [];
+
+        if (user.roles.length > 0) {
+            const { role, status, team } = user.roles[0];
+
+            // This the updated subscription
+            const subscription = await getSubscription(team.id);
+
+            const isActive =
+                compareAsc(
+                    endOfDay(new Date()),
+                    endOfDay(subscription.expireIn),
+                ) <= 0;
+
+            roles.push({
+                role,
+                status,
+                team: {
+                    ...team,
+                    isActive,
+                },
+            });
+        }
+
         const organizedUser = {
             id: user.id,
             fid: user.firebaseUid,
             email: user.email,
             name: user.name,
             last_name: user.lastName,
-
-            roles: user.roles.map(r => {
-                const subscriptions = r.team.subscriptions.filter(
-                    sub =>
-                        compareAsc(
-                            startOfDay(new Date()),
-                            startOfDay(sub.expireIn),
-                        ) <= 0,
-                );
-
-                return {
-                    role: r.role,
-                    status: r.status,
-                    team: {
-                        id: r.team.id,
-                        name: r.team.name,
-                        isActive: subscriptions.length > 0,
-                    },
-                };
-            }),
+            roles,
         };
 
         return res.status(200).json(organizedUser);
