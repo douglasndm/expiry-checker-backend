@@ -6,6 +6,7 @@ import AppVersionController from '@controllers/AppVersionController';
 import User from '@controllers/User';
 import ProductSearch from '@controllers/ProductSearch';
 import ProductInformation from '@controllers/ProductInformation';
+import ImageController from '@controllers/Products/ImageController';
 import SessionController from '@controllers/Session';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
@@ -34,6 +35,7 @@ routes.post('/auth', Auth.store);
 // temp with out check for auth for expiry checker
 routes.get('/products/search', ProductSearch.index);
 routes.get('/product/:ean', AppCheck, ProductInformation.index);
+routes.get('/product/image/:ean', ImageController.index);
 
 // from now on all routes need authentication
 routes.use(FirebaseAuth);
