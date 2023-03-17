@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { compareAsc, startOfDay } from 'date-fns';
+import { compareAsc, endOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
 import User from '@models/User';
@@ -54,8 +54,8 @@ class UserController {
                 const subscriptions = r.team.subscriptions.filter(
                     sub =>
                         compareAsc(
-                            startOfDay(new Date()),
-                            startOfDay(sub.expireIn),
+                            endOfDay(new Date()),
+                            endOfDay(sub.expireIn),
                         ) <= 0,
                 );
 
