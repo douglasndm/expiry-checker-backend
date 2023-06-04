@@ -1,6 +1,5 @@
 import { createConnection, getConnectionOptions } from 'typeorm';
 
-import AppVersion from '@models/AppVersion';
 import Batch from '@models/Batch';
 import Category from '@models/Category';
 import Product from '@models/Product';
@@ -22,7 +21,6 @@ import TeamPreferences from '@models/TeamPreferences';
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
 export const entities = [
-    AppVersion,
     Batch,
     Category,
     Product,

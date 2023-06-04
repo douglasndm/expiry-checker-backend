@@ -3,9 +3,35 @@ import { formatInTimeZone } from 'date-fns-tz';
 
 import Cache from '@services/Cache';
 
-async function findProductByEANExternal(
-    code: string,
+async function brasilAPI(
+    query: string,
 ): Promise<findProductByEANExternalResponse> {
+    const api = axios.create({
+        baseURL: 'http://brasilapi.simplescontrole.com.br',
+        params: {
+            'access-token': process.env.BRASIL_API_TOKEN,
+            _format: 'json',
+        },
+    });
+
+    const response = await api.get<BrasilAPIResponse>(`/mercadoria/consulta/`, {
+        params: {
+            ean: query,
+        },
+    });
+
+    if (!response.data.return) {
+        throw new Error(response.data.message);
+    }
+
+    return {
+        name: response.data.return.nome.trim(),
+        code: response.data.return.ean.trim(),
+        brand: response.data.return?.marca_nome.trim(),
+    };
+}
+
+async function cosmoAPI(query: string) {
     const api = axios.create({
         baseURL: 'https://api.cosmos.bluesoft.com.br',
         headers: {
@@ -14,7 +40,7 @@ async function findProductByEANExternal(
         },
     });
 
-    const response = await api.get<BluesoftResponse>(`/gtins/${code}`);
+    const response = await api.get<BluesoftResponse>(`/gtins/${query}`);
 
     return {
         name: response.data.description,
@@ -22,6 +48,19 @@ async function findProductByEANExternal(
         brand: response.data?.brand?.name,
         thumbnail: response.data.thumbnail,
     };
+}
+
+async function findProductByEANExternal(
+    code: string,
+): Promise<findProductByEANExternalResponse> {
+    try {
+        const response = await brasilAPI(code);
+
+        return response;
+    } catch (error) {
+        const response = await cosmoAPI(code);
+        return response;
+    }
 }
 
 async function allowExternalQuery(): Promise<void> {

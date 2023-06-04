@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import Auth from '@controllers/Auth';
 
-import AppVersionController from '@controllers/AppVersionController';
 import User from '@controllers/User';
 import ProductSearch from '@controllers/ProductSearch';
 import ProductInformation from '@controllers/ProductInformation';
@@ -25,8 +24,6 @@ import internalRoutes from './internal.routes';
 const routes = Router();
 
 routes.use('/internal', internalRoutes);
-
-routes.get('/version', AppVersionController.index);
 
 routes.post('/users', User.store);
 
