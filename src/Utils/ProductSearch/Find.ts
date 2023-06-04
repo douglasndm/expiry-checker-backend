@@ -78,7 +78,9 @@ async function findProductByEAN({
                         await cache.save('stop_external_ean_api_request', true);
                     }
                 } else if (err instanceof Error) {
-                    console.log(`Erro while searching ${query} at Bluesoft`);
+                    console.log(
+                        `Erro while searching ${query} at external source`,
+                    );
                     console.error(err);
                 }
             }
