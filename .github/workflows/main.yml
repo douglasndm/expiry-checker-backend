@@ -58,7 +58,7 @@ jobs:
           
         
       - name: Copy code to Digital Ocean
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@495830820fa9cf8c3026738073281a05f0d6dfeb
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
