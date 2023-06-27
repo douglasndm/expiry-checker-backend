@@ -3,6 +3,8 @@ import { getRepository } from 'typeorm';
 import Team from '@models/Team';
 import UserRoles from '@models/UserRoles';
 
+import Cache from '@services/Cache';
+
 interface getAllTeamsUserIsProps {
     user_id: string;
 }
@@ -48,4 +50,9 @@ export async function removeUserFromAllTeams({
 
     // Remove o usuário de todos os times dos quais ele não é gerente
     await userTeamsRepository.remove(notManagersTeams);
+
+    const cache = new Cache();
+    notManagersTeams.forEach(async role => {
+        await cache.invalidade(`users-from-teams:${role.team.id}`);
+    });
 }
