@@ -65,7 +65,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           source: ".,!node_modules"
-          target: "~/apps/teams"
+          target: "~/apps/expirychecker"
                     
       - name: Run production scripts
         uses: appleboy/ssh-action@master
@@ -75,10 +75,10 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: |            
-            cd ~/apps/teams
+            cd ~/apps/expirychecker
             yarn            
             yarn typeorm migration:run
-            pm2 restart ExpiryTeams
+            pm2 restart expiry-checker
             pm2 restart expiry-checker-queues
             echo "Finished"
 
