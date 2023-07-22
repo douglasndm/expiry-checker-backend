@@ -66,6 +66,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: ".,!node_modules"
           target: "~/apps/teams"
+          tar_tmp_path: "~/tempBuild"
+          timeout: 60s
                     
       - name: Run production scripts
         uses: appleboy/ssh-action@master
