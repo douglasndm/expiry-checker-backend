@@ -37,7 +37,7 @@ class TeamController {
                 });
         }
         const { team_id } = req.params;
-        const { removeCheckedBatches, sortByBatches } = req.query;
+        const { removeCheckedBatches, sortByBatches, page } = req.query;
 
         const subscription = await checkIfTeamIsActive({ team_id });
 
@@ -53,29 +53,15 @@ class TeamController {
 
         const user = await getUserByFirebaseId(req.userId || '');
 
-        let products = await getProductsFromTeam({
+        const pg = Number(page) <= 0 ? 0 : Number(page);
+
+        const products = await getProductsFromTeam({
             team_id,
             user_id: user.id,
+            page: page ? pg : undefined,
+            removeCheckedBatches: true,
+            sortByBatches: true,
         });
-
-        if (removeCheckedBatches === 'true') {
-            const checkedRemoved = products.map(prod => {
-                const batches = prod.batches.filter(
-                    batch => batch.status !== 'checked',
-                );
-
-                return {
-                    ...prod,
-                    batches,
-                };
-            });
-
-            products = checkedRemoved;
-        }
-
-        if (sortByBatches === 'true') {
-            products = sortProductsByBatchesExpDate(products);
-        }
 
         const fixedCategories = products.map(p => {
             const categories = p.categories.map(c => c.category);
