@@ -15,6 +15,7 @@ interface getProductsFromTeamProps {
     page?: number;
     removeCheckedBatches?: boolean;
     sortByBatches?: boolean;
+    search?: string;
 }
 
 async function getProductsFromTeam({
@@ -23,6 +24,7 @@ async function getProductsFromTeam({
     page,
     removeCheckedBatches,
     sortByBatches,
+    search,
 }: getProductsFromTeamProps): Promise<Product[]> {
     const cache = new Cache();
 
@@ -81,6 +83,12 @@ async function getProductsFromTeam({
 
         if (page !== undefined) {
             query.take(20).skip(page * 20);
+        }
+
+        if (search) {
+            query.andWhere('lower(product.name) like lower(:search)', {
+                search: `%${search}%`,
+            });
         }
 
         productsTeam = await query.getMany();

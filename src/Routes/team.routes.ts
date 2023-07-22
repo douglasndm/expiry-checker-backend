@@ -28,7 +28,6 @@ routes.post('/join', TeamUsers.store);
 routes.use(checkIfUserIsPending);
 
 routes.put('', Team.update);
-routes.get('/products', Team.index);
 routes.get('/users', TeamUsers.index);
 
 routes.delete('/user', UserTeam.delete);
