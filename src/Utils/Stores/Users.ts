@@ -28,10 +28,19 @@ async function getAllUsersFromStore({
     const userRepository = getRepository(User);
 
     const users = await userRepository
-        .createQueryBuilder('users')
-        .leftJoinAndSelect('users.stores', 'usersStores')
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.stores', 'usersStores')
         .leftJoinAndSelect('usersStores.store', 'store')
         .where('store.id = :store_id', { store_id })
+        .select([
+            'usersStores',
+            'store.id',
+            'store.name',
+            'user.id',
+            'user.name',
+            'user.lastName',
+            'user.firebaseUid',
+        ])
         .getMany();
 
     const usersWithFixedStores = users.map(user => ({

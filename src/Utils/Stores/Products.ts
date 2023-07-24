@@ -26,10 +26,24 @@ async function getAllProductsFromStore({
     const productRepository = getRepository(Product);
 
     const prodcuts = await productRepository
-        .createQueryBuilder('products')
-        .leftJoinAndSelect('products.store', 'store')
-        .leftJoinAndSelect('products.batches', 'batches')
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.store', 'store')
+        .leftJoinAndSelect('product.batches', 'batches')
         .where('store.id = :store_id', { store_id })
+        .select([
+            'product.id',
+            'product.name',
+            'product.code',
+            'store.id',
+            'store.name',
+            'batches.id',
+            'batches.name',
+            'batches.exp_date',
+            'batches.amount',
+            'batches.price',
+            'batches.status',
+            'batches.price_tmp',
+        ])
         .getMany();
 
     return prodcuts;

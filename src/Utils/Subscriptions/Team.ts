@@ -15,6 +15,7 @@ async function getTeamSubscription({
         .createQueryBuilder('sub')
         .leftJoinAndSelect('sub.team', 'team')
         .where('team.id = :team_id', { team_id })
+        .select(['sub.id', 'sub.expireIn', 'sub.membersLimit', 'sub.isActive'])
         .orderBy('sub.expireIn', 'DESC')
         .getOne();
 
