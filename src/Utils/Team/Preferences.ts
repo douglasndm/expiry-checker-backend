@@ -39,22 +39,19 @@ async function getPreferencesFromTeam({
 
 interface updateTeamPreferencesProps {
     team_id: string;
-    allowCollectProduct?: boolean;
     daysToBeNext?: number;
 }
 
 async function updateTeamPreferences({
     team_id,
-    allowCollectProduct,
     daysToBeNext,
 }: updateTeamPreferencesProps): Promise<TeamPreferences> {
     const schema = Yup.object().shape({
-        allowCollectProduct: Yup.bool(),
         daysToBeNext: Yup.number(),
     });
 
     try {
-        await schema.validate({ allowCollectProduct, daysToBeNext });
+        await schema.validate({ daysToBeNext });
     } catch (err) {
         if (err instanceof Error)
             throw new AppError({
@@ -77,20 +74,12 @@ async function updateTeamPreferences({
         const prefe = new TeamPreferences();
         prefe.team = team;
 
-        if (allowCollectProduct !== undefined) {
-            prefe.allowCollectProduct = allowCollectProduct;
-        }
-
         if (daysToBeNext !== undefined) {
             prefe.daysToBeNext = daysToBeNext;
         }
 
         preferences = await preferencesRepository.save(prefe);
     } else {
-        if (allowCollectProduct !== undefined) {
-            preferences.allowCollectProduct = allowCollectProduct;
-        }
-
         if (daysToBeNext !== undefined) {
             preferences.daysToBeNext = daysToBeNext;
         }

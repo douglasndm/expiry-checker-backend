@@ -16,11 +16,10 @@ class TeamPreferences {
 
     async update(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
-        const { allowCollectProduct, daysToBeNext } = req.body;
+        const { daysToBeNext } = req.body;
 
         const preferences = await updateTeamPreferences({
             team_id,
-            allowCollectProduct,
             daysToBeNext,
         });
 
