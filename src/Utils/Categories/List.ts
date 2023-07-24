@@ -25,6 +25,7 @@ async function getAllCategoriesFromTeam({
         .createQueryBuilder('category')
         .leftJoinAndSelect('category.team', 'team')
         .where('team.id = :team_id', { team_id })
+        .select(['category.id', 'category.name'])
         .getMany();
 
     await cache.save(`categories_from_team:${team_id}`, categories);

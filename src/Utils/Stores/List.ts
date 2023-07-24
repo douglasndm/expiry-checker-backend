@@ -23,6 +23,7 @@ async function getAllStoresFromTeam({
         .createQueryBuilder('stores')
         .leftJoinAndSelect('stores.team', 'team')
         .where('team.id = :team_id', { team_id })
+        .select(['stores.id', 'stores.name'])
         .getMany();
 
     await cache.save(`stores_from_team:${team_id}`, stores);

@@ -27,6 +27,7 @@ export async function getAllBrands({
     const brands = await brandRepository
         .createQueryBuilder('brand')
         .where('brand.team_id = :team_id', { team_id })
+        .select(['brand.id', 'brand.name'])
         .getMany();
 
     await cache.save(`team_brands:${team_id}`, brands);

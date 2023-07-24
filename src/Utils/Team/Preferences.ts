@@ -20,6 +20,7 @@ async function getPreferencesFromTeam({
         .createQueryBuilder('prefe')
         .leftJoinAndSelect('prefe.team', 'team')
         .where('team.id = :team_id', { team_id })
+        .select(['prefe.daysToBeNext'])
         .getOne();
 
     if (!preferences) {

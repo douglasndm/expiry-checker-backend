@@ -125,9 +125,8 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
     }
 
     if (!teamSubscription || isExpired) {
-        const externalSubscription = await getExternalSubscriptionByTeamIdOrAdminId(
-            team_id,
-        );
+        const externalSubscription =
+            await getExternalSubscriptionByTeamIdOrAdminId(team_id);
 
         const subscriptions = externalSubscription.map(sub =>
             handleMembersLimit(sub),
