@@ -17,9 +17,16 @@ interface getProductsFromTeamProps {
     search?: string;
 }
 
+interface Response {
+    total: number;
+    per_page: number;
+    page?: number;
+    products: Product[];
+}
+
 async function getProductsFromTeam(
     props: getProductsFromTeamProps,
-): Promise<Product[]> {
+): Promise<Response> {
     const {
         team_id,
         user_id,
@@ -103,10 +110,12 @@ async function getProductsFromTeam(
     }
 
     if (page !== undefined) {
-        query.take(20).skip(page * 20);
+        query.take(100).skip(page * 100);
     }
 
-    productsTeam = await query.getMany();
+    const [prodsTeams, count] = await query.getManyAndCount();
+
+    productsTeam = prodsTeams;
 
     products = productsTeam.map(p => p.product);
 
@@ -128,11 +137,21 @@ async function getProductsFromTeam(
                 return false;
             });
 
-            return prods;
+            return {
+                page,
+                per_page: 100,
+                total: count,
+                products: prods,
+            };
         }
     }
 
-    return products;
+    return {
+        page,
+        per_page: 100,
+        total: count,
+        products,
+    };
 }
 
 export { getProductsFromTeam };

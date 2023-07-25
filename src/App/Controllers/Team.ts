@@ -55,7 +55,7 @@ class TeamController {
 
         const pg = Number(page) <= 0 ? 0 : Number(page);
 
-        const products = await getProductsFromTeam({
+        const { products, per_page, total } = await getProductsFromTeam({
             team_id,
             user_id: user.id,
             page: page ? pg : undefined,
@@ -80,7 +80,9 @@ class TeamController {
             };
         });
 
-        return res.status(200).json({ team, products: productsWithImages });
+        return res
+            .status(200)
+            .json({ total, page: pg, per_page, products: productsWithImages });
     }
 
     async store(req: Request, res: Response): Promise<Response> {
