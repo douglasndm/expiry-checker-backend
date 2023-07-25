@@ -7,13 +7,6 @@ import rateLimiter from './App/Middlewares/RateLimiter';
 
 import Routes from './Routes/index.routes';
 
-import './Services/NewRelic';
-import './Services/Firebase';
-import './Services/Redis';
-import './Services/Database';
-import './Services/Cron';
-import './Services/AWS';
-
 import AppError from './Errors/AppError';
 
 import App from './start';
