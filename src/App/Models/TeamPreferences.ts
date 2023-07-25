@@ -15,9 +15,6 @@ class TeamPreferences {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ name: 'allow_collect_product' })
-    allowCollectProduct: boolean;
-
     @Column({ name: 'days_product_next_expire' })
     daysToBeNext: number;
 
