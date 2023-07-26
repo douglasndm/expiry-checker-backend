@@ -44,6 +44,7 @@ async function getAllProductsFromStore({
             'batches.status',
             'batches.price_tmp',
         ])
+        .orderBy('batches.exp_date', 'ASC')
         .getMany();
 
     return prodcuts;
