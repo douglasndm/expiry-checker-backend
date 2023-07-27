@@ -6,6 +6,9 @@ import { registerDevice } from '@utils/User/Login';
 import { createUser } from '@utils/User/Create';
 
 import AppError from '@errors/AppError';
+import { getTeamFromUser } from '@utils/User/Team';
+import { getSubscriptionFromTeam } from '@utils/Team/Subscription/Get';
+import { compareAsc, endOfDay } from 'date-fns';
 
 class SessionController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -59,7 +62,35 @@ class SessionController {
                     firebaseToken,
                 });
 
-                return res.status(201).json(user);
+                const userTeam = await getTeamFromUser(user.id);
+
+                const team = { ...userTeam };
+
+                if (userTeam) {
+                    const sub = await getSubscriptionFromTeam(userTeam.team.id);
+
+                    let isActive = false;
+
+                    if (sub) {
+                        if (
+                            compareAsc(
+                                endOfDay(new Date()),
+                                endOfDay(sub.expireIn),
+                            ) <= 0
+                        ) {
+                            isActive = true;
+                        }
+                    }
+
+                    team.team.isActive = isActive;
+                }
+
+                const response = {
+                    ...user,
+                    team,
+                };
+
+                return res.status(201).json(response);
             } catch (err) {
                 throw new AppError({
                     message: 'Unauthorized',
