@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
+import { compareAsc, endOfDay } from 'date-fns';
 import * as admin from 'firebase-admin';
 
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { registerDevice } from '@utils/User/Login';
 import { createUser } from '@utils/User/Create';
-
-import AppError from '@errors/AppError';
 import { getTeamFromUser } from '@utils/User/Team';
 import { getSubscriptionFromTeam } from '@utils/Team/Subscription/Get';
-import { compareAsc, endOfDay } from 'date-fns';
+
+import AppError from '@errors/AppError';
 
 class SessionController {
     async store(req: Request, res: Response): Promise<Response> {
