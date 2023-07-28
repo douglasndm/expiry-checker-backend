@@ -10,6 +10,13 @@ async function getUserByFirebaseId(firebase_id: string): Promise<User> {
     const user = await userReposity
         .createQueryBuilder('user')
         .where('user.firebase_uid = :firebase_id', { firebase_id })
+        .select([
+            'user.id',
+            'user.name',
+            'user.lastName',
+            'user.email',
+            'user.firebaseUid',
+        ])
         .getOne();
 
     if (!user) {

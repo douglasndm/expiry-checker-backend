@@ -33,6 +33,19 @@ class UserController {
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('roles.team', 'team')
             .leftJoinAndSelect('team.subscriptions', 'subscriptions')
+            .select([
+                'user',
+                'roles.role',
+                'roles.code',
+                'roles.status',
+
+                'team.id',
+                'team.name',
+
+                'subscriptions.expireIn',
+                'subscriptions.membersLimit',
+                'subscriptions.isActive',
+            ])
             .getOne();
 
         if (!user) {
@@ -43,7 +56,7 @@ class UserController {
             });
         }
 
-        const organizedUser = {
+        let organizedUser = {
             id: user.id,
             fid: user.firebaseUid,
             email: user.email,
@@ -70,6 +83,13 @@ class UserController {
                 };
             }),
         };
+
+        if (user.roles.length > 0) {
+            organizedUser = {
+                ...organizedUser,
+                role: user.roles[0],
+            };
+        }
 
         return res.status(200).json(organizedUser);
     }

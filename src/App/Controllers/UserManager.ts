@@ -8,6 +8,7 @@ import { addUserToTeam } from '@utils/Team/Roles/Create';
 import { getUserByEmail } from '@utils/User/Find';
 
 import AppError from '@errors/AppError';
+import { getTeamFromUser } from '@utils/User/Team';
 
 class UserManagerController {
     async create(req: Request, res: Response): Promise<Response> {
@@ -45,6 +46,15 @@ class UserManagerController {
             throw new AppError({
                 message: 'There is no user with this e-mail',
                 internalErrorCode: 18,
+            });
+        }
+
+        const team = await getTeamFromUser(user.id);
+
+        if (team) {
+            throw new AppError({
+                message: 'User is in another team',
+                internalErrorCode: 30,
             });
         }
 
