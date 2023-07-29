@@ -35,20 +35,29 @@ async function findProductByEAN({
     const queryWithoutLetters = code.replace(/\D/g, '').trim();
     const query = queryWithoutLetters.replace(/^0+/, ''); // Remove zero on begin
 
-    let formatedDate = formatInTimeZone(
-        new Date(),
-        'America/Sao_Paulo',
-        'dd-MM-yyyy HH:mm:ss zzzz',
+    const cache = new Cache();
+
+    const cachedProduct = await cache.get<ProductDetails>(
+        `product_suggestion:${query}`,
     );
+
+    console.log(cachedProduct);
+
+    if (cachedProduct) {
+        return {
+            ...cachedProduct,
+            thumbnail: getProductImageURL(cachedProduct.code),
+        };
+    }
 
     const productRepository = getRepository(ProductDetails);
     const product = await productRepository
         .createQueryBuilder('product')
         .where('product.code = :code', { code: `${query}` })
+        .select(['product.name', 'product.brand', 'product.thumbnail'])
         .getOne();
 
     if (!product) {
-        const cache = new Cache();
         const blockRequest = await cache.get<boolean>(
             'stop_external_ean_api_request',
         );
@@ -64,6 +73,12 @@ async function findProductByEAN({
                 }
             } catch (err) {
                 if (axios.isAxiosError(err)) {
+                    let formatedDate = formatInTimeZone(
+                        new Date(),
+                        'America/Sao_Paulo',
+                        'dd-MM-yyyy HH:mm:ss zzzz',
+                    );
+
                     // No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
                     // até o próximo dia
                     if (err.response?.status === 429) {
@@ -117,6 +132,10 @@ async function findProductByEAN({
     if (!photo && product) {
         photo = getProductImageURL(product.code);
     }
+
+    cache.save(`product_suggestion:${query}`, {
+        ...product,
+    });
 
     return {
         ...product,
