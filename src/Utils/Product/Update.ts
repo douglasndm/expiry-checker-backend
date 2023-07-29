@@ -21,7 +21,7 @@ interface updateProductProps {
     code?: string;
     brand_id?: string;
     store_id?: string | null;
-    categories?: string[];
+    category_id?: string;
 }
 
 async function updateProduct({
@@ -30,7 +30,7 @@ async function updateProduct({
     code,
     brand_id,
     store_id,
-    categories,
+    category_id,
 }: updateProductProps): Promise<Product> {
     const productRepository = getRepository(Product);
     const product = await getProduct({ product_id: id });
@@ -67,22 +67,26 @@ async function updateProduct({
     if (product.brand)
         await cache.invalidade(`products-from-brand:${product.brand.id}`);
     // This update brand cache only if its have an update value
-    if (findedBrand)
+    if (findedBrand) {
         await cache.invalidade(`products-from-brand:${findedBrand.id}`);
+    }
+    if (product.store) {
+        await cache.invalidade(`products-from-store:${product.store.id}`);
+    }
 
     product.brand = findedBrand || null;
 
     const updatedProduct = await productRepository.save(product);
 
-    await removeAllCategoriesFromProduct({
-        product_id: updatedProduct.id,
-    });
+    if (category_id) {
+        await removeAllCategoriesFromProduct({
+            product_id: updatedProduct.id,
+        });
 
-    if (!!categories && categories.length > 0) {
         const categoryRepository = getRepository(Category);
         const category = await categoryRepository.findOne({
             where: {
-                id: categories[0],
+                id: category_id,
             },
         });
 

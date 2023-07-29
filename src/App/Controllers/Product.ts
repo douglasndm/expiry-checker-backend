@@ -122,6 +122,7 @@ class ProductController {
             code: Yup.string().nullable(),
             brand: Yup.string().uuid().nullable(),
             store_id: Yup.string().uuid().nullable(),
+            category_id: Yup.string().uuid().nullable(),
             categories: Yup.array().of(Yup.string()),
         });
 
@@ -146,7 +147,14 @@ class ProductController {
         }
 
         const { product_id } = req.params;
-        const { name, code, brand, store_id, categories } = req.body;
+        const { name, code, brand, store_id, category_id, categories } =
+            req.body;
+
+        let cat_id: string = category_id;
+
+        if (!cat_id && categories) {
+            cat_id = String(categories[0]);
+        }
 
         const updatedProduct = await updateProduct({
             id: product_id,
@@ -154,7 +162,7 @@ class ProductController {
             code,
             brand_id: brand,
             store_id,
-            categories,
+            category_id: cat_id,
         });
         return res.status(201).json(updatedProduct);
     }
@@ -192,6 +200,7 @@ class ProductController {
         const prod = await productRepository
             .createQueryBuilder('prod')
             .leftJoinAndSelect('prod.brand', 'brand')
+            .leftJoinAndSelect('prod.store', 'store')
             .leftJoinAndSelect('prod.categories', 'prodCategories')
             .leftJoinAndSelect('prodCategories.category', 'category')
             .leftJoinAndSelect('prod.team', 'prodTeam')
@@ -232,6 +241,10 @@ class ProductController {
         await cache.invalidade(`products-from-brand:${prod.brand?.id}`);
         await cache.invalidade(`products-from-teams:${team.id}`);
         await cache.invalidade(`product:${team.id}:${prod.id}`);
+
+        if (prod.store) {
+            await cache.invalidade(`products-from-store:${prod.store.id}`);
+        }
 
         await productRepository.remove(prod);
 

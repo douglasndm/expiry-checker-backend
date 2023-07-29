@@ -98,6 +98,8 @@ async function createProduct({
 
     if (userStore) {
         prod.store = userStore;
+
+        await cache.invalidade(`products-from-store:${userStore.id}`);
     }
 
     const savedProd = await repository.save(prod);

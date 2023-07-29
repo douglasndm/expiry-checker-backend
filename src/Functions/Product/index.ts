@@ -42,6 +42,30 @@ export async function getProduct({
         .leftJoinAndSelect('product.categories', 'categories')
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('categories.category', 'category')
+        .select([
+            'product.id',
+            'product.name',
+            'product.code',
+
+            'brand.id',
+            'brand.name',
+
+            'store.id',
+            'store.name',
+
+            'categories',
+
+            'category.id',
+            'category.name',
+
+            'batches.id',
+            'batches.name',
+            'batches.exp_date',
+            'batches.amount',
+            'batches.price',
+            'batches.status',
+            'batches.price_tmp',
+        ])
         .getOne();
 
     if (!product) {
@@ -63,6 +87,7 @@ export async function getProduct({
 
     const organizedProduct = {
         ...product,
+        category: categories.length > 0 ? categories[0].category : undefined,
         categories,
         batches,
     };

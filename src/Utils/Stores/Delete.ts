@@ -67,6 +67,7 @@ async function deleteStore({
 
     const cache = new Cache();
     await cache.invalidade(`stores_from_team:${team_id}`);
+    await cache.invalidade(`products-from-store:${store_id}`);
 }
 
 export { deleteStore };

@@ -177,6 +177,7 @@ class BatchController {
         const batch = await batchReposity
             .createQueryBuilder('batch')
             .leftJoinAndSelect('batch.product', 'product')
+            .leftJoinAndSelect('product.store', 'store')
             .leftJoinAndSelect('product.team', 'prodTeam')
             .leftJoinAndSelect('prodTeam.team', 'team')
             .where('batch.id = :batch_id', { batch_id })
@@ -214,10 +215,15 @@ class BatchController {
             });
         }
 
-        await batchReposity.remove(batch);
-
         await cache.invalidade(`products-from-teams:${team.id}`);
         await cache.invalidade(`product:${team.id}:${batch.product.id}`);
+
+        if (batch.product.store) {
+            await cache.invalidade(
+                `products-from-store:${batch.product.store.id}`,
+            );
+        }
+        await batchReposity.remove(batch);
 
         return res.status(204).send();
     }

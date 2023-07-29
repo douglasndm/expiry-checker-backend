@@ -5,9 +5,9 @@ import {
     createBrand,
     deleteBrand,
     getAllBrands,
-    getAllProductsFromBrand,
     updateBrand,
 } from '@utils/Brand';
+import { getAllProductsFromBrand } from '@utils/Brands/Products';
 import { sortBrands } from '@utils/Brands/Sort';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
@@ -17,20 +17,6 @@ import AppError from '@errors/AppError';
 
 class BrandController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error) {
-                throw new AppError({
-                    message: err.message,
-                });
-            }
-        }
-
         const { team_id } = req.params;
 
         const brands = await getAllBrands({ team_id });

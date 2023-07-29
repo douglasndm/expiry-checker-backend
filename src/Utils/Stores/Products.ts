@@ -1,7 +1,10 @@
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import Cache from '@services/Cache';
+
 import Product from '@models/Product';
+
 import AppError from '@errors/AppError';
 
 interface getAllProductsFromStoreProps {
@@ -23,31 +26,42 @@ async function getAllProductsFromStore({
             internalErrorCode: 1,
         });
     }
-    const productRepository = getRepository(Product);
 
-    const prodcuts = await productRepository
-        .createQueryBuilder('product')
-        .leftJoinAndSelect('product.store', 'store')
-        .leftJoinAndSelect('product.batches', 'batches')
-        .where('store.id = :store_id', { store_id })
-        .select([
-            'product.id',
-            'product.name',
-            'product.code',
-            'store.id',
-            'store.name',
-            'batches.id',
-            'batches.name',
-            'batches.exp_date',
-            'batches.amount',
-            'batches.price',
-            'batches.status',
-            'batches.price_tmp',
-        ])
-        .orderBy('batches.exp_date', 'ASC')
-        .getMany();
+    const cache = new Cache();
 
-    return prodcuts;
+    let productsInStore = await cache.get<Product[]>(
+        `products-from-store:${store_id}`,
+    );
+
+    if (!productsInStore) {
+        const productRepository = getRepository(Product);
+
+        productsInStore = await productRepository
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.store', 'store')
+            .leftJoinAndSelect('product.batches', 'batches')
+            .where('store.id = :store_id', { store_id })
+            .select([
+                'product.id',
+                'product.name',
+                'product.code',
+                'store.id',
+                'store.name',
+                'batches.id',
+                'batches.name',
+                'batches.exp_date',
+                'batches.amount',
+                'batches.price',
+                'batches.status',
+                'batches.price_tmp',
+            ])
+            .orderBy('batches.exp_date', 'ASC')
+            .getMany();
+
+        await cache.save(`products-from-store:${store_id}`, productsInStore);
+    }
+
+    return productsInStore;
 }
 
 export { getAllProductsFromStore };
