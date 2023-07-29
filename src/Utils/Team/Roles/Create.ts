@@ -4,6 +4,8 @@ import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 import User from '@models/User';
 
+import { getTeamFromUser } from '@utils/User/Team';
+
 import { checkMembersLimit } from '@functions/Team';
 
 import Cache from '@services/Cache';
@@ -41,6 +43,15 @@ async function addUserToTeam({
             });
         }
     } else {
+        const team = await getTeamFromUser(user_id);
+
+        if (team) {
+            throw new AppError({
+                message: 'User is in another team',
+                internalErrorCode: 30,
+            });
+        }
+
         const alreadyInARole = await userRolesRepository
             .createQueryBuilder('userRole')
             .leftJoinAndSelect('userRole.user', 'user')

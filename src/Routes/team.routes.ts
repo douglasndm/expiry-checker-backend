@@ -8,6 +8,7 @@ import TeamPreferences from '@controllers/TeamPreferences';
 
 import { checkTeamId, checkIfUserIsPending } from '@middlewares/TeamChecker';
 import ManagerChecker from '@middlewares/ManagerChecker';
+import SubscriptionLimit from '@middlewares/Team/SubscriptionLimit';
 
 import ProductsRoutes from './products.routes';
 
@@ -30,7 +31,9 @@ routes.use(checkIfUserIsPending);
 routes.put('', Team.update);
 routes.get('/users', TeamUsers.index);
 
-routes.delete('/user', UserTeam.delete);
+routes.delete('/manager/user/:user_id', ManagerChecker, UserManager.delete);
+
+routes.use(SubscriptionLimit);
 
 routes.use('/products', ProductsRoutes);
 routes.use('/batches', batchesRoutes);
@@ -47,7 +50,6 @@ routes.use(ManagerChecker);
 routes.delete('', Team.delete);
 routes.post('/manager/user', UserManager.create);
 routes.put('/manager/user', UserManager.update);
-routes.delete('/manager/user/:user_id', UserManager.delete);
 
 routes.use('/management', ManagementRoutes);
 
