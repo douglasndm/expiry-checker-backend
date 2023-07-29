@@ -41,12 +41,10 @@ async function findProductByEAN({
         `product_suggestion:${query}`,
     );
 
-    console.log(cachedProduct);
-
     if (cachedProduct) {
         return {
             ...cachedProduct,
-            thumbnail: getProductImageURL(cachedProduct.code),
+            thumbnail: getProductImageURL(query),
         };
     }
 
@@ -130,7 +128,7 @@ async function findProductByEAN({
     }
 
     if (!photo && product) {
-        photo = getProductImageURL(product.code);
+        photo = getProductImageURL(query);
     }
 
     cache.save(`product_suggestion:${query}`, {
