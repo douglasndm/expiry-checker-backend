@@ -150,13 +150,19 @@ class ProductController {
         const { name, code, brand, store_id, category_id, categories } =
             req.body;
 
+        let cat_id: string = category_id;
+
+        if (!cat_id && categories) {
+            cat_id = String(categories[0]);
+        }
+
         const updatedProduct = await updateProduct({
             id: product_id,
             name,
             code,
             brand_id: brand,
             store_id,
-            category_id: category_id || categories[0],
+            category_id: cat_id,
         });
         return res.status(201).json(updatedProduct);
     }

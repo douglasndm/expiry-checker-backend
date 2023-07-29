@@ -78,11 +78,11 @@ async function updateProduct({
 
     const updatedProduct = await productRepository.save(product);
 
-    await removeAllCategoriesFromProduct({
-        product_id: updatedProduct.id,
-    });
-
     if (category_id) {
+        await removeAllCategoriesFromProduct({
+            product_id: updatedProduct.id,
+        });
+
         const categoryRepository = getRepository(Category);
         const category = await categoryRepository.findOne({
             where: {
