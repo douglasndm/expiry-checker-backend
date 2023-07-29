@@ -63,6 +63,10 @@ async function createBatch({
     await cache.invalidade(`products-from-teams:${team.id}`);
     await cache.invalidade(`product:${team.id}:${product_id}`);
 
+    if (product.store) {
+        await cache.invalidade(`products-from-store:${product.store.id}`);
+    }
+
     return createdBatch;
 }
 

@@ -67,8 +67,12 @@ async function updateProduct({
     if (product.brand)
         await cache.invalidade(`products-from-brand:${product.brand.id}`);
     // This update brand cache only if its have an update value
-    if (findedBrand)
+    if (findedBrand) {
         await cache.invalidade(`products-from-brand:${findedBrand.id}`);
+    }
+    if (product.store) {
+        await cache.invalidade(`products-from-store:${product.store.id}`);
+    }
 
     product.brand = findedBrand || null;
 

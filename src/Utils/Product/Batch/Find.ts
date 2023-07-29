@@ -25,6 +25,7 @@ async function findBatchById(batch_id: string): Promise<Batch> {
     const product = await repository
         .createQueryBuilder('batch')
         .leftJoinAndSelect('batch.product', 'product')
+        .leftJoinAndSelect('product.store', 'store')
         .where('batch.id = :batch_id', { batch_id })
         .getOne();
 

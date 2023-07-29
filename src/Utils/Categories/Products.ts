@@ -35,6 +35,26 @@ async function getAllProductsFromCategory({
             .leftJoinAndSelect('team.team', 'teamObj')
             .leftJoinAndSelect('prod_cat.category', 'category')
             .where('category.id = :id', { id: category_id })
+            .select([
+                'prod_cat',
+                'category.id',
+                'category.name',
+
+                'product.id',
+                'product.name',
+                'product.code',
+
+                'batches.id',
+                'batches.name',
+                'batches.exp_date',
+                'batches.amount',
+                'batches.price',
+                'batches.status',
+                'batches.price_tmp',
+
+                'store.id',
+                'store.name',
+            ])
             .orderBy('batches.exp_date', 'ASC')
             .getMany();
 
