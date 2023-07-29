@@ -9,12 +9,11 @@ import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getTeamById } from '@utils/Team/Find';
+import { getTeamFromUser } from '@utils/User/Team';
 
 import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
 import { deleteAllProducts } from '@functions/Team/Products';
-import { sortProductsByBatchesExpDate } from '@functions/Products';
 
-import UserRoles from '@models/UserRoles';
 import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
@@ -112,7 +111,7 @@ class TeamController {
         const { name } = req.body;
 
         const team = await createTeam({
-            name,
+            name: name.trim(),
             admin_id: req.userId,
         });
 
@@ -120,16 +119,11 @@ class TeamController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
-        const schemaParams = Yup.object().shape({
-            team_id: Yup.string().required().uuid(),
-        });
-
         const schema = Yup.object().shape({
             name: Yup.string().required(),
         });
 
         try {
-            await schemaParams.validate(req.params);
             await schema.validate(req.body);
         } catch (err) {
             if (err instanceof Error)
@@ -150,17 +144,12 @@ class TeamController {
         const { team_id } = req.params;
         const { name } = req.body;
 
-        const userRolesRepository = getRepository(UserRoles);
+        const teamRepository = getRepository(Team);
 
-        const userRoles = await userRolesRepository.findOne({
-            where: {
-                user: { firebaseUid: req.userId },
-                team: { id: team_id },
-            },
-        });
+        const user = await getUserByFirebaseId(req.userId);
+        const userRoles = await getTeamFromUser(user.id);
 
-        // this check if person has access and it is a manager to update the team
-        if (!userRoles || userRoles.role.toLocaleLowerCase() !== 'manager') {
+        if (!userRoles) {
             throw new AppError({
                 message: "You don't have authorization to be here",
                 statusCode: 401,
@@ -168,36 +157,18 @@ class TeamController {
             });
         }
 
-        const teamRepository = getRepository(Team);
-        const team = await teamRepository.findOne(team_id);
-
-        if (!team) {
+        if (userRoles.team.id !== team_id) {
             throw new AppError({
-                message: 'Team was not found',
-                statusCode: 400,
-                internalErrorCode: 6,
+                message: "You don't have permission to update this team",
+                statusCode: 401,
+                internalErrorCode: 2,
             });
         }
 
-        // Check if user already has a team with the same name
-        const userTeams = await userRolesRepository.find({
-            where: {
-                user: { id: req.userId },
-            },
-            relations: ['team'],
+        const updatedTeam = await teamRepository.save({
+            ...userRoles.team,
+            name: name.trim(),
         });
-
-        const existsName = userTeams.filter(ur => ur.team.name === name);
-
-        if (existsName.length > 0) {
-            throw new AppError({
-                message: 'You already have a team with that name',
-            });
-        }
-
-        team.name = name;
-
-        const updatedTeam = await teamRepository.save(team);
 
         return res.json(updatedTeam);
     }

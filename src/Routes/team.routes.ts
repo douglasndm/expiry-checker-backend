@@ -28,7 +28,6 @@ routes.post('/join', TeamUsers.store);
 
 routes.use(checkIfUserIsPending);
 
-routes.put('', Team.update);
 routes.get('/users', TeamUsers.index);
 
 routes.delete('/manager/user/:user_id', ManagerChecker, UserManager.delete);
@@ -47,6 +46,7 @@ routes.get('/preferences', TeamPreferences.index);
 
 // From now one all routes will check if user is a manager
 routes.use(ManagerChecker);
+routes.put('', Team.update);
 routes.delete('', Team.delete);
 routes.post('/manager/user', UserManager.create);
 routes.put('/manager/user', UserManager.update);
