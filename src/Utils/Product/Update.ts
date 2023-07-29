@@ -21,7 +21,7 @@ interface updateProductProps {
     code?: string;
     brand_id?: string;
     store_id?: string | null;
-    categories?: string[];
+    category_id?: string;
 }
 
 async function updateProduct({
@@ -30,7 +30,7 @@ async function updateProduct({
     code,
     brand_id,
     store_id,
-    categories,
+    category_id,
 }: updateProductProps): Promise<Product> {
     const productRepository = getRepository(Product);
     const product = await getProduct({ product_id: id });
@@ -82,11 +82,11 @@ async function updateProduct({
         product_id: updatedProduct.id,
     });
 
-    if (!!categories && categories.length > 0) {
+    if (category_id) {
         const categoryRepository = getRepository(Category);
         const category = await categoryRepository.findOne({
             where: {
-                id: categories[0],
+                id: category_id,
             },
         });
 

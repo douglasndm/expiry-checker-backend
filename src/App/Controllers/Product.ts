@@ -122,6 +122,7 @@ class ProductController {
             code: Yup.string().nullable(),
             brand: Yup.string().uuid().nullable(),
             store_id: Yup.string().uuid().nullable(),
+            category_id: Yup.string().uuid().nullable(),
             categories: Yup.array().of(Yup.string()),
         });
 
@@ -146,7 +147,8 @@ class ProductController {
         }
 
         const { product_id } = req.params;
-        const { name, code, brand, store_id, categories } = req.body;
+        const { name, code, brand, store_id, category_id, categories } =
+            req.body;
 
         const updatedProduct = await updateProduct({
             id: product_id,
@@ -154,7 +156,7 @@ class ProductController {
             code,
             brand_id: brand,
             store_id,
-            categories,
+            category_id: category_id || categories[0],
         });
         return res.status(201).json(updatedProduct);
     }
