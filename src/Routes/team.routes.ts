@@ -32,7 +32,7 @@ routes.get('/users', TeamUsers.index);
 
 routes.delete('/manager/user/:user_id', ManagerChecker, UserManager.delete);
 
-routes.use(SubscriptionLimit);
+// routes.use(SubscriptionLimit);
 
 routes.use('/products', ProductsRoutes);
 routes.use('/batches', batchesRoutes);
