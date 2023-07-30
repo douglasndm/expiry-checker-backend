@@ -1,5 +1,7 @@
 import { getRepository } from 'typeorm';
 
+import Cache from '@services/Cache';
+
 import ProductCategory from '@models/ProductCategory';
 
 interface removeAllCategoriesFromProductProps {
@@ -18,6 +20,14 @@ export async function removeAllCategoriesFromProduct({
             },
         },
     });
+
+    if (categoriesFinded.length > 0) {
+        const cache = new Cache();
+
+        await cache.invalidade(
+            `products-from-category:${categoriesFinded[0].category.id}`,
+        );
+    }
 
     await productCategoryRepository.remove(categoriesFinded);
 }
