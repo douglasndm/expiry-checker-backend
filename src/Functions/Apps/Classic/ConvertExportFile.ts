@@ -36,7 +36,9 @@ export async function convertExportFile({
     const categoryRepository = getRepository(Category);
     const productCategoryRepo = getRepository(ProductCategory);
 
-    const team = await teamRepository.findOne(team_id);
+    const team = await teamRepository.findOneBy({
+        id: team_id,
+    });
 
     if (!team) {
         throw new AppError({

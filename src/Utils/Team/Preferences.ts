@@ -28,7 +28,6 @@ async function getPreferencesFromTeam({
 
         const prefe = new TeamPreferences();
         prefe.team = team;
-        prefe.allowCollectProduct = false;
         prefe.daysToBeNext = 30;
 
         preferences = await preferencesRepository.save(prefe);

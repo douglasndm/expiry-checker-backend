@@ -13,9 +13,12 @@ async function deleteCategory({
     category_id,
 }: deleteCategoryProps): Promise<void> {
     const categoryRepository = getRepository(Category);
-    const category = await categoryRepository.findOne(category_id, {
-        relations: ['team'],
-    });
+
+    const category = await categoryRepository
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.team', 'team')
+        .where('category.id = :category_id', { category_id })
+        .getOne();
 
     if (!category) {
         throw new AppError({

@@ -15,7 +15,7 @@ export async function isUserManager({
 }: getUserRoleProps): Promise<boolean> {
     const userRolesRepository = getRepository(UserRoles);
 
-    let userRole: undefined | UserRoles;
+    let userRole: UserRoles | null;
 
     if (useInternalId) {
         userRole = await userRolesRepository
