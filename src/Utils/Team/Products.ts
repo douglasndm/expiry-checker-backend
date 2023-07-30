@@ -57,6 +57,9 @@ async function getProductsFromTeam(
             'product.id',
             'product.name',
             'product.code',
+            'product.created_at',
+            'product.updated_at',
+
             'store.id',
             'store.name',
             'prodCat.id',
@@ -72,6 +75,8 @@ async function getProductsFromTeam(
             'batches.price',
             'batches.status',
             'batches.price_tmp',
+            'batches.created_at',
+            'batches.updated_at',
         ]);
 
     if (sortByBatches) {
