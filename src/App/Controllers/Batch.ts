@@ -140,10 +140,16 @@ class BatchController {
             });
         }
 
+        let date = parseISO(exp_date);
+
+        if (!isValid(date)) {
+            date = startOfDay(new Date(exp_date));
+        }
+
         const updatedBatch = await updateBatch({
             batch_id,
             name,
-            exp_date,
+            exp_date: date,
             amount,
             price,
             status,
