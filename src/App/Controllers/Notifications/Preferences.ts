@@ -17,12 +17,26 @@ class EmailPreferences {
             });
         }
 
+        const user = await getUserByFirebaseId(req.userId);
+
         const notificationRepository = getRepository(NotificationsPreferences);
         const settings = await notificationRepository
             .createQueryBuilder('notification')
             .leftJoinAndSelect('notification.user', 'user')
-            .where('user.firebaseUid = :user_id', { user_id: req.userId })
+            .where('user.id = :user_id', { user_id: user.id })
             .getOne();
+
+        if (!settings) {
+            const notification = new NotificationsPreferences();
+
+            notification.user = user;
+            notification.email_enabled = false;
+            notification.email_change_date = new Date();
+
+            await notificationRepository.save(notification);
+
+            return res.status(201).json(notification);
+        }
 
         return res.status(200).json(settings);
     }
