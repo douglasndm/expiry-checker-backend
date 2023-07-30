@@ -54,6 +54,7 @@ async function getProductsFromTeam(
         .leftJoinAndSelect('product.batches', 'batches')
         .select([
             'product_teams.id',
+
             'product.id',
             'product.name',
             'product.code',
@@ -87,7 +88,10 @@ async function getProductsFromTeam(
         const parsedDate = parseISO(search);
         const isValidDate = isValid(parsedDate);
 
-        if (isValidDate) {
+        // WHY THIS? HAHA
+        // BACAUSE PARSEISO WAS RETURNING NUMBERS WITHOUT - AS YEAR
+        // AND VALID DATE, SO SEARCH NEED TO HAVE - TO BE CONSIDERED A DATE
+        if (isValidDate && search.indexOf('-') > -1) {
             query.andWhere('DATE(batches.exp_date) = :date', {
                 date: parsedDate,
             });
@@ -96,13 +100,16 @@ async function getProductsFromTeam(
 
             query.andWhere(
                 new Brackets(qb => {
-                    qb.where('lower(product.name) like lower(:search)', {
+                    qb.where('product.name ilike :search', {
                         search: searchParam,
                     })
-                        .orWhere('lower(product.code) like lower(:search)', {
-                            search: searchParam,
-                        })
-                        .orWhere('lower(batches.name) like lower(:search)', {
+                        .orWhere(
+                            'product.code IS NOT NULL AND product.code ilike :search',
+                            {
+                                search: searchParam,
+                            },
+                        )
+                        .orWhere('batches.name ilike :search', {
                             search: searchParam,
                         });
                 }),
