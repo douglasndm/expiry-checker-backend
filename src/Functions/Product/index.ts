@@ -46,6 +46,8 @@ export async function getProduct({
             'product.id',
             'product.name',
             'product.code',
+            'product.created_at',
+            'product.updated_at',
 
             'brand.id',
             'brand.name',
@@ -65,6 +67,8 @@ export async function getProduct({
             'batches.price',
             'batches.status',
             'batches.price_tmp',
+            'batches.created_at',
+            'batches.updated_at',
         ])
         .getOne();
 
