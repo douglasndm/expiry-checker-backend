@@ -21,7 +21,7 @@ interface updateProductProps {
     code?: string;
     brand_id?: string;
     store_id?: string | null;
-    category_id?: string;
+    category_id?: string | null;
 }
 
 async function updateProduct({
@@ -78,6 +78,12 @@ async function updateProduct({
 
     const updatedProduct = await productRepository.save(product);
 
+    if (category_id === null) {
+        await removeAllCategoriesFromProduct({
+            product_id: updatedProduct.id,
+        });
+    }
+
     if (category_id) {
         await removeAllCategoriesFromProduct({
             product_id: updatedProduct.id,
@@ -102,8 +108,6 @@ async function updateProduct({
             product_id: updatedProduct.id,
             category_id: category.id,
         });
-
-        await cache.invalidade(`products-from-category:${category.id}`);
     }
 
     await cache.invalidade(`products-from-teams:${team.id}`);
