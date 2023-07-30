@@ -17,7 +17,9 @@ interface getTeamProps {
 
 export async function getTeam({ team_id }: getTeamProps): Promise<Team> {
     const teamRepository = getRepository(Team);
-    const team = await teamRepository.findOne(team_id);
+    const team = await teamRepository.findOneBy({
+        id: team_id,
+    });
 
     if (!team) {
         throw new AppError({
@@ -95,7 +97,9 @@ export async function deleteTeam({
     }
 
     const teamRepository = getRepository(Team);
-    const team = await teamRepository.findOne(team_id);
+    const team = await teamRepository.findOneBy({
+        id: team_id,
+    });
 
     if (!team) {
         throw new AppError({

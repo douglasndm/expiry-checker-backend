@@ -23,17 +23,19 @@ export async function saveManyCategories({
     const teamRepository = getRepository(Team);
     const categoryRepository = getRepository(Category);
 
-    const team = await teamRepository.findOne(team_id);
+    const team = await teamRepository.findOneBy({
+        id: team_id,
+    });
 
     if (!team) {
         throw new AppError({ message: 'Team was not found', statusCode: 400 });
     }
 
-    const categoriesFromTeam = await categoryRepository.find({
-        where: {
-            team,
-        },
-    });
+    const categoriesFromTeam = await categoryRepository
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.team', 'team')
+        .where('team.id = :team_id', { team_id })
+        .getMany();
 
     // This search for all categories with the same name already in team
     // those categories wont be created again
