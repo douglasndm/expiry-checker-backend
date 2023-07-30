@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
+import { parseISO, isValid, startOfDay } from 'date-fns';
 
 import Cache from '@services/Cache';
 import BackgroundJob from '@services/Background';
@@ -85,10 +86,16 @@ class BatchController {
             });
         }
 
+        let date = parseISO(exp_date);
+
+        if (!isValid(date)) {
+            date = startOfDay(new Date(exp_date));
+        }
+
         const createdBatch = await createBatch({
             product_id,
             name,
-            exp_date,
+            exp_date: date,
             amount,
             price,
         });
