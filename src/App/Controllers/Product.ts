@@ -152,7 +152,7 @@ class ProductController {
 
         let cat_id: string = category_id;
 
-        if (!cat_id && categories) {
+        if (!cat_id && categories && categories.length > 0) {
             cat_id = String(categories[0]);
         }
 
