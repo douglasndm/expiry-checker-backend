@@ -78,7 +78,7 @@ async function updateProduct({
 
     const updatedProduct = await productRepository.save(product);
 
-    if (category_id === null) {
+    if (!category_id) {
         await removeAllCategoriesFromProduct({
             product_id: updatedProduct.id,
         });

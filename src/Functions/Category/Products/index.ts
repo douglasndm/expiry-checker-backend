@@ -11,23 +11,20 @@ interface removeAllCategoriesFromProductProps {
 export async function removeAllCategoriesFromProduct({
     product_id,
 }: removeAllCategoriesFromProductProps): Promise<void> {
-    const productCategoryRepository = getRepository(ProductCategory);
+    const repository = getRepository(ProductCategory);
 
-    const categoriesFinded = await productCategoryRepository.find({
-        where: {
-            product: {
-                id: product_id,
-            },
-        },
-    });
+    const finded = await repository
+        .createQueryBuilder('prodCat')
+        .leftJoinAndSelect('prodCat.product', 'product')
+        .leftJoinAndSelect('prodCat.category', 'category')
+        .where('product.id = :product_id', { product_id })
+        .getOne();
 
-    if (categoriesFinded.length > 0) {
+    if (finded) {
         const cache = new Cache();
 
-        await cache.invalidade(
-            `products-from-category:${categoriesFinded[0].category.id}`,
-        );
-    }
+        await cache.invalidade(`products-from-category:${finded.category.id}`);
 
-    await productCategoryRepository.remove(categoriesFinded);
+        await repository.remove(finded);
+    }
 }
