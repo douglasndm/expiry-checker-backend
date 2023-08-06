@@ -32,26 +32,23 @@ async function findProductByEAN({
         }
     }
 
-    const queryWithoutLetters = code.replace(/\D/g, '').trim();
-    const query = queryWithoutLetters.replace(/^0+/, ''); // Remove zero on begin
-
     const cache = new Cache();
 
     const cachedProduct = await cache.get<ProductDetails>(
-        `product_suggestion:${query}`,
+        `product_suggestion:${code}`,
     );
 
-    if (cachedProduct) {
+    if (cachedProduct?.name) {
         return {
             ...cachedProduct,
-            thumbnail: getProductImageURL(query),
+            thumbnail: getProductImageURL(code),
         };
     }
 
     const productRepository = getRepository(ProductDetails);
     const product = await productRepository
         .createQueryBuilder('product')
-        .where('product.code = :code', { code: `${query}` })
+        .where('product.code = :code', { code: `${code}` })
         .select(['product.name', 'product.brand', 'product.thumbnail'])
         .getOne();
 
@@ -64,7 +61,7 @@ async function findProductByEAN({
 
         if (blockRequest !== true) {
             try {
-                const externalSearch = await findProductByEANExternal(query);
+                const externalSearch = await findProductByEANExternal(code);
 
                 if (externalSearch.name) {
                     externalProduct = externalSearch;
@@ -92,7 +89,7 @@ async function findProductByEAN({
                     }
                 } else if (err instanceof Error) {
                     console.log(
-                        `Erro while searching ${query} at external source`,
+                        `Erro while searching ${code} at external source`,
                     );
                     console.error(err);
                 }
@@ -101,7 +98,7 @@ async function findProductByEAN({
 
         await BackgroundJob.add('HandleAfterProductSearch', {
             response: externalProduct,
-            code: query,
+            code,
         });
 
         if (externalProduct) {
@@ -128,12 +125,16 @@ async function findProductByEAN({
     }
 
     if (!photo && product) {
-        photo = getProductImageURL(query);
+        photo = getProductImageURL(code);
     }
 
-    cache.save(`product_suggestion:${query}`, {
+    cache.save(`product_suggestion:${code}`, {
         ...product,
     });
+
+    if (!product) {
+        return null;
+    }
 
     return {
         ...product,
