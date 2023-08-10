@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { parseISO, isValid, startOfDay } from 'date-fns';
+import { parseISO, isValid, endOfDay } from 'date-fns';
 
 import Cache from '@services/Cache';
 import BackgroundJob from '@services/Background';
@@ -89,7 +89,7 @@ class BatchController {
         let date = parseISO(exp_date);
 
         if (!isValid(date)) {
-            date = startOfDay(new Date(exp_date));
+            date = endOfDay(new Date(exp_date));
         }
 
         const createdBatch = await createBatch({
@@ -143,7 +143,7 @@ class BatchController {
         let date = parseISO(exp_date);
 
         if (!isValid(date)) {
-            date = startOfDay(new Date(exp_date));
+            date = endOfDay(new Date(exp_date));
         }
 
         const updatedBatch = await updateBatch({
