@@ -1,3 +1,4 @@
+import fs from 'fs';
 import aws from 'aws-sdk';
 
 aws.config.update({
@@ -6,8 +7,9 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
+const bucket = 'expirychecker-contents';
+
 function getProductImageURL(code: string): string {
-    const bucket = 'expirychecker-contents';
     const path = `products/${code}.jpg`;
     const signedUrlExpireSeconds = 60 * 5;
 
@@ -20,4 +22,28 @@ function getProductImageURL(code: string): string {
     return url;
 }
 
-export { getProductImageURL };
+function uploadToS3(filePath: string): void {
+    const file = fs.readFileSync(filePath);
+
+    const filename = filePath.split('/').pop();
+
+    const path = `teams/products/${filename}`;
+
+    s3.upload(
+        {
+            Bucket: bucket,
+            Key: path,
+            Body: file,
+        },
+        (err, data) => {
+            if (err) {
+                console.error(err);
+            }
+            fs.unlinkSync(filePath);
+
+            // return data.Location;
+        },
+    );
+}
+
+export { getProductImageURL, uploadToS3 };

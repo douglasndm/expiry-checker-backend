@@ -20,6 +20,8 @@ import BrandsRoutes from './brands.routes';
 import CategoriesRoutes from './categories.routes';
 import StoresRoutes from './stores.routes';
 
+import UploadRoutes from './files.routes';
+
 const routes = Router({ mergeParams: true });
 
 routes.use(checkTeamId);
@@ -43,6 +45,8 @@ routes.use('/stores', StoresRoutes);
 routes.use('/subscriptions', SubscriptionsRoutes);
 
 routes.get('/preferences', TeamPreferences.index);
+
+routes.use('/upload', UploadRoutes);
 
 // From now one all routes will check if user is a manager
 routes.use(ManagerChecker);
