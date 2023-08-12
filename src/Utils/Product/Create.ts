@@ -92,7 +92,6 @@ async function createProduct({
 
     if (findedBrand) {
         prod.brand = findedBrand;
-
         await cache.invalidade(`products-from-brand:${findedBrand.id}`);
     }
 
