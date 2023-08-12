@@ -13,7 +13,7 @@ export async function getAllUserRoles(): Promise<UserRoles[]> {
         .leftJoinAndSelect('roles.team', 'team')
         .leftJoinAndSelect('roles.user', 'user')
         .leftJoinAndSelect('team.stores', 'teamStores')
-        .leftJoinAndSelect('user.stores', 'userStores')
+        .leftJoinAndSelect('user.store', 'userStores')
         .leftJoinAndSelect('userStores.store', 'store')
         .leftJoinAndSelect('store.team', 'storeTeam')
         .getMany();

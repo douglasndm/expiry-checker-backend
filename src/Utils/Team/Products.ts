@@ -138,6 +138,13 @@ async function getProductsFromTeam(
         useInternalId: true,
     });
 
+    const response = {
+        page,
+        per_page: 100,
+        total: count,
+        products,
+    };
+
     if (!isManager) {
         if (userStores.length > 0) {
             const prods = products.filter(p => {
@@ -150,20 +157,13 @@ async function getProductsFromTeam(
             });
 
             return {
-                page,
-                per_page: 100,
-                total: count,
+                ...response,
                 products: prods,
             };
         }
     }
 
-    return {
-        page,
-        per_page: 100,
-        total: count,
-        products,
-    };
+    return response;
 }
 
 export { getProductsFromTeam };

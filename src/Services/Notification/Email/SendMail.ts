@@ -104,9 +104,9 @@ async function sendMail(): Promise<void> {
         const userStores: Store[] = [];
 
         userFilted.forEach(u => {
-            u.user.stores.forEach(store => {
-                userStores.push(store.store);
-            });
+            if (u.user.store) {
+                userStores.push(u.user.store.store);
+            }
         });
 
         const teamBatches = batches.filter(b => {

@@ -39,6 +39,7 @@ class TeamUsersController {
                     email: user.email,
                     role: user.role,
                     status: user.status,
+                    store: user.store,
                 });
             });
 

@@ -19,6 +19,7 @@ export interface UserResponse {
     role: string;
     status: string;
     device?: string | null;
+    store: Store | null;
 }
 
 export async function getAllUsersFromTeam({
@@ -41,9 +42,8 @@ export async function getAllUsersFromTeam({
             .createQueryBuilder('usersTeam')
             .leftJoinAndSelect('usersTeam.user', 'user')
             .leftJoinAndSelect('usersTeam.team', 'team')
-            .leftJoinAndSelect('user.stores', 'userStores')
+            .leftJoinAndSelect('user.store', 'userStores')
             .leftJoinAndSelect('userStores.store', 'store')
-            .leftJoinAndSelect('userStores.user', 'uStore')
             .where('team.id = :team_id', { team_id })
             .getMany();
 
@@ -55,10 +55,8 @@ export async function getAllUsersFromTeam({
     const users: Array<UserResponse> = usersFromTeam.map(u => {
         const stores: Store[] = [];
 
-        if (u.user.stores && u.user.stores.length > 0) {
-            u.user.stores.forEach(store => {
-                if (store.user.id === u.user.id) stores.push(store.store);
-            });
+        if (u.user.store) {
+            stores.push(u.user.store.store);
         }
 
         return {
@@ -74,6 +72,7 @@ export async function getAllUsersFromTeam({
             stores,
             status: u.status,
             code: u.code,
+            store: u.user.store?.store,
         };
     });
 
