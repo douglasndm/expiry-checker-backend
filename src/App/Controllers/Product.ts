@@ -58,7 +58,6 @@ class ProductController {
         const productWithFixCat = {
             ...product,
             brand: product.brand?.id,
-            store: product.store?.id,
             categories: product.categories.map(cat => cat.category),
             thumbnail,
         };
