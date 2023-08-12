@@ -31,6 +31,9 @@ class UserController {
             .createQueryBuilder('user')
             .where('user.firebaseUid = :id', { id: req.userId })
             .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('user.store', 'userStore')
+            .leftJoinAndSelect('userStore.store', 'store')
+            .leftJoinAndSelect('user.login', 'login')
             .leftJoinAndSelect('roles.team', 'team')
             .leftJoinAndSelect('team.subscriptions', 'subscriptions')
             .select([
@@ -38,6 +41,10 @@ class UserController {
                 'roles.role',
                 'roles.code',
                 'roles.status',
+
+                'userStore',
+                'store.id',
+                'store.name',
 
                 'team.id',
                 'team.name',
@@ -82,6 +89,8 @@ class UserController {
                     },
                 };
             }),
+
+            store: user.store ? user.store.store : null,
         };
 
         if (user.roles.length > 0) {
