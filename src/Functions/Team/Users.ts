@@ -55,10 +55,8 @@ export async function getAllUsersFromTeam({
     const users: Array<UserResponse> = usersFromTeam.map(u => {
         const stores: Store[] = [];
 
-        if (u.user.stores && u.user.stores.length > 0) {
-            u.user.stores.forEach(store => {
-                if (store.user.id === u.user.id) stores.push(store.store);
-            });
+        if (u.user.store) {
+            stores.push(u.user.store.store);
         }
 
         return {

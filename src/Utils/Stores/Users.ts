@@ -45,7 +45,7 @@ async function getAllUsersFromStore({
 
     const usersWithFixedStores = users.map(user => ({
         ...user,
-        stores: user.stores.map(userStores => userStores.store),
+        stores: [user.store.store],
     }));
 
     return usersWithFixedStores;

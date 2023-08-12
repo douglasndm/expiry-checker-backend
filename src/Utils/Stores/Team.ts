@@ -62,9 +62,7 @@ async function removeUserFromAllStoresFromTeam({
         .andWhere('user.id = :user_id', { user_id })
         .getOne();
 
-    const storesToRemove = userRoles?.user.stores.filter(
-        store => store.store.team.id === team_id,
-    );
+    const storesToRemove = userRoles?.user.store;
 
     if (storesToRemove) {
         const userStoresRepository = getRepository(UserStores);

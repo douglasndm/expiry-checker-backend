@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 
 import UserRoles from './UserRoles';
-import UsersStores from './UsersStores';
+import UserStore from './UsersStores';
 import UserLogin from './UserLogin';
 import UserLogs from './UserLogs';
 
@@ -36,8 +36,8 @@ export default class User {
     @OneToMany(() => UserRoles, userRoles => userRoles.user)
     roles: Array<UserRoles>;
 
-    @OneToMany(() => UsersStores, usersStores => usersStores.user)
-    stores: Array<UsersStores>;
+    @OneToOne(() => UserStore, userStore => userStore.user)
+    store: UserStore;
 
     @OneToOne(() => UserLogin, userLogin => userLogin.user)
     login: UserLogin;
