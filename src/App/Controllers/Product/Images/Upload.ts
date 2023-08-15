@@ -4,8 +4,10 @@ import sharp from 'sharp';
 
 import { uploadToS3 } from '@services/AWS';
 
-import AppError from '@errors/AppError';
 import { getProduct } from '@functions/Product';
+import { updateProduct } from '@utils/Product/Update';
+
+import AppError from '@errors/AppError';
 
 class UploadController {
     async store(req: Request, res: Response): Promise<Response> {
@@ -44,10 +46,20 @@ class UploadController {
         await sharp(req.file.path)
             .resize({ width: 800 })
             .toFile(`${newPath}`)
-            .then(() => {
+            .then(async () => {
                 if (req.file) unlinkSync(req.file.path);
 
-                uploadToS3(newPath);
+                const response = await uploadToS3(newPath);
+
+                const name = response.split('/').pop();
+
+                await updateProduct({
+                    id: product_id,
+                    image: name,
+                });
+            })
+            .finally(() => {
+                unlinkSync(newPath);
             });
 
         return res.json({ message: 'Uploaded' });

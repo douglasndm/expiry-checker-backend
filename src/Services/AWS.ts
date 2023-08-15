@@ -1,6 +1,8 @@
 import fs from 'fs';
 import aws from 'aws-sdk';
 
+import AppError from '@errors/AppError';
+
 aws.config.update({
     region: 'us-east-1',
 });
@@ -22,28 +24,30 @@ function getProductImageURL(code: string): string {
     return url;
 }
 
-function uploadToS3(filePath: string): void {
+async function uploadToS3(filePath: string): Promise<string> {
     const file = fs.readFileSync(filePath);
 
     const filename = filePath.split('/').pop();
 
     const path = `teams/products/${filename}`;
 
-    s3.upload(
-        {
-            Bucket: bucket,
-            Key: path,
-            Body: file,
-        },
-        (err, data) => {
-            if (err) {
-                console.error(err);
-            }
-            fs.unlinkSync(filePath);
+    try {
+        const response = await s3
+            .upload({
+                Bucket: bucket,
+                Key: path,
+                Body: file,
+            })
+            .promise();
 
-            // return data.Location;
-        },
-    );
+        return response.Location;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new AppError({
+                message: error.message,
+            });
+        }
+    }
 }
 
 export { getProductImageURL, uploadToS3 };

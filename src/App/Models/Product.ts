@@ -16,7 +16,7 @@ import ProductCategory from './ProductCategory';
 import Brand from './Brand';
 import Store from './Store';
 
-@Entity({ name: 'users_products' })
+@Entity({ name: 'team_products' })
 export default class Product {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -26,6 +26,9 @@ export default class Product {
 
     @Column('varchar')
     code: string | null;
+
+    @Column('varchar')
+    image: string | null;
 
     @OneToOne(() => Brand)
     @JoinColumn({ name: 'brand_id' })

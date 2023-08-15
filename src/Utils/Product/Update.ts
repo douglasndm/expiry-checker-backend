@@ -19,6 +19,7 @@ interface updateProductProps {
     id: string;
     name?: string;
     code?: string;
+    image?: string;
     brand_id?: string;
     store_id?: string | null;
     category_id?: string | null;
@@ -28,6 +29,7 @@ async function updateProduct({
     id,
     name,
     code,
+    image,
     brand_id,
     store_id,
     category_id,
@@ -55,6 +57,7 @@ async function updateProduct({
 
     if (name) product.name = name;
     if (code) product.code = code;
+    if (image) product.image = image;
 
     if (product.categories.length > 0) {
         await cache.invalidade(
