@@ -4,9 +4,9 @@ import Cache from '@services/Cache';
 
 import Category from '@models/Category';
 
-import { getTeam } from '@functions/Team';
-
 import AppError from '@errors/AppError';
+
+import { getTeamById } from '@utils/Team/Find';
 
 interface createCategoryProps {
     team_id: string;
@@ -32,7 +32,7 @@ async function createCategory({
         });
     }
 
-    const team = await getTeam({ team_id });
+    const team = await getTeamById(team_id);
 
     const category = new Category();
     category.name = name;

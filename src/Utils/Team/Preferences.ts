@@ -3,9 +3,9 @@ import * as Yup from 'yup';
 
 import TeamPreferences from '@models/TeamPreferences';
 
-import { getTeam } from '@functions/Team';
-
 import AppError from '@errors/AppError';
+
+import { getTeamById } from './Find';
 
 interface getPreferencesFromTeamProps {
     team_id: string;
@@ -24,7 +24,7 @@ async function getPreferencesFromTeam({
         .getOne();
 
     if (!preferences) {
-        const team = await getTeam({ team_id });
+        const team = await getTeamById(team_id);
 
         const prefe = new TeamPreferences();
         prefe.team = team;
@@ -68,7 +68,7 @@ async function updateTeamPreferences({
         .getOne();
 
     if (!preferences) {
-        const team = await getTeam({ team_id });
+        const team = await getTeamById(team_id);
 
         const prefe = new TeamPreferences();
         prefe.team = team;

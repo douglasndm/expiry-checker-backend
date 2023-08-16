@@ -1,9 +1,10 @@
 import { getRepository } from 'typeorm';
 
-import AppError from '@errors/AppError';
+import { getTeamById } from '@utils/Team/Find';
 
 import Category from '@models/Category';
-import Team from '@models/Team';
+
+import AppError from '@errors/AppError';
 
 interface saveManyCategoriesProps {
     categories: Array<CVCategory>;
@@ -20,16 +21,9 @@ export async function saveManyCategories({
     categories,
     team_id,
 }: saveManyCategoriesProps): Promise<Array<OldToNewCategories>> {
-    const teamRepository = getRepository(Team);
     const categoryRepository = getRepository(Category);
 
-    const team = await teamRepository.findOneBy({
-        id: team_id,
-    });
-
-    if (!team) {
-        throw new AppError({ message: 'Team was not found', statusCode: 400 });
-    }
+    const team = await getTeamById(team_id);
 
     const categoriesFromTeam = await categoryRepository
         .createQueryBuilder('category')

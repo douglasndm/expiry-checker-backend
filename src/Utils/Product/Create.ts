@@ -12,9 +12,10 @@ import { getAllBrands } from '@utils/Brand';
 import { getUserStoreOnTeam } from '@utils/Stores/Team';
 
 import { checkIfProductAlreadyExists } from '@functions/Products';
-import { getTeam } from '@functions/Team';
 
 import AppError from '@errors/AppError';
+
+import { getTeamById } from '@utils/Team/Find';
 import { addToCategory } from './Category/AddToCategory';
 
 interface createProductProps {
@@ -39,7 +40,7 @@ async function createProduct({
     const repository = getRepository(Product);
     const productTeamRepository = getRepository(ProductTeams);
 
-    const team = await getTeam({ team_id });
+    const team = await getTeamById(team_id);
 
     const userRoleOnTeam = await getUserRoleInTeam({ user_id, team_id });
 

@@ -6,7 +6,8 @@ import Cache from '@services/Cache';
 import Store from '@models/Store';
 
 import { isUserManager } from '@functions/Users/UserRoles';
-import { getTeam } from '@functions/Team';
+
+import { getTeamById } from '@utils/Team/Find';
 
 import AppError from '@errors/AppError';
 
@@ -51,7 +52,7 @@ async function createStore({
         });
     }
 
-    const team = await getTeam({ team_id });
+    const team = await getTeamById(team_id);
 
     const storeRepository = getRepository(Store);
 
