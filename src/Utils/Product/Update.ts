@@ -77,7 +77,10 @@ async function updateProduct({
         await cache.invalidade(`products-from-store:${product.store.id}`);
     }
     product.brand = findedBrand || null;
-    product.store = findedStore || null;
+
+    if (store_id === null || findedStore) {
+        product.store = findedStore || null;
+    }
 
     const updatedProduct = await productRepository.save(product);
 

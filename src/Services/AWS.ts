@@ -10,10 +10,22 @@ aws.config.update({
 const s3 = new aws.S3();
 
 const bucket = 'expirychecker-contents';
+const signedUrlExpireSeconds = 60 * 5;
 
 function getProductImageURL(code: string): string {
     const path = `products/${code}.jpg`;
-    const signedUrlExpireSeconds = 60 * 5;
+
+    const url = s3.getSignedUrl('getObject', {
+        Bucket: bucket,
+        Key: path,
+        Expires: signedUrlExpireSeconds,
+    });
+
+    return url;
+}
+
+function getProductImageURLByFileName(fileName: string): string {
+    const path = `teams/products/${fileName}`;
 
     const url = s3.getSignedUrl('getObject', {
         Bucket: bucket,
@@ -50,4 +62,4 @@ async function uploadToS3(filePath: string): Promise<string> {
     }
 }
 
-export { getProductImageURL, uploadToS3 };
+export { getProductImageURL, getProductImageURLByFileName, uploadToS3 };
