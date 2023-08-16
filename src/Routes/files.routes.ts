@@ -21,7 +21,7 @@ filesRoute.post(
 
 filesRoute.post(
     '/product/:product_id/image',
-    upload.single('file'),
+    upload.single('image'),
     ImageUpload.store,
 );
 

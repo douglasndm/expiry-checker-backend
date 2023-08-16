@@ -36,6 +36,13 @@ class ImportController {
             });
         }
 
+        if (!req.file) {
+            throw new AppError({
+                message: 'File was not sent',
+                internalErrorCode: 26,
+            });
+        }
+
         const { team_id } = req.params;
 
         const [_, ext] = req.file.filename.split('.');
