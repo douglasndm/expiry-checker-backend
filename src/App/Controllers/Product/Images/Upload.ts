@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import { rmSync, unlinkSync } from 'fs';
 import sharp from 'sharp';
 
-import { uploadToS3 } from '@services/AWS';
+import { removeProductImageFromS3, uploadToS3 } from '@services/AWS';
+
+import { updateProduct } from '@utils/Product/Update';
 
 import { getProduct } from '@functions/Product';
-import { updateProduct } from '@utils/Product/Update';
 
 import AppError from '@errors/AppError';
 
@@ -63,6 +64,25 @@ class UploadController {
             });
 
         return res.json({ message: 'Uploaded' });
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const { product_id } = req.params;
+
+        const product = await getProduct({
+            product_id,
+        });
+
+        if (product.image) {
+            removeProductImageFromS3(product.image);
+        }
+
+        await updateProduct({
+            id: product_id,
+            image: null,
+        });
+
+        return res.send();
     }
 }
 

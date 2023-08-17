@@ -25,4 +25,6 @@ filesRoute.post(
     ImageUpload.store,
 );
 
+filesRoute.delete('/product/:product_id/image', ImageUpload.delete);
+
 export default filesRoute;

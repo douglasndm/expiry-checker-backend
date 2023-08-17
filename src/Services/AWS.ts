@@ -36,6 +36,23 @@ function getProductImageURLByFileName(fileName: string): string {
     return url;
 }
 
+function removeProductImageFromS3(fileName: string): void {
+    const path = `teams/products/${fileName}`;
+
+    try {
+        s3.deleteObject({
+            Bucket: bucket,
+            Key: path,
+        }).promise();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new AppError({
+                message: error.message,
+            });
+        }
+    }
+}
+
 async function uploadToS3(filePath: string): Promise<string> {
     const file = fs.readFileSync(filePath);
 
@@ -62,4 +79,9 @@ async function uploadToS3(filePath: string): Promise<string> {
     }
 }
 
-export { getProductImageURL, getProductImageURLByFileName, uploadToS3 };
+export {
+    getProductImageURL,
+    getProductImageURLByFileName,
+    uploadToS3,
+    removeProductImageFromS3,
+};
