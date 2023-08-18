@@ -90,6 +90,7 @@ async function uploadToS3({
                 Bucket: bucket,
                 Key: path,
                 Body: file,
+                ContentType: 'image/jpeg',
             })
             .promise();
 
