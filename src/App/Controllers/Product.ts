@@ -55,7 +55,10 @@ class ProductController {
         let thumbnail: string | null = null;
 
         if (product.image) {
-            thumbnail = getProductImageURLByFileName(product.image);
+            thumbnail = getProductImageURLByFileName({
+                fileName: product.image,
+                team_id,
+            });
         } else if (product.code) {
             thumbnail = getProductImageURL(product.code);
         }

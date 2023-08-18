@@ -39,7 +39,7 @@ class UploadController {
 
         await sharp(req.file.path)
             .toFormat('jpeg', {
-                quality: 20,
+                quality: 40,
             })
             .toFile(`${newPath}`)
             .then(async () => {

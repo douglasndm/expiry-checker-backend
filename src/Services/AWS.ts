@@ -24,8 +24,16 @@ function getProductImageURL(code: string): string {
     return url;
 }
 
-function getProductImageURLByFileName(fileName: string): string {
-    const path = `teams/products/${fileName}`;
+interface getProductImageURLByFileNameProps {
+    fileName: string;
+    team_id: string;
+}
+
+function getProductImageURLByFileName({
+    fileName,
+    team_id,
+}: getProductImageURLByFileNameProps): string {
+    const path = `teams/${team_id}/products/${fileName}`;
 
     const url = s3.getSignedUrl('getObject', {
         Bucket: bucket,

@@ -3,7 +3,10 @@ import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
-import { getProductImageURL } from '@services/AWS';
+import {
+    getProductImageURL,
+    getProductImageURLByFileName,
+} from '@services/AWS';
 
 import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
@@ -71,6 +74,16 @@ class TeamController {
         });
 
         const productsWithImages = fixedCategories.map(p => {
+            if (p.image) {
+                return {
+                    ...p,
+                    thumbnail: getProductImageURLByFileName({
+                        fileName: p.image,
+                        team_id,
+                    }),
+                };
+            }
+
             return {
                 ...p,
                 thumbnail: p.code ? getProductImageURL(p.code) : null,
