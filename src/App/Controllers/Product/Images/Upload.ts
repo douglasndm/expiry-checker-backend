@@ -32,13 +32,6 @@ class UploadController {
             product_id,
         });
 
-        if (!product.code) {
-            throw new AppError({
-                message: "Product doesn't have a code",
-                statusCode: 400,
-            });
-        }
-
         const [_, ext] = req.file.filename.split('.');
         const newName = `${product.id}.${ext}`;
 
