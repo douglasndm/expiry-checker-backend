@@ -45,7 +45,9 @@ class UploadController {
         const newPath = req.file.path.replace(req.file.filename, newName);
 
         await sharp(req.file.path)
-            .resize({ width: 800 })
+            .toFormat('jpeg', {
+                quality: 20,
+            })
             .toFile(`${newPath}`)
             .then(async () => {
                 if (req.file) unlinkSync(req.file.path);
