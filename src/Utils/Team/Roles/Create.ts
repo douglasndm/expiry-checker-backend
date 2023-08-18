@@ -12,6 +12,8 @@ import Cache from '@services/Cache';
 
 import AppError from '@errors/AppError';
 
+import { getTeamById } from '../Find';
+
 interface addUserToTeamProps {
     user_id: string;
     team_id: string;
@@ -72,9 +74,8 @@ async function addUserToTeam({
     const teamRepository = getRepository(Team);
     const userRepository = getRepository(User);
 
-    const team = await teamRepository.findOneBy({
-        id: team_id,
-    });
+    const team = await getTeamById(team_id);
+
     const user = await userRepository
         .createQueryBuilder('user')
         .where('user.id = :user_id', { user_id })

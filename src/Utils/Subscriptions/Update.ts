@@ -3,7 +3,7 @@ import { parseISO, startOfDay } from 'date-fns';
 
 import TeamSubscription from '@models/TeamSubscription';
 
-import { getTeam } from '@functions/Team';
+import { getTeamById } from '@utils/Team/Find';
 
 interface setTeamSubscriptionProps {
     team_id: string;
@@ -28,7 +28,7 @@ async function setTeamSubscription({
         await repository.remove(subscriptions);
     }
 
-    const team = await getTeam({ team_id });
+    const team = await getTeamById(team_id);
 
     const teamSubscription = new TeamSubscription();
     teamSubscription.expireIn = startOfDay(parseISO(subscription.expires_date));

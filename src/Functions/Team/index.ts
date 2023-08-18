@@ -8,28 +8,9 @@ import { isUserManager } from '@functions/Users/UserRoles';
 import AppError from '@errors/AppError';
 
 import { getSubscription } from '@utils/Subscriptions/Subscription';
+import { getTeamById } from '@utils/Team/Find';
 import { getAllUsersFromTeam } from './Users';
 import { deleteAllProducts } from './Products';
-
-interface getTeamProps {
-    team_id: string;
-}
-
-export async function getTeam({ team_id }: getTeamProps): Promise<Team> {
-    const teamRepository = getRepository(Team);
-    const team = await teamRepository.findOneBy({
-        id: team_id,
-    });
-
-    if (!team) {
-        throw new AppError({
-            message: 'Team not found',
-            internalErrorCode: 6,
-        });
-    }
-
-    return team;
-}
 
 interface checkIfTeamIsActiveProps {
     team_id: string;
@@ -96,18 +77,9 @@ export async function deleteTeam({
         });
     }
 
-    const teamRepository = getRepository(Team);
-    const team = await teamRepository.findOneBy({
-        id: team_id,
-    });
+    const team = await getTeamById(team_id);
 
-    if (!team) {
-        throw new AppError({
-            message: 'Team was not found',
-            statusCode: 400,
-            internalErrorCode: 6,
-        });
-    }
+    const teamRepository = getRepository(Team);
 
     await deleteAllProducts({ team_id });
 

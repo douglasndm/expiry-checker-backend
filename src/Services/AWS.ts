@@ -1,6 +1,8 @@
 import fs from 'fs';
 import aws from 'aws-sdk';
 
+import AppError from '@errors/AppError';
+
 aws.config.update({
     region: 'us-east-1',
 });
@@ -8,10 +10,10 @@ aws.config.update({
 const s3 = new aws.S3();
 
 const bucket = 'expirychecker-contents';
+const signedUrlExpireSeconds = 60 * 5;
 
 function getProductImageURL(code: string): string {
     const path = `products/${code}.jpg`;
-    const signedUrlExpireSeconds = 60 * 5;
 
     const url = s3.getSignedUrl('getObject', {
         Bucket: bucket,
@@ -22,28 +24,82 @@ function getProductImageURL(code: string): string {
     return url;
 }
 
-function uploadToS3(filePath: string): void {
+function getProductImageURLByFileName(fileName: string): string {
+    const path = `teams/products/${fileName}`;
+
+    const url = s3.getSignedUrl('getObject', {
+        Bucket: bucket,
+        Key: path,
+        Expires: signedUrlExpireSeconds,
+    });
+
+    return url;
+}
+
+interface removeProductImageFromS3Props {
+    fileName: string;
+    team_id: string;
+}
+
+function removeProductImageFromS3({
+    fileName,
+    team_id,
+}: removeProductImageFromS3Props): void {
+    const path = `teams/${team_id}/products/${fileName}`;
+
+    try {
+        s3.deleteObject({
+            Bucket: bucket,
+            Key: path,
+        }).promise();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new AppError({
+                message: error.message,
+            });
+        }
+    }
+}
+
+interface uploadToS3Props {
+    filePath: string;
+    team_id: string;
+}
+
+async function uploadToS3({
+    filePath,
+    team_id,
+}: uploadToS3Props): Promise<string | null> {
     const file = fs.readFileSync(filePath);
 
     const filename = filePath.split('/').pop();
 
-    const path = `teams/products/${filename}`;
+    const path = `teams/${team_id}/products/${filename}`;
 
-    s3.upload(
-        {
-            Bucket: bucket,
-            Key: path,
-            Body: file,
-        },
-        (err, data) => {
-            if (err) {
-                console.error(err);
-            }
-            fs.unlinkSync(filePath);
+    try {
+        const response = await s3
+            .upload({
+                Bucket: bucket,
+                Key: path,
+                Body: file,
+            })
+            .promise();
 
-            // return data.Location;
-        },
-    );
+        return response.Location;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new AppError({
+                message: error.message,
+            });
+        }
+    }
+
+    return null;
 }
 
-export { getProductImageURL, uploadToS3 };
+export {
+    getProductImageURL,
+    getProductImageURLByFileName,
+    uploadToS3,
+    removeProductImageFromS3,
+};

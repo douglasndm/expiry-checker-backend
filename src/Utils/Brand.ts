@@ -5,11 +5,10 @@ import Cache from '@services/Cache';
 import Product from '@models/Product';
 import Brand from '@models/Brand';
 
-import { getTeam } from '@functions/Team';
-
 import AppError from '@errors/AppError';
 
 import { getUserRoleInTeam } from './UserRoles';
+import { getTeamById } from './Team/Find';
 
 export async function getAllBrands({
     team_id,
@@ -46,7 +45,7 @@ export async function createBrand({
         team_id,
     });
 
-    const team = await getTeam({ team_id });
+    const team = await getTeamById(team_id);
 
     const brandRepository = getRepository(Brand);
 
@@ -203,7 +202,7 @@ export async function createManyBrands({
         });
     }
 
-    const team = await getTeam({ team_id });
+    const team = await getTeamById(team_id);
     const allBrands = await getAllBrands({ team_id });
 
     const brandsToCreate = brands.filter(brand => {

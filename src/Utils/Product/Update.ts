@@ -19,7 +19,8 @@ interface updateProductProps {
     id: string;
     name?: string;
     code?: string;
-    brand_id?: string;
+    image?: string | null;
+    brand_id?: string | null;
     store_id?: string | null;
     category_id?: string | null;
 }
@@ -28,6 +29,7 @@ async function updateProduct({
     id,
     name,
     code,
+    image,
     brand_id,
     store_id,
     category_id,
@@ -55,6 +57,8 @@ async function updateProduct({
 
     if (name) product.name = name;
     if (code) product.code = code;
+    // image or NULL is ok, undefined is not, and it should not update
+    if (image || image === null) product.image = image;
 
     if (product.categories.length > 0) {
         await cache.invalidade(
@@ -74,7 +78,10 @@ async function updateProduct({
         await cache.invalidade(`products-from-store:${product.store.id}`);
     }
     product.brand = findedBrand || null;
-    product.store = findedStore || null;
+
+    if (store_id === null || findedStore) {
+        product.store = findedStore || null;
+    }
 
     const updatedProduct = await productRepository.save(product);
 

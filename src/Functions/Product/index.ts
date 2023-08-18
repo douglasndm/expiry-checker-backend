@@ -46,6 +46,7 @@ export async function getProduct({
             'product.id',
             'product.name',
             'product.code',
+            'product.image',
             'product.created_at',
             'product.updated_at',
 

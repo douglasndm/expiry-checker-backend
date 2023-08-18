@@ -13,7 +13,10 @@ import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
 import Cache from '@services/Cache';
-import { getProductImageURL } from '@services/AWS';
+import {
+    getProductImageURL,
+    getProductImageURLByFileName,
+} from '@services/AWS';
 
 import AppError from '@errors/AppError';
 
@@ -51,7 +54,9 @@ class ProductController {
 
         let thumbnail: string | null = null;
 
-        if (product.code) {
+        if (product.image) {
+            thumbnail = getProductImageURLByFileName(product.image);
+        } else if (product.code) {
             thumbnail = getProductImageURL(product.code);
         }
 

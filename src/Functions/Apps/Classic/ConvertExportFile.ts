@@ -1,9 +1,8 @@
 import { getRepository } from 'typeorm';
 import { startOfDay, parseISO } from 'date-fns';
 
+import { getTeamById } from '@utils/Team/Find';
 import { createManyBrands, getAllBrands } from '@utils/Brand';
-
-import AppError from '@errors/AppError';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
@@ -36,17 +35,7 @@ export async function convertExportFile({
     const categoryRepository = getRepository(Category);
     const productCategoryRepo = getRepository(ProductCategory);
 
-    const team = await teamRepository.findOneBy({
-        id: team_id,
-    });
-
-    if (!team) {
-        throw new AppError({
-            message: 'Team was not found',
-            statusCode: 400,
-            internalErrorCode: 6,
-        });
-    }
+    const team = getTeamById(team_id);
 
     const newCategoriesUUID: Array<string> = [];
 

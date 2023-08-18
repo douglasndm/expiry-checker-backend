@@ -48,8 +48,6 @@ class TeamController {
             });
         }
 
-        const team = await getTeamById(team_id);
-
         const user = await getUserByFirebaseId(req.userId || '');
 
         const pg = Number(page) <= 0 ? 0 : Number(page);
