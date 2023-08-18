@@ -40,7 +40,7 @@ class UploadController {
         }
 
         const [_, ext] = req.file.filename.split('.');
-        const newName = `${team_id}_${product.code}.${ext}`;
+        const newName = `${product.id}.${ext}`;
 
         const newPath = req.file.path.replace(req.file.filename, newName);
 
@@ -50,14 +50,25 @@ class UploadController {
             .then(async () => {
                 if (req.file) unlinkSync(req.file.path);
 
-                const response = await uploadToS3(newPath);
-
-                const name = response.split('/').pop();
-
-                await updateProduct({
-                    id: product_id,
-                    image: name,
+                const response = await uploadToS3({
+                    filePath: newPath,
+                    team_id,
                 });
+
+                if (response) {
+                    const name = response.split('/').pop();
+
+                    await updateProduct({
+                        id: product_id,
+                        image: name,
+                    });
+                } else {
+                    throw new AppError({
+                        message: 'Fail on upload to S3',
+                        internalErrorCode: 43,
+                        statusCode: 500,
+                    });
+                }
             })
             .finally(() => {
                 unlinkSync(newPath);
@@ -67,14 +78,14 @@ class UploadController {
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        const { product_id } = req.params;
+        const { team_id, product_id } = req.params;
 
         const product = await getProduct({
             product_id,
         });
 
         if (product.image) {
-            removeProductImageFromS3(product.image);
+            removeProductImageFromS3({ fileName: product.image, team_id });
         }
 
         await updateProduct({

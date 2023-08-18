@@ -36,8 +36,16 @@ function getProductImageURLByFileName(fileName: string): string {
     return url;
 }
 
-function removeProductImageFromS3(fileName: string): void {
-    const path = `teams/products/${fileName}`;
+interface removeProductImageFromS3Props {
+    fileName: string;
+    team_id: string;
+}
+
+function removeProductImageFromS3({
+    fileName,
+    team_id,
+}: removeProductImageFromS3Props): void {
+    const path = `teams/${team_id}/products/${fileName}`;
 
     try {
         s3.deleteObject({
@@ -53,12 +61,20 @@ function removeProductImageFromS3(fileName: string): void {
     }
 }
 
-async function uploadToS3(filePath: string): Promise<string> {
+interface uploadToS3Props {
+    filePath: string;
+    team_id: string;
+}
+
+async function uploadToS3({
+    filePath,
+    team_id,
+}: uploadToS3Props): Promise<string | null> {
     const file = fs.readFileSync(filePath);
 
     const filename = filePath.split('/').pop();
 
-    const path = `teams/products/${filename}`;
+    const path = `teams/${team_id}/products/${filename}`;
 
     try {
         const response = await s3
@@ -77,6 +93,8 @@ async function uploadToS3(filePath: string): Promise<string> {
             });
         }
     }
+
+    return null;
 }
 
 export {
