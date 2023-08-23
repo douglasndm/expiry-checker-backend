@@ -66,6 +66,7 @@ async function createProduct({
             userStore = uStore.store;
         }
     }
+    /*
 
     const productAlreadyExists = await checkIfProductAlreadyExists({
         name,
@@ -80,7 +81,7 @@ async function createProduct({
             statusCode: 400,
             internalErrorCode: 11,
         });
-    }
+    } */
 
     const allBrands = await getAllBrands({ team_id });
     const findedBrand = allBrands.find(b => b.id === brand_id);
