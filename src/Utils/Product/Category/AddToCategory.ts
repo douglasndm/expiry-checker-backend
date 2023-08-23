@@ -64,6 +64,7 @@ async function addToCategory({
 
     const cache = new Cache();
     await cache.invalidadePrefix(`product:${category.team.id}:${product_id}`);
+    await cache.invalidade(`products-from-category:${category_id}`);
 }
 
 export { addToCategory };
