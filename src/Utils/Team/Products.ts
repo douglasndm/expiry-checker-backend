@@ -2,8 +2,7 @@ import { Brackets, getRepository } from 'typeorm';
 import { isValid, parseISO } from 'date-fns';
 
 import { getAllStoresFromUser } from '@utils/Stores/Users';
-
-import { isUserManager } from '@functions/Users/UserRoles';
+import { isManager } from '@utils/Team/Roles/Manager';
 
 import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
@@ -137,10 +136,9 @@ async function getProductsFromTeam(
     products = productsTeam.map(p => p.product);
 
     // if user is manager they will get full products from any store
-    const isManager = await isUserManager({
+    const isAManager = await isManager({
         user_id,
         team_id,
-        useInternalId: true,
     });
 
     const response = {
@@ -150,7 +148,7 @@ async function getProductsFromTeam(
         products,
     };
 
-    if (!isManager) {
+    if (!isAManager) {
         if (userStores.length > 0) {
             const prods = products.filter(p => {
                 if (p.store) {

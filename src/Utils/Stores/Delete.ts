@@ -5,7 +5,7 @@ import Cache from '@services/Cache';
 
 import Store from '@models/Store';
 
-import { isUserManager } from '@functions/Users/UserRoles';
+import { isManager } from '@utils/Team/Roles/Manager';
 
 import AppError from '@errors/AppError';
 
@@ -37,13 +37,12 @@ async function deleteStore({
     }
 
     // Check if user has access and it is a manager on team
-    const isManager = await isUserManager({
+    const isAManager = await isManager({
         user_id: admin_id,
         team_id,
-        useInternalId: true, // force check to look for own uuid and not firebase
     });
 
-    if (!isManager) {
+    if (!isAManager) {
         throw new AppError({
             message: 'Only managers can delete stores',
             internalErrorCode: 35,

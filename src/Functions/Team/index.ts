@@ -3,12 +3,13 @@ import { compareAsc, startOfDay } from 'date-fns';
 
 import Team from '@models/Team';
 
-import { isUserManager } from '@functions/Users/UserRoles';
+import { isManager } from '@utils/Team/Roles/Manager';
+import { getSubscription } from '@utils/Subscriptions/Subscription';
+import { getTeamById } from '@utils/Team/Find';
+import { getUserByFirebaseId } from '@utils/User/Find';
 
 import AppError from '@errors/AppError';
 
-import { getSubscription } from '@utils/Subscriptions/Subscription';
-import { getTeamById } from '@utils/Team/Find';
 import { getAllUsersFromTeam } from './Users';
 import { deleteAllProducts } from './Products';
 
@@ -67,9 +68,11 @@ export async function deleteTeam({
     team_id,
     user_id,
 }: deleteTeamProps): Promise<void> {
-    const isManager = await isUserManager({ user_id, team_id });
+    const user = await getUserByFirebaseId(user_id);
 
-    if (!isManager) {
+    const isAManager = await isManager({ user_id: user.id, team_id });
+
+    if (!isAManager) {
         throw new AppError({
             message: "You don't have permission to do that",
             statusCode: 401,
