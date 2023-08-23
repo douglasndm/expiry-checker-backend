@@ -117,9 +117,13 @@ async function getProductsFromTeam(
             );
         }
     }
-
     if (removeCheckedBatches) {
-        query.andWhere('batches.status = :status', { status: 'unchecked' });
+        query.andWhere(
+            new Brackets(qb => {
+                qb.where('batches.status = :status', { status: 'unchecked' });
+                qb.orWhere('batches IS NULL');
+            }),
+        );
     }
 
     if (page !== undefined) {

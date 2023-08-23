@@ -6,7 +6,6 @@ import ProductTeams from '@models/ProductTeams';
 import AppError from '@errors/AppError';
 
 interface isProductDuplicateProps {
-    name: string;
     code?: string;
     team_id: string;
     store_id?: string;
@@ -18,19 +17,17 @@ interface isProductDuplicateResponse {
 }
 
 async function isProductDuplicate({
-    name,
     code,
     team_id,
     store_id,
 }: isProductDuplicateProps): Promise<isProductDuplicateResponse> {
     const schema = Yup.object().shape({
-        name: Yup.string().required(),
         code: Yup.string(),
         store_id: Yup.string().uuid(),
     });
 
     try {
-        await schema.validate({ name, code, store_id });
+        await schema.validate({ code, store_id });
     } catch (err) {
         if (err instanceof Error) {
             throw new AppError({
@@ -42,7 +39,7 @@ async function isProductDuplicate({
     const productTeamRepository = getRepository(ProductTeams);
 
     if (code) {
-        const products = await productTeamRepository
+        const query = productTeamRepository
             .createQueryBuilder('prods')
             .leftJoinAndSelect('prods.product', 'product')
             .leftJoinAndSelect('prods.team', 'team')
@@ -50,8 +47,15 @@ async function isProductDuplicate({
             .where('product.code = :code', {
                 code,
             })
-            .andWhere('team.id = :team_id', { team_id })
-            .getMany();
+            .andWhere('team.id = :team_id', { team_id });
+
+        if (store_id) {
+            query.andWhere('store.id = :store_id', { store_id });
+        } else {
+            query.andWhere('product.store IS NULL');
+        }
+
+        const products = await query.getMany();
 
         if (store_id) {
             const exists = products.find(
@@ -75,40 +79,6 @@ async function isProductDuplicate({
                 product_id: products[0].product.id,
             };
         }
-    }
-
-    const products = await productTeamRepository
-        .createQueryBuilder('prods')
-        .leftJoinAndSelect('prods.product', 'product')
-        .leftJoinAndSelect('prods.team', 'team')
-        .leftJoinAndSelect('product.store', 'store')
-        .where('LOWER(product.name) = LOWER(:product_name)', {
-            product_name: name.trim(),
-        })
-        .andWhere('team.id = :team_id', { team_id })
-        .getMany();
-
-    if (store_id) {
-        const exists = products.find(
-            prod => prod.product.store?.id === store_id,
-        );
-
-        if (exists) {
-            return {
-                isDuplicate: true,
-                product_id: exists.product.id,
-            };
-        }
-        return {
-            isDuplicate: false,
-        };
-    }
-
-    if (products.length > 0) {
-        return {
-            isDuplicate: true,
-            product_id: products[0].product.id,
-        };
     }
 
     return { isDuplicate: false };

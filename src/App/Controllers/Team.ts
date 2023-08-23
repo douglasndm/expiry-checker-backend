@@ -59,8 +59,8 @@ class TeamController {
             team_id,
             user_id: user.id,
             page: page ? pg : undefined,
-            removeCheckedBatches: true,
-            sortByBatches: true,
+            removeCheckedBatches: removeCheckedBatches === 'true',
+            sortByBatches: sortByBatches === 'true',
         });
 
         const fixedCategories = products.map(p => {
