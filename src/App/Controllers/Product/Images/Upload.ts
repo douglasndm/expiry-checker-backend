@@ -32,20 +32,15 @@ class UploadController {
             product_id,
         });
 
-        if (!product.code) {
-            throw new AppError({
-                message: "Product doesn't have a code",
-                statusCode: 400,
-            });
-        }
-
         const [_, ext] = req.file.filename.split('.');
         const newName = `${product.id}.${ext}`;
 
         const newPath = req.file.path.replace(req.file.filename, newName);
 
         await sharp(req.file.path)
-            .resize({ width: 800 })
+            .toFormat('jpeg', {
+                quality: 40,
+            })
             .toFile(`${newPath}`)
             .then(async () => {
                 if (req.file) unlinkSync(req.file.path);

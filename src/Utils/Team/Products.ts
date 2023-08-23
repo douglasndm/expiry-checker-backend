@@ -58,6 +58,7 @@ async function getProductsFromTeam(
             'product.id',
             'product.name',
             'product.code',
+            'product.image',
             'product.created_at',
             'product.updated_at',
 
