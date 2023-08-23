@@ -3,7 +3,6 @@ import { getRepository } from 'typeorm';
 import Cache from '@services/Cache';
 
 import Product from '@models/Product';
-import Category from '@models/Category';
 
 import { getAllBrands } from '@utils/Brand';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
@@ -13,6 +12,7 @@ import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
 import AppError from '@errors/AppError';
+import { findCategoryById } from '@utils/Categories/Find';
 import { addToCategory } from './Category/AddToCategory';
 
 interface updateProductProps {
@@ -96,20 +96,7 @@ async function updateProduct({
             product_id: updatedProduct.id,
         });
 
-        const categoryRepository = getRepository(Category);
-        const category = await categoryRepository.findOne({
-            where: {
-                id: category_id,
-            },
-        });
-
-        if (!category) {
-            throw new AppError({
-                message: 'Category was not found',
-                statusCode: 400,
-                internalErrorCode: 10,
-            });
-        }
+        const category = await findCategoryById(category_id);
 
         await addToCategory({
             product_id: updatedProduct.id,
