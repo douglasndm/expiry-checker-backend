@@ -17,7 +17,7 @@ routes.get('/search', ProductsFind.index);
 routes.get('/images', ProductsImages.index);
 
 routes.get('/extrainfo', ExtraInfo.index);
-routes.post('/duplicate', FindDuplicate.index);
+routes.get('/duplicate', FindDuplicate.index);
 
 routes.post('/', Product.create);
 routes.get('/:product_id', Product.index);
