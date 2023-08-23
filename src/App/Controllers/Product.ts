@@ -66,7 +66,7 @@ class ProductController {
         const productWithFixCat = {
             ...product,
             brand: product.brand?.id,
-            categories: product.categories.map(cat => cat.category),
+            category: product.category?.category,
             thumbnail,
         };
 
@@ -239,9 +239,9 @@ class ProductController {
             });
         }
 
-        if (prod.categories.length > 0) {
+        if (prod.category) {
             await cache.invalidade(
-                `products-from-category:${prod.categories[0].category.id}`,
+                `products-from-category:${prod.category.category.id}`,
             );
         }
 

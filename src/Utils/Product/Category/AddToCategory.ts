@@ -3,11 +3,11 @@ import * as Yup from 'yup';
 
 import Cache from '@services/Cache';
 
-import Product from '@models/Product';
-import Category from '@models/Category';
 import ProductCategory from '@models/ProductCategory';
 
 import AppError from '@errors/AppError';
+import { findCategoryById } from '@utils/Categories/Find';
+import { findProductById } from '../Find';
 
 interface addToCategoryProps {
     product_id: string;
@@ -36,27 +36,10 @@ async function addToCategory({
         }
     }
 
-    const productRepository = getRepository(Product);
-    const categoryRepository = getRepository(Category);
     const prodCategoryRepository = getRepository(ProductCategory);
 
-    const product = await productRepository
-        .createQueryBuilder('product')
-        .where('product.id = :product_id', { product_id })
-        .getOne();
-
-    const category = await categoryRepository
-        .createQueryBuilder('category')
-        .leftJoinAndSelect('category.team', 'team')
-        .where('category.id = :category_id', { category_id })
-        .getOne();
-
-    if (!product || !category) {
-        throw new AppError({
-            message: 'Category or Product was not found',
-            statusCode: 400,
-        });
-    }
+    const product = await findProductById(product_id);
+    const category = await findCategoryById(category_id);
 
     const alreadyExists = await prodCategoryRepository
         .createQueryBuilder('prodCat')
@@ -81,6 +64,7 @@ async function addToCategory({
 
     const cache = new Cache();
     await cache.invalidadePrefix(`product:${category.team.id}:${product_id}`);
+    await cache.invalidade(`products-from-category:${category_id}`);
 }
 
 export { addToCategory };

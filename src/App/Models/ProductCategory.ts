@@ -3,6 +3,7 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -15,11 +16,11 @@ class ProductCategory {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Product, product => product.categories)
+    @OneToOne(() => Product, product => product.category)
     @JoinColumn({ name: 'product_id' })
     product: Product;
 
-    @ManyToOne(type => Category, category => category.team)
+    @OneToOne(() => Category, category => category)
     @JoinColumn({ name: 'category_id' })
     category: Category;
 

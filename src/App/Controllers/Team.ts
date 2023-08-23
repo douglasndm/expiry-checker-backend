@@ -64,12 +64,10 @@ class TeamController {
         });
 
         const fixedCategories = products.map(p => {
-            const categories = p.categories.map(c => c.category);
-
             return {
                 ...p,
                 brand: p.brand?.id,
-                categories,
+                category: p.category ? p.category.category : null,
             };
         });
 
