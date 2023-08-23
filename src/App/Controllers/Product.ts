@@ -66,7 +66,7 @@ class ProductController {
         const productWithFixCat = {
             ...product,
             brand: product.brand?.id,
-            categories: product.category ? [product.category.category] : [],
+            category: product.category?.category,
             thumbnail,
         };
 
