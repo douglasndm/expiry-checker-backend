@@ -8,6 +8,7 @@ async function findCategoryById(category_id: string): Promise<Category> {
 
     const category = await categoryRepository
         .createQueryBuilder('category')
+        .leftJoinAndSelect('category.team', 'team')
         .where('category.id = :category_id', { category_id })
         .getOne();
 

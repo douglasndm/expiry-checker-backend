@@ -60,9 +60,9 @@ async function updateProduct({
     // image or NULL is ok, undefined is not, and it should not update
     if (image || image === null) product.image = image;
 
-    if (product.categories.length > 0) {
+    if (product.category) {
         await cache.invalidade(
-            `products-from-category:${product.categories[0].category.id}`,
+            `products-from-category:${product.category.category.id}`,
         );
     }
 
@@ -85,7 +85,7 @@ async function updateProduct({
 
     const updatedProduct = await productRepository.save(product);
 
-    if (!category_id) {
+    if (category_id === null) {
         await removeAllCategoriesFromProduct({
             product_id: updatedProduct.id,
         });

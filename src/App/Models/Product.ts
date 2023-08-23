@@ -34,11 +34,8 @@ export default class Product {
     @JoinColumn({ name: 'brand_id' })
     brand?: Brand | null;
 
-    @OneToMany(
-        () => ProductCategory,
-        productCategory => productCategory.product,
-    )
-    categories: Array<ProductCategory>;
+    @OneToOne(() => ProductCategory, prodCat => prodCat.product)
+    category?: ProductCategory;
 
     @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;

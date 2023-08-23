@@ -49,7 +49,7 @@ async function getProductsFromTeam(
         .leftJoinAndSelect('product_teams.product', 'product')
         .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.brand', 'brand')
-        .leftJoinAndSelect('product.categories', 'prodCat')
+        .leftJoinAndSelect('product.category', 'prodCat')
         .leftJoinAndSelect('prodCat.category', 'category')
         .leftJoinAndSelect('product.batches', 'batches')
         .select([

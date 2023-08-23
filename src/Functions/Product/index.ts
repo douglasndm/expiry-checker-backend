@@ -39,9 +39,9 @@ export async function getProduct({
         .where('product.id = :product_id', { product_id })
         .leftJoinAndSelect('product.brand', 'brand')
         .leftJoinAndSelect('product.store', 'store')
-        .leftJoinAndSelect('product.categories', 'categories')
+        .leftJoinAndSelect('product.category', 'prodCat')
         .leftJoinAndSelect('product.batches', 'batches')
-        .leftJoinAndSelect('categories.category', 'category')
+        .leftJoinAndSelect('prodCat.category', 'category')
         .select([
             'product.id',
             'product.name',
@@ -56,7 +56,7 @@ export async function getProduct({
             'store.id',
             'store.name',
 
-            'categories',
+            'prodCat',
 
             'category.id',
             'category.name',
@@ -80,10 +80,6 @@ export async function getProduct({
         });
     }
 
-    const categories: Array<ProductCategory> = [];
-
-    product.categories.forEach(cat => categories.push(cat));
-
     let batches: Array<Batch> = [];
 
     if (product?.batches) {
@@ -92,8 +88,6 @@ export async function getProduct({
 
     const organizedProduct = {
         ...product,
-        category: categories.length > 0 ? categories[0].category : undefined,
-        categories,
         batches,
     };
 
