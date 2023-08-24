@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import Product from '@models/Product';
 
 import Cache from '@services/Cache';
+import { removeProductImageFromS3 } from '@services/AWS';
 
 import { getProductById } from './Get';
 
@@ -34,6 +35,13 @@ async function deleteProduct(props: deleteProductProps): Promise<void> {
 
     await cache.invalidade(`products-from-teams:${product.team.team.id}`);
     await cache.invalidade(`product:${product.team.team.id}:${product.id}`);
+
+    if (product.image) {
+        removeProductImageFromS3({
+            fileName: product.image,
+            team_id: product.team.team.id,
+        });
+    }
 
     const productRepository = getRepository(Product);
     await productRepository.remove(product);
