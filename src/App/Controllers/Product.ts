@@ -22,21 +22,6 @@ import AppError from '@errors/AppError';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -120,10 +105,6 @@ class ProductController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
-        const schemaParams = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string().nullable(),
@@ -135,7 +116,6 @@ class ProductController {
 
         try {
             await schema.validate(req.body);
-            await schemaParams.validate(req.params);
         } catch (err) {
             if (err instanceof Error)
                 throw new AppError({
@@ -175,21 +155,6 @@ class ProductController {
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
