@@ -16,6 +16,8 @@ export async function removeAllCategoriesFromProduct({
     const finded = await repository
         .createQueryBuilder('prodCat')
         .leftJoinAndSelect('prodCat.product', 'product')
+        .leftJoinAndSelect('product.team', 'prodTeam')
+        .leftJoinAndSelect('prodTeam.team', 'team')
         .leftJoinAndSelect('prodCat.category', 'category')
         .where('product.id = :product_id', { product_id })
         .getOne();
@@ -23,7 +25,11 @@ export async function removeAllCategoriesFromProduct({
     if (finded) {
         const cache = new Cache();
 
-        await cache.invalidade(`products-from-category:${finded.category.id}`);
+        const { team } = finded.product.team;
+
+        await cache.invalidade(
+            `category_products:${team.id}:${finded.category.id}`,
+        );
 
         await repository.remove(finded);
     }

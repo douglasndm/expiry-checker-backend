@@ -24,9 +24,7 @@ async function getProductsRequestsByRank(
 
 async function callRemainingDailyAPICalls(): Promise<void> {
     const cache = new Cache();
-    const blockRequest = await cache.get<boolean>(
-        'stop_external_ean_api_request',
-    );
+    const blockRequest = await cache.get<boolean>('external_api_request');
 
     if (blockRequest !== true) {
         const requests = await getProductsRequestsByRank(100);

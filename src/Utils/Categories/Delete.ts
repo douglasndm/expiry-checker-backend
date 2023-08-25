@@ -31,7 +31,7 @@ async function deleteCategory({
     await categoryRepository.remove(category);
 
     const cache = new Cache();
-    await cache.invalidade(`categories_from_team:${category.team.id}`);
+    await cache.invalidade(`team_categories:${category.team.id}`);
 }
 
 export { deleteCategory };

@@ -21,25 +21,27 @@ async function deleteProduct(props: deleteProductProps): Promise<void> {
 
     const cache = new Cache();
 
+    const { team } = product.team;
+
     if (product.brand) {
-        await cache.invalidade(`products-from-brand:${product.brand.id}`);
+        await cache.invalidade(`brand_products:${team.id}:${product.brand.id}`);
     }
     if (product.category) {
         await cache.invalidade(
-            `products-from-category:${product.category.category.id}`,
+            `category_products:${team.id}:${product.category.category.id}`,
         );
     }
     if (product.store) {
-        await cache.invalidade(`products-from-store:${product.store.id}`);
+        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
     }
 
-    await cache.invalidade(`products-from-teams:${product.team.team.id}`);
-    await cache.invalidade(`product:${product.team.team.id}:${product.id}`);
+    await cache.invalidade(`team_products:${team.id}`);
+    await cache.invalidade(`product:${team.id}:${product.id}`);
 
     if (product.image) {
         removeProductImageFromS3({
             fileName: product.image,
-            team_id: product.team.team.id,
+            team_id: team.id,
         });
     }
 

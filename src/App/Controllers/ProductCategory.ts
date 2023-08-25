@@ -37,10 +37,11 @@ class ProductCategoryController {
             });
         }
 
-        const { category_id } = req.params;
+        const { category_id, team_id } = req.params;
 
         const productsInCategory = await getAllProductsFromCategory({
             category_id,
+            team_id,
         });
 
         const sortedProducts = sortProductsByBatchesExpDate(

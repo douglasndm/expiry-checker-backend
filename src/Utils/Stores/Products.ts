@@ -9,10 +9,12 @@ import AppError from '@errors/AppError';
 
 interface getAllProductsFromStoreProps {
     store_id: string;
+    team_id: string;
 }
 
 async function getAllProductsFromStore({
     store_id,
+    team_id,
 }: getAllProductsFromStoreProps): Promise<Product[]> {
     const schema = Yup.object().shape({
         store_id: Yup.string().required().uuid(),
@@ -30,7 +32,7 @@ async function getAllProductsFromStore({
     const cache = new Cache();
 
     let productsInStore = await cache.get<Product[]>(
-        `products-from-store:${store_id}`,
+        `store_products:${team_id}:${store_id}`,
     );
 
     if (!productsInStore) {
@@ -58,7 +60,10 @@ async function getAllProductsFromStore({
             .orderBy('batches.exp_date', 'ASC')
             .getMany();
 
-        await cache.save(`products-from-store:${store_id}`, productsInStore);
+        await cache.save(
+            `store_products:${team_id}:${store_id}`,
+            productsInStore,
+        );
     }
 
     return productsInStore;

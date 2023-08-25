@@ -53,9 +53,7 @@ async function findProductByEAN({
         .getOne();
 
     if (!product) {
-        const blockRequest = await cache.get<boolean>(
-            'stop_external_ean_api_request',
-        );
+        const blockRequest = await cache.get<boolean>('external_api_request');
 
         let externalProduct: null | findProductByEANExternalResponse = null;
 
@@ -85,7 +83,7 @@ async function findProductByEAN({
                         console.log('Blocking for external api request');
                         console.log(formatedDate);
 
-                        await cache.save('stop_external_ean_api_request', true);
+                        await cache.save('external_api_request', true);
                     }
                 } else if (err instanceof Error) {
                     console.log(

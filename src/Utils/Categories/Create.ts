@@ -41,7 +41,7 @@ async function createCategory({
     const savedCategory = await categoryRepository.save(category);
 
     const cache = new Cache();
-    await cache.invalidade(`categories_from_team:${team_id}`);
+    await cache.invalidade(`team_categories:${team_id}`);
 
     return savedCategory;
 }

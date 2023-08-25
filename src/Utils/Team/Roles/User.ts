@@ -43,7 +43,7 @@ async function updateRole({
     const updatedRole = await roleRepository.save(findedRole);
 
     const cache = new Cache();
-    await cache.invalidade(`users-from-teams:${team_id}`);
+    await cache.invalidade(`team_users:${team_id}`);
 
     return updatedRole;
 }
@@ -72,6 +72,6 @@ async function removeUser({
     await roleRepository.remove(role);
 
     const cache = new Cache();
-    await cache.invalidade(`users-from-teams:${team_id}`);
+    await cache.invalidade(`team_users:${team_id}`);
 }
 export { updateRole, removeUser };

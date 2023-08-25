@@ -228,12 +228,12 @@ class BatchController {
             });
         }
 
-        await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`team_products:${team.id}`);
         await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
         if (batch.product.store) {
             await cache.invalidade(
-                `products-from-store:${batch.product.store.id}`,
+                `store_products:${team.id}:${batch.product.store.id}`,
             );
         }
         await batchReposity.remove(batch);

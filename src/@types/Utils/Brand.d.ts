@@ -21,6 +21,7 @@ interface deleteBrandProps {
 
 interface getAllProductsFromBrand {
     brand_id: string;
+    team_id: string;
 }
 
 interface createManyBrandsProps {

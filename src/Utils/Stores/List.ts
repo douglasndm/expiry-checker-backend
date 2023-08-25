@@ -11,7 +11,7 @@ async function getAllStoresFromTeam({
     team_id,
 }: getAllStoresFromTeamProps): Promise<Store[]> {
     const cache = new Cache();
-    const cached = await cache.get<Store[]>(`stores_from_team:${team_id}`);
+    const cached = await cache.get<Store[]>(`team_stores:${team_id}`);
 
     if (cached) {
         return cached;
@@ -26,7 +26,7 @@ async function getAllStoresFromTeam({
         .select(['stores.id', 'stores.name'])
         .getMany();
 
-    await cache.save(`stores_from_team:${team_id}`, stores);
+    await cache.save(`team_stores:${team_id}`, stores);
 
     return stores;
 }

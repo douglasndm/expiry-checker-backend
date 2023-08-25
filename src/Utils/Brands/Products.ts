@@ -6,11 +6,12 @@ import Product from '@models/Product';
 
 async function getAllProductsFromBrand({
     brand_id,
+    team_id,
 }: getAllProductsFromBrand): Promise<Product[]> {
     const cache = new Cache();
 
     let productsInBrand = await cache.get<Product[]>(
-        `products-from-brand:${brand_id}`,
+        `brand_products:${team_id}:${brand_id}`,
     );
 
     if (!productsInBrand) {
@@ -39,7 +40,10 @@ async function getAllProductsFromBrand({
             ])
             .getMany();
 
-        await cache.save(`products-from-brand:${brand_id}`, productsInBrand);
+        await cache.save(
+            `brand_products:${team_id}:${brand_id}`,
+            productsInBrand,
+        );
     }
 
     return productsInBrand;

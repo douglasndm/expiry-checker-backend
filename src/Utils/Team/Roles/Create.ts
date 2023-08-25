@@ -29,7 +29,7 @@ async function addUserToTeam({
 
     const cache = new Cache();
     const cachedUsers = await cache.get<Array<UserRoles>>(
-        `users-from-teams:${team_id}`,
+        `team_users:${team_id}`,
     );
 
     // Check if user is already on team
@@ -114,7 +114,7 @@ async function addUserToTeam({
     }
 
     const savedRole = await userRolesRepository.save(teamUser);
-    await cache.invalidade(`users-from-teams:${team_id}`);
+    await cache.invalidade(`team_users:${team_id}`);
 
     return savedRole;
 }

@@ -2,6 +2,24 @@ import { Redis as RedisClient } from 'ioredis';
 
 import { redisClient } from '@services/Redis';
 
+// team_products:team_id
+// team_brands:team_id
+// team_categories:team_id
+// team_stores:team_id
+// team_users:team_id
+
+// product:team_id:product_id
+// store_products:team_id:store_id
+// category_products:team_id:category_id
+// brand_products:team_id:brand_id
+
+// users_devices
+// users_logins
+
+// external_api_request
+
+// product_suggestion:${code}
+
 export default class RedisCache {
     private client: RedisClient;
 

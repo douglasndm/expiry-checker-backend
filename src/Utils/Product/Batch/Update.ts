@@ -76,11 +76,13 @@ async function updateBatch({
     const team = await getProductTeam(batch.product);
 
     const cache = new Cache();
-    await cache.invalidade(`products-from-teams:${team.id}`);
+    await cache.invalidade(`team_products:${team.id}`);
     await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
     if (batch.product.store) {
-        await cache.invalidade(`products-from-store:${batch.product.store.id}`);
+        await cache.invalidade(
+            `store_products:${team.id}:${batch.product.store.id}`,
+        );
     }
 
     return updatedBatch;

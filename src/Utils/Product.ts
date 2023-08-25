@@ -10,6 +10,9 @@ export async function deleteManyProducts({
 }: deleteManyProductsProps): Promise<void> {
     const productRepository = getRepository(Product);
 
+    // to do
+    // clean stores, categories, brands cache
+    // remove images from s3
     const products = await productRepository
         .createQueryBuilder('product')
         .where('product.id IN (:...productsIds)', { productsIds })
@@ -19,6 +22,6 @@ export async function deleteManyProducts({
         await productRepository.remove(products);
 
         const cache = new Cache();
-        await cache.invalidade(`products-from-teams:${team_id}`);
+        await cache.invalidade(`team_products:${team_id}`);
     }
 }

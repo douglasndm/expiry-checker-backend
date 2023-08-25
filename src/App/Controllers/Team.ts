@@ -198,8 +198,8 @@ class TeamController {
         await deleteAllProducts({ team_id });
         await deleteTeam({ team_id, user_id: req.userId });
 
-        await cache.invalidade(`products-from-teams:${team_id}`);
-        await cache.invalidade(`users-from-teams:${team_id}`);
+        await cache.invalidade(`team_products:${team_id}`);
+        await cache.invalidade(`team_users:${team_id}`);
 
         return res.status(204).send();
     }

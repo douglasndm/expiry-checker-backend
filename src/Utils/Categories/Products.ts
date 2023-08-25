@@ -7,6 +7,7 @@ import ProductCategory from '@models/ProductCategory';
 
 interface getAllProductsFromCategoryProps {
     category_id: string;
+    team_id: string;
 }
 
 interface getAllProductsFromCategoryResponse {
@@ -16,11 +17,12 @@ interface getAllProductsFromCategoryResponse {
 
 async function getAllProductsFromCategory({
     category_id,
+    team_id,
 }: getAllProductsFromCategoryProps): Promise<getAllProductsFromCategoryResponse> {
     const cache = new Cache();
 
     let productsInCategory = await cache.get<ProductCategory[]>(
-        `products-from-category:${category_id}`,
+        `category_products:${team_id}:${category_id}`,
     );
 
     if (!productsInCategory) {
@@ -59,7 +61,7 @@ async function getAllProductsFromCategory({
             .getMany();
 
         await cache.save(
-            `products-from-category:${category_id}`,
+            `category_products:${team_id}:${category_id}`,
             productsInCategory,
         );
     }

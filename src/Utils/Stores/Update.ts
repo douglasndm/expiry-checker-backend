@@ -70,7 +70,7 @@ async function updateStore({
     const updatedStore = await storeRepository.save(store);
 
     const cache = new Cache();
-    await cache.invalidade(`stores_from_team:${team_id}`);
+    await cache.invalidade(`team_stores:${team_id}`);
 
     return updatedStore;
 }

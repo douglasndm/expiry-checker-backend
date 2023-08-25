@@ -53,6 +53,6 @@ export async function removeUserFromAllTeams({
 
     const cache = new Cache();
     notManagersTeams.forEach(async role => {
-        await cache.invalidade(`users-from-teams:${role.team.id}`);
+        await cache.invalidade(`team_users:${role.team.id}`);
     });
 }
