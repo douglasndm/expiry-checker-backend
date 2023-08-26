@@ -67,7 +67,7 @@ class ImportController {
         const parsedFile = JSON.parse(originalFile);
 
         const cache = new Cache();
-        await cache.invalidade(`products-from-teams:${team_id}`);
+        await cache.invalidade(`team_products:${team_id}`);
 
         const user = await getUserByFirebaseId(req.userId || '');
         if (!user) return res.status(400).send();

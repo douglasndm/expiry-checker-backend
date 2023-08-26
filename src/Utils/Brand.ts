@@ -179,7 +179,7 @@ export async function deleteBrand({
     await brandRepository.remove(brand);
 
     const cache = new Cache();
-    await cache.invalidade(`products-from-teams:${brand.team.id}`);
+    await cache.invalidade(`team_products:${brand.team.id}`);
     await cache.invalidade(`team_brands:${brand.team.id}`);
 }
 

@@ -62,20 +62,20 @@ async function updateProduct({
 
     if (product.category) {
         await cache.invalidade(
-            `products-from-category:${product.category.category.id}`,
+            `category_products:${team.id}:${product.category.category.id}`,
         );
     }
 
     // This invalidade the old brand products and the new one
     if (product.brand)
-        await cache.invalidade(`products-from-brand:${product.brand.id}`);
+        await cache.invalidade(`brand_products:${team.id}:${product.brand.id}`);
     // This update brand cache only if its have an update value
     if (findedBrand) {
-        await cache.invalidade(`products-from-brand:${findedBrand.id}`);
+        await cache.invalidade(`brand_products:${team.id}:${findedBrand.id}`);
     }
 
     if (product.store) {
-        await cache.invalidade(`products-from-store:${product.store.id}`);
+        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
     }
     product.brand = findedBrand || null;
 
@@ -104,7 +104,7 @@ async function updateProduct({
         });
     }
 
-    await cache.invalidade(`products-from-teams:${team.id}`);
+    await cache.invalidade(`team_products:${team.id}`);
     await cache.invalidade(`product:${team.id}:${updatedProduct.id}`);
 
     return updatedProduct;

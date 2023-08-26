@@ -65,8 +65,8 @@ async function deleteStore({
     await storeRepository.remove(store);
 
     const cache = new Cache();
-    await cache.invalidade(`stores_from_team:${team_id}`);
-    await cache.invalidade(`products-from-store:${store_id}`);
+    await cache.invalidade(`team_stores:${team_id}`);
+    await cache.invalidade(`store_products:${team_id}:${store_id}`);
 }
 
 export { deleteStore };

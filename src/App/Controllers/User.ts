@@ -69,34 +69,16 @@ class UserController {
             email: user.email,
             name: user.name,
             last_name: user.lastName,
-
-            roles: user.roles.map(r => {
-                const subscriptions = r.team.subscriptions.filter(
-                    sub =>
-                        compareAsc(
-                            endOfDay(new Date()),
-                            endOfDay(sub.expireIn),
-                        ) <= 0,
-                );
-
-                return {
-                    role: r.role,
-                    status: r.status,
-                    team: {
-                        id: r.team.id,
-                        name: r.team.name,
-                        isActive: subscriptions.length > 0,
-                    },
-                };
-            }),
-
-            store: user.store ? user.store.store : null,
         };
 
         if (user.roles.length > 0) {
             organizedUser = {
                 ...organizedUser,
                 role: user.roles[0],
+                store:
+                    user.store && user.roles[0].role.toLowerCase() !== 'manager'
+                        ? user.store.store
+                        : null,
             };
         }
 

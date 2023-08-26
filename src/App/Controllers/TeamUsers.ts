@@ -97,7 +97,7 @@ class TeamUsersController {
         roles.status = 'Completed';
 
         const updatedRole = await userRolesRepositoy.save(roles);
-        await cache.invalidade(`users-from-teams:${team_id}`);
+        await cache.invalidade(`team_users:${team_id}`);
 
         return res.status(200).json(updatedRole);
     }

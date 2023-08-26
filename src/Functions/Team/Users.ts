@@ -28,7 +28,7 @@ export async function getAllUsersFromTeam({
     const cache = new Cache();
 
     const cachedUsers = await cache.get<Array<UserRoles>>(
-        `users-from-teams:${team_id}`,
+        `team_users:${team_id}`,
     );
 
     let usersFromTeam: Array<UserRoles> = [];
@@ -47,7 +47,7 @@ export async function getAllUsersFromTeam({
             .where('team.id = :team_id', { team_id })
             .getMany();
 
-        await cache.save(`users-from-teams:${team_id}`, usersTeam);
+        await cache.save(`team_users:${team_id}`, usersTeam);
 
         usersFromTeam = usersTeam;
     }

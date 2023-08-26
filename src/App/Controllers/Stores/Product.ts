@@ -6,9 +6,9 @@ import { sortProductsByBatchesExpDate } from '@functions/Products';
 
 class StoreProducts {
     async index(req: Request, res: Response): Promise<Response> {
-        const { store_id } = req.params;
+        const { store_id, team_id } = req.params;
 
-        const products = await getAllProductsFromStore({ store_id });
+        const products = await getAllProductsFromStore({ store_id, team_id });
 
         const sortedProducts = sortProductsByBatchesExpDate(products);
 

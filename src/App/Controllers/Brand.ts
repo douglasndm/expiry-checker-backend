@@ -128,9 +128,12 @@ class BrandController {
             });
         }
 
-        const { brand_id } = req.params;
+        const { brand_id, team_id } = req.params;
 
-        const productsInBrands = await getAllProductsFromBrand({ brand_id });
+        const productsInBrands = await getAllProductsFromBrand({
+            brand_id,
+            team_id,
+        });
 
         // REMOVE PRODUCTS FROM STORES THAT USER IS NOT IN
         const user = await getUserByFirebaseId(req.userId);

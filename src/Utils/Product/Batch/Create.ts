@@ -60,11 +60,11 @@ async function createBatch({
     const team = await getProductTeam(product);
 
     const cache = new Cache();
-    await cache.invalidade(`products-from-teams:${team.id}`);
+    await cache.invalidade(`team_products:${team.id}`);
     await cache.invalidade(`product:${team.id}:${product_id}`);
 
     if (product.store) {
-        await cache.invalidade(`products-from-store:${product.store.id}`);
+        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
     }
 
     return createdBatch;

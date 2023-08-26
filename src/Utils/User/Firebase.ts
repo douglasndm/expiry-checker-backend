@@ -54,6 +54,11 @@ async function createUserOnFirebase({
             });
         }
     }
+
+    throw new AppError({
+        message: 'Something went wrong',
+        statusCode: 500,
+    });
 }
 
 export { createUserOnFirebase };

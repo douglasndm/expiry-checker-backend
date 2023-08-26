@@ -73,7 +73,7 @@ class BatchDiscount {
 
         const cache = new Cache();
 
-        await cache.invalidade(`products-from-teams:${team.id}`);
+        await cache.invalidade(`team_products:${team.id}`);
         await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
         return res.status(201).json(updatedBatch);

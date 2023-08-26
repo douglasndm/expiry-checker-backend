@@ -1,5 +1,7 @@
 import { Router } from 'express';
 
+import ProductIdCheck from '@middlewares/Team/Product/IdCheck';
+
 import Team from '@controllers/Team';
 import Product from '@controllers/Product';
 import Products from '@controllers/Products';
@@ -20,9 +22,9 @@ routes.get('/extrainfo', ExtraInfo.index);
 routes.get('/duplicate', FindDuplicate.index);
 
 routes.post('/', Product.create);
-routes.get('/:product_id', Product.index);
-routes.put('/:product_id', Product.update);
-routes.delete('/:product_id', Product.delete);
+routes.get('/:product_id', ProductIdCheck, Product.index);
+routes.put('/:product_id', ProductIdCheck, Product.update);
+routes.delete('/:product_id', ProductIdCheck, Product.delete);
 
 routes.delete('/', Products.delete);
 

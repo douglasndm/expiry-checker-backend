@@ -40,7 +40,7 @@ export default class Product {
     @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;
 
-    @OneToMany(() => ProductTeams, productTeams => productTeams.product)
+    @OneToOne(() => ProductTeams, productTeams => productTeams.product)
     team: ProductTeams;
 
     @ManyToOne(() => Store, store => store.products)

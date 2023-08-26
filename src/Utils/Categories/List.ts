@@ -11,9 +11,7 @@ async function getAllCategoriesFromTeam({
     team_id,
 }: getAllCategoriesFromTeamProps): Promise<Category[]> {
     const cache = new Cache();
-    const cached = await cache.get<Category[]>(
-        `categories_from_team:${team_id}`,
-    );
+    const cached = await cache.get<Category[]>(`team_categories:${team_id}`);
 
     if (cached) {
         return cached;
@@ -28,7 +26,7 @@ async function getAllCategoriesFromTeam({
         .select(['category.id', 'category.name'])
         .getMany();
 
-    await cache.save(`categories_from_team:${team_id}`, categories);
+    await cache.save(`team_categories:${team_id}`, categories);
 
     return categories;
 }

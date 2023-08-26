@@ -2,6 +2,24 @@ import { Redis as RedisClient } from 'ioredis';
 
 import { redisClient } from '@services/Redis';
 
+// team_products:team_id
+// team_brands:team_id
+// team_categories:team_id
+// team_stores:team_id
+// team_users:team_id
+
+// product:team_id:product_id
+// store_products:team_id:store_id
+// category_products:team_id:category_id
+// brand_products:team_id:brand_id
+
+// users_devices
+// users_logins
+
+// external_api_request
+
+// product_suggestion:${code}
+
 export default class RedisCache {
     private client: RedisClient;
 
@@ -39,6 +57,19 @@ export default class RedisCache {
 
     public async invalidadePrefix(prefix: string): Promise<void> {
         const keys = await this.client.keys(`${prefix}:*`);
+
+        const pipeline = this.client.pipeline();
+
+        if (!keys) return;
+        keys.forEach(key => {
+            pipeline.del(key);
+        });
+
+        await pipeline.exec();
+    }
+
+    public async invalidadeTeamCache(team_id: string): Promise<void> {
+        const keys = await this.client.keys(`*${team_id}*`);
 
         const pipeline = this.client.pipeline();
 

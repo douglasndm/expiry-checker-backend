@@ -69,6 +69,27 @@ function removeProductImageFromS3({
     }
 }
 
+function removeManyImages(files: string[], team_id: string): void {
+    const path = `teams/${team_id}/products/`;
+
+    try {
+        s3.deleteObjects({
+            Bucket: bucket,
+            Delete: {
+                Objects: files.map(file => ({
+                    Key: path + file,
+                })),
+            },
+        }).promise();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new AppError({
+                message: error.message,
+            });
+        }
+    }
+}
+
 interface uploadToS3Props {
     filePath: string;
     team_id: string;
@@ -111,4 +132,5 @@ export {
     getProductImageURLByFileName,
     uploadToS3,
     removeProductImageFromS3,
+    removeManyImages,
 };

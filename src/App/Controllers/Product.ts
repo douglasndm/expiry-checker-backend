@@ -1,15 +1,12 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
-
-import Product from '@models/Product';
 
 import { createProduct } from '@utils/Product/Create';
 import { updateProduct } from '@utils/Product/Update';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getUserRole } from '@utils/Team/Roles/Find';
+import { deleteProduct } from '@utils/Product/Delete';
 
-import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
 import Cache from '@services/Cache';
@@ -22,21 +19,6 @@ import AppError from '@errors/AppError';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -120,10 +102,6 @@ class ProductController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
-        const schemaParams = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string().nullable(),
@@ -135,7 +113,6 @@ class ProductController {
 
         try {
             await schema.validate(req.body);
-            await schemaParams.validate(req.params);
         } catch (err) {
             if (err instanceof Error)
                 throw new AppError({
@@ -171,25 +148,11 @@ class ProductController {
             store_id,
             category_id: cat_id,
         });
+
         return res.status(201).json(updatedProduct);
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        const schema = Yup.object().shape({
-            product_id: Yup.string().required().uuid(),
-        });
-
-        try {
-            await schema.validate(req.params);
-        } catch (err) {
-            if (err instanceof Error)
-                throw new AppError({
-                    message: err.message,
-                    statusCode: 400,
-                    internalErrorCode: 1,
-                });
-        }
-
         if (!req.userId) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -198,32 +161,8 @@ class ProductController {
             });
         }
 
-        const cache = new Cache();
-
         const { product_id, team_id } = req.params;
 
-        const productRepository = getRepository(Product);
-
-        const prod = await productRepository
-            .createQueryBuilder('prod')
-            .leftJoinAndSelect('prod.brand', 'brand')
-            .leftJoinAndSelect('prod.store', 'store')
-            .leftJoinAndSelect('prod.categories', 'prodCategories')
-            .leftJoinAndSelect('prodCategories.category', 'category')
-            .leftJoinAndSelect('prod.team', 'prodTeam')
-            .leftJoinAndSelect('prodTeam.team', 'team')
-            .where('prod.id = :product_id', { product_id })
-            .getOne();
-
-        if (!prod) {
-            throw new AppError({
-                message: 'Product was not found',
-                statusCode: 400,
-                internalErrorCode: 8,
-            });
-        }
-
-        const team = await getProductTeam(prod);
         const user = await getUserByFirebaseId(req.userId);
 
         const { role } = await getUserRole({ user_id: user.id, team_id });
@@ -239,21 +178,9 @@ class ProductController {
             });
         }
 
-        if (prod.category) {
-            await cache.invalidade(
-                `products-from-category:${prod.category.category.id}`,
-            );
-        }
-
-        await cache.invalidade(`products-from-brand:${prod.brand?.id}`);
-        await cache.invalidade(`products-from-teams:${team.id}`);
-        await cache.invalidade(`product:${team.id}:${prod.id}`);
-
-        if (prod.store) {
-            await cache.invalidade(`products-from-store:${prod.store.id}`);
-        }
-
-        await productRepository.remove(prod);
+        await deleteProduct({
+            product_id,
+        });
 
         return res.status(204).send();
     }

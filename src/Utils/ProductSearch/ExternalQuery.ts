@@ -73,7 +73,7 @@ async function allowExternalQuery(): Promise<void> {
     console.log(formatedDate);
 
     const cache = new Cache();
-    await cache.invalidade('stop_external_ean_api_request');
+    await cache.invalidade('external_api_request');
 }
 
 export { findProductByEANExternal, allowExternalQuery };

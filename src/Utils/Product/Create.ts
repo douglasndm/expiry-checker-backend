@@ -94,13 +94,13 @@ async function createProduct({
 
     if (findedBrand) {
         prod.brand = findedBrand;
-        await cache.invalidade(`products-from-brand:${findedBrand.id}`);
+        await cache.invalidade(`brand_products:${team_id}:${findedBrand.id}`);
     }
 
     if (userStore) {
         prod.store = userStore;
 
-        await cache.invalidade(`products-from-store:${userStore.id}`);
+        await cache.invalidade(`store_products:${team_id}:${userStore.id}`);
     }
 
     const savedProd = await repository.save(prod);
@@ -117,10 +117,10 @@ async function createProduct({
             category_id,
         });
 
-        await cache.invalidade(`products-from-category:${category_id}`);
+        await cache.invalidade(`category_products:${team_id}:${category_id}`);
     }
 
-    await cache.invalidade(`products-from-teams:${team_id}`);
+    await cache.invalidade(`team_products:${team_id}`);
 
     return savedProd;
 }
