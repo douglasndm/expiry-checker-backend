@@ -6,7 +6,6 @@ import { createManyBrands, getAllBrands } from '@utils/Brand';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
-import Team from '@models/Team';
 import ProductTeams from '@models/ProductTeams';
 import Category from '@models/Category';
 import ProductCategory from '@models/ProductCategory';
@@ -28,14 +27,13 @@ export async function convertExportFile({
     categories,
     brands,
 }: convertExportFileProps): Promise<Array<Product>> {
-    const teamRepository = getRepository(Team);
     const productRepository = getRepository(Product);
     const batchRepository = getRepository(Batch);
     const prodTeamRepository = getRepository(ProductTeams);
     const categoryRepository = getRepository(Category);
     const productCategoryRepo = getRepository(ProductCategory);
 
-    const team = getTeamById(team_id);
+    const team = await getTeamById(team_id);
 
     const newCategoriesUUID: Array<string> = [];
 
