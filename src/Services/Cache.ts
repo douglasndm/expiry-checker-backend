@@ -68,6 +68,19 @@ export default class RedisCache {
         await pipeline.exec();
     }
 
+    public async invalidadeTeamCache(team_id: string): Promise<void> {
+        const keys = await this.client.keys(`*${team_id}*`);
+
+        const pipeline = this.client.pipeline();
+
+        if (!keys) return;
+        keys.forEach(key => {
+            pipeline.del(key);
+        });
+
+        await pipeline.exec();
+    }
+
     public async invalidadeAllCache(): Promise<void> {
         await this.client.flushall();
     }
