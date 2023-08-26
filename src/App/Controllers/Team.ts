@@ -7,6 +7,7 @@ import {
     getProductImageURL,
     getProductImageURLByFileName,
 } from '@services/AWS';
+import { deleteTeamFromS3 } from '@services/AWS/Team';
 
 import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
@@ -68,6 +69,7 @@ class TeamController {
                 ...p,
                 brand: p.brand?.id,
                 category: p.category ? p.category.category : null,
+                categories: p.category ? [p.category?.category] : [],
             };
         });
 
@@ -193,13 +195,13 @@ class TeamController {
 
         const { team_id } = req.params;
 
-        const cache = new Cache();
-
         await deleteAllProducts({ team_id });
         await deleteTeam({ team_id, user_id: req.userId });
 
-        await cache.invalidade(`team_products:${team_id}`);
-        await cache.invalidade(`team_users:${team_id}`);
+        const cache = new Cache();
+        await cache.invalidadeTeamCache(team_id);
+
+        await deleteTeamFromS3(team_id);
 
         return res.status(204).send();
     }
