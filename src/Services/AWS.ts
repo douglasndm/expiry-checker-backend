@@ -133,4 +133,6 @@ export {
     uploadToS3,
     removeProductImageFromS3,
     removeManyImages,
+    s3,
+    bucket,
 };
