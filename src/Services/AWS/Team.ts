@@ -3,7 +3,7 @@ import AppError from '@errors/AppError';
 import { s3, bucket } from '../AWS';
 
 async function deleteTeamFromS3(team_id: string): Promise<void> {
-    const path = `teams/${team_id}}`;
+    const path = `teams/${team_id}`;
 
     try {
         const listParams = {
@@ -16,12 +16,6 @@ async function deleteTeamFromS3(team_id: string): Promise<void> {
         if (!listedObjects.Contents || listedObjects.Contents.length === 0)
             return;
 
-        interface DeleteObjects {
-            Objects: {
-                Key: string;
-            };
-        }
-
         const deleteParams = {
             Bucket: bucket,
             Delete: { Objects: [] },
@@ -33,7 +27,9 @@ async function deleteTeamFromS3(team_id: string): Promise<void> {
 
         await s3.deleteObjects(deleteParams).promise();
 
-        if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+        if (listedObjects.IsTruncated) {
+            await deleteTeamFromS3(team_id);
+        }
     } catch (error) {
         if (error instanceof Error) {
             throw new AppError({
