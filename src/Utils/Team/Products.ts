@@ -81,7 +81,8 @@ async function getProductsFromTeam(
         ]);
 
     if (sortByBatches) {
-        query.orderBy('batches.exp_date', 'ASC');
+        query.orderBy('batches.status', 'DESC');
+        query.addOrderBy('batches.exp_date', 'ASC');
     }
 
     if (search !== undefined && search.trim() !== '') {
