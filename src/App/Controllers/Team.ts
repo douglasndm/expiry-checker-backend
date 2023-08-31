@@ -69,6 +69,7 @@ class TeamController {
                 ...p,
                 brand: p.brand?.id,
                 category: p.category ? p.category.category : null,
+                categories: p.category ? [p.category?.category] : [],
             };
         });
 
