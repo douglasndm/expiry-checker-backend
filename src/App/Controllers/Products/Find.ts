@@ -30,8 +30,9 @@ class FindProductsController {
         const products = await getProductsFromTeam({
             team_id,
             user_id: user.id,
-            removeCheckedBatches: Boolean(removeCheckedBatches),
-            sortByBatches: Boolean(sortByBatches),
+            // removeCheckedBatches: removeCheckedBatches === 'true',
+            removeCheckedBatches: false,
+            sortByBatches: sortByBatches === 'true',
             search: String(search),
         });
 

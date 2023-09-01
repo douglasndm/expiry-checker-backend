@@ -31,6 +31,7 @@ routes.post('/join', TeamUsers.store);
 routes.use(checkIfUserIsPending);
 
 routes.get('/users', TeamUsers.index);
+routes.delete('/user', UserTeam.delete);
 
 routes.delete('/manager/user/:user_id', ManagerChecker, UserManager.delete);
 
