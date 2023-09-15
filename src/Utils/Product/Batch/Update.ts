@@ -79,6 +79,17 @@ async function updateBatch({
     await cache.invalidade(`team_products:${team.id}`);
     await cache.invalidade(`product:${team.id}:${batch.product.id}`);
 
+    if (batch.product.brand) {
+        await cache.invalidade(
+            `brand_products:${team.id}:${batch.product.brand.id}`,
+        );
+    }
+
+    if (batch.product.category) {
+        await cache.invalidade(
+            `category_products:${team.id}:${batch.product.category.category.id}`,
+        );
+    }
     if (batch.product.store) {
         await cache.invalidade(
             `store_products:${team.id}:${batch.product.store.id}`,
