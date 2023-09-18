@@ -1,7 +1,8 @@
 import { getRepository } from 'typeorm';
 
-import Team from '@models/Team';
 import UserRoles from '@models/UserRoles';
+
+import { deleteTeam } from '@utils/Team/Delete';
 
 import Cache from '@services/Cache';
 
@@ -43,10 +44,9 @@ export async function removeUserFromAllTeams({
     );
 
     // Apagar os times nos quais o usuário é o gerente
-    const teamsToDelete = managersTeams.map(userRoles => userRoles.team);
-
-    const teamRepository = getRepository(Team);
-    await teamRepository.remove(teamsToDelete);
+    if (managersTeams.length > 0) {
+        await deleteTeam(managersTeams[0].team.id);
+    }
 
     // Remove o usuário de todos os times dos quais ele não é gerente
     await userTeamsRepository.remove(notManagersTeams);
