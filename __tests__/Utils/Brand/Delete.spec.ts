@@ -1,7 +1,8 @@
 import User from '@models/User';
 import Team from '@models/Team';
 
-import { createBrand, deleteBrand } from '@utils/Brand';
+import { deleteBrand } from '@utils/Brands/Delete';
+import { createBrand } from '@utils/Brand';
 
 import AppError from '@errors/AppError';
 
