@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { parseISO, isValid, endOfDay } from 'date-fns';
 
-import Cache from '@services/Cache';
 import BackgroundJob from '@services/Background';
 
 import Batch from '@models/Batch';
@@ -11,6 +10,8 @@ import { findBatchById } from '@utils/Product/Batch/Find';
 import { createBatch } from '@utils/Product/Batch/Create';
 import { updateBatch } from '@utils/Product/Batch/Update';
 import { getUserRoleInTeam } from '@utils/UserRoles';
+import { deleteBatch } from '@utils/Product/Batch/Delete';
+
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
 
@@ -181,28 +182,9 @@ class BatchController {
             });
         }
 
-        const cache = new Cache();
-
         const { batch_id } = req.params;
 
-        const batchReposity = getRepository(Batch);
-
-        const batch = await batchReposity
-            .createQueryBuilder('batch')
-            .leftJoinAndSelect('batch.product', 'product')
-            .leftJoinAndSelect('product.store', 'store')
-            .leftJoinAndSelect('product.team', 'prodTeam')
-            .leftJoinAndSelect('prodTeam.team', 'team')
-            .where('batch.id = :batch_id', { batch_id })
-            .getOne();
-
-        if (!batch) {
-            throw new AppError({
-                message: 'Batch was not found',
-                statusCode: 400,
-                internalErrorCode: 9,
-            });
-        }
+        const batch = await findBatchById(batch_id);
 
         const team = await getProductTeam(batch.product);
 
@@ -228,15 +210,7 @@ class BatchController {
             });
         }
 
-        await cache.invalidade(`team_products:${team.id}`);
-        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
-
-        if (batch.product.store) {
-            await cache.invalidade(
-                `store_products:${team.id}:${batch.product.store.id}`,
-            );
-        }
-        await batchReposity.remove(batch);
+        await deleteBatch(batch_id);
 
         return res.status(204).send();
     }
