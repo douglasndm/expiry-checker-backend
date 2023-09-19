@@ -1,7 +1,6 @@
 import { getRepository } from 'typeorm';
 
 import UserRoles from '@models/UserRoles';
-import Team from '@models/Team';
 import User from '@models/User';
 
 import { getTeamFromUser } from '@utils/User/Team';
@@ -48,6 +47,13 @@ async function addUserToTeam({
         const team = await getTeamFromUser(user_id);
 
         if (team) {
+            if (team.team.id === team_id) {
+                throw new AppError({
+                    message: 'User is already into team',
+                    statusCode: 400,
+                    internalErrorCode: 23,
+                });
+            }
             throw new AppError({
                 message: 'User is in another team',
                 internalErrorCode: 30,
@@ -71,7 +77,6 @@ async function addUserToTeam({
     }
     // #endregion
 
-    const teamRepository = getRepository(Team);
     const userRepository = getRepository(User);
 
     const team = await getTeamById(team_id);
