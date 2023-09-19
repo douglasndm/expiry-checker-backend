@@ -56,7 +56,20 @@ describe('List of brands proccess', () => {
         const allBrands = await getAllBrands({ team_id: team.id });
 
         expect(allBrands).toEqual(
-            expect.arrayContaining([brand1, brand2, brand3]),
+            expect.arrayContaining([
+                {
+                    id: brand1.id,
+                    name: brand1.name,
+                },
+                {
+                    id: brand2.id,
+                    name: brand2.name,
+                },
+                {
+                    id: brand3.id,
+                    name: brand3.name,
+                },
+            ]),
         );
     });
 });
