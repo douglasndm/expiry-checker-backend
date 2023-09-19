@@ -1,11 +1,11 @@
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import Cache from '@services/Cache';
-
 import Batch from '@models/Batch';
 
 import { findProductById } from '@utils/Product/Find';
+import { clearProductCache } from '@utils/Cache/Product';
+
 import { getProductTeam } from '@functions/Product/Team';
 
 import AppError from '@errors/AppError';
@@ -59,13 +59,7 @@ async function createBatch({
 
     const team = await getProductTeam(product);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_products:${team.id}`);
-    await cache.invalidade(`product:${team.id}:${product_id}`);
-
-    if (product.store) {
-        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
-    }
+    await clearProductCache(product.id);
 
     return createdBatch;
 }
