@@ -6,12 +6,11 @@ import Product from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
 import Store from '@models/Store';
 
+import { isProductDuplicate } from '@utils/Product/FindDuplicate';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
 import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getAllBrands } from '@utils/Brand';
 import { getUserStoreOnTeam } from '@utils/Stores/Team';
-
-import { checkIfProductAlreadyExists } from '@functions/Products';
 
 import AppError from '@errors/AppError';
 
@@ -68,8 +67,7 @@ async function createProduct({
     }
     /*
 
-    const productAlreadyExists = await checkIfProductAlreadyExists({
-        name,
+    const productAlreadyExists = await isProductDuplicate({
         code,
         team_id,
         store_id: store_id || userStore?.id,
