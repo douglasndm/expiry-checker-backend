@@ -6,8 +6,8 @@ import User from '@models/User';
 
 import AppError from '@errors/AppError';
 
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Create of batch process', () => {
     let user: User | null = null;

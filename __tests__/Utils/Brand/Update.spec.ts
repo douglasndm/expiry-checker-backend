@@ -7,8 +7,8 @@ import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Update of brand proccess', () => {
     let user: User | null = null;
