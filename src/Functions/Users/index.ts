@@ -4,7 +4,8 @@ import User from '@models/User';
 
 import { removeUserFromAllTeams } from '@functions/Users/Teams';
 
-import AppError from '@errors/AppError';
+import { getUserByFirebaseId } from '@utils/User/Find';
+import { deleteUser as deleteU } from '@utils/User/Delete';
 
 // #region
 interface deleteUserProps {
@@ -15,20 +16,8 @@ export async function deleteUser({ user_id }: deleteUserProps): Promise<void> {
 
     await removeUserFromAllTeams({ user_id });
 
-    const user = await userRepository.findOne({
-        where: {
-            firebaseUid: user_id,
-        },
-    });
+    const user = await getUserByFirebaseId(user_id);
 
-    if (!user) {
-        throw new AppError({
-            message: 'User not found',
-            statusCode: 400,
-            internalErrorCode: 7,
-        });
-    }
-
-    await userRepository.remove(user);
+    await deleteU(user.id);
 }
 // #endregion

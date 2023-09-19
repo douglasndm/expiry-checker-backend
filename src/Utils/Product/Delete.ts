@@ -49,4 +49,20 @@ async function deleteProduct(props: deleteProductProps): Promise<void> {
     await productRepository.remove(product);
 }
 
-export { deleteProduct };
+async function deleteAllProductsFromTeam(team_id: string): Promise<void> {
+    const productRepository = getRepository(Product);
+
+    const products = await productRepository
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.team', 'prodTeam')
+        .leftJoinAndSelect('prodTeam.team', 'team')
+        .where('team.id = :team_id', { team_id })
+        .getMany();
+
+    await productRepository.remove(products);
+
+    const cache = new Cache();
+    await cache.invalidadeTeamCache(team_id);
+}
+
+export { deleteProduct, deleteAllProductsFromTeam };
