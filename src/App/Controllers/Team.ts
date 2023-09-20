@@ -15,8 +15,6 @@ import { getUserByFirebaseId } from '@utils/User/Find';
 import { getTeamFromUser } from '@utils/User/Team';
 import { deleteTeam } from '@utils/Team/Delete';
 
-import { checkIfTeamIsActive } from '@functions/Team';
-
 import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
@@ -40,16 +38,6 @@ class TeamController {
         }
         const { team_id } = req.params;
         const { removeCheckedBatches, sortByBatches, page } = req.query;
-
-        const subscription = await checkIfTeamIsActive({ team_id });
-
-        if (!subscription) {
-            throw new AppError({
-                message: "Team doesn't have an active subscription",
-                statusCode: 401,
-                internalErrorCode: 5,
-            });
-        }
 
         const user = await getUserByFirebaseId(req.userId || '');
 

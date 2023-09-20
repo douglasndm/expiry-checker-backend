@@ -6,22 +6,6 @@ import AppError from '@errors/AppError';
 
 import { getAllUsersFromTeam } from './Users';
 
-interface checkIfTeamIsActiveProps {
-    team_id: string;
-}
-
-export async function checkIfTeamIsActive({
-    team_id,
-}: checkIfTeamIsActiveProps): Promise<boolean> {
-    try {
-        await getSubscription(team_id);
-
-        return true;
-    } catch (err) {
-        return false;
-    }
-}
-
 interface checkMembersLimitProps {
     team_id: string;
 }
