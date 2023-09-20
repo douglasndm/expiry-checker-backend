@@ -6,8 +6,6 @@ import Batch from '@models/Batch';
 import { findProductById } from '@utils/Product/Find';
 import { clearProductCache } from '@utils/Cache/Product';
 
-import { getProductTeam } from '@functions/Product/Team';
-
 import AppError from '@errors/AppError';
 
 interface createBatchProps {
@@ -56,8 +54,6 @@ async function createBatch({
     batch.product = product;
 
     const createdBatch = await batchReposity.save(batch);
-
-    const team = await getProductTeam(product);
 
     await clearProductCache(product.id);
 
