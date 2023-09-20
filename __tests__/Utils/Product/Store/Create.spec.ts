@@ -110,7 +110,6 @@ describe('Creation of a product with store', () => {
             expect(product.name).toBe('product with store no id');
             expect(product.store?.id).toBe(store.id);
         } catch (err) {
-            console.log(err);
             expect(false).toBeTruthy();
         }
     });
