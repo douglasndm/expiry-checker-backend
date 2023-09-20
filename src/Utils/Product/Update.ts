@@ -6,8 +6,8 @@ import Product from '@models/Product';
 
 import { getAllBrands } from '@utils/Brand';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
+import { removeCategoryFromProduct } from '@utils/Product/Category/Remove';
 
-import { removeAllCategoriesFromProduct } from '@functions/Category/Products';
 import { getProductTeam } from '@functions/Product/Team';
 import { getProduct } from '@functions/Product';
 
@@ -86,15 +86,11 @@ async function updateProduct({
     const updatedProduct = await productRepository.save(product);
 
     if (category_id === null) {
-        await removeAllCategoriesFromProduct({
-            product_id: updatedProduct.id,
-        });
+        await removeCategoryFromProduct(updatedProduct.id);
     }
 
     if (category_id) {
-        await removeAllCategoriesFromProduct({
-            product_id: updatedProduct.id,
-        });
+        await removeCategoryFromProduct(updatedProduct.id);
 
         const category = await findCategoryById(category_id);
 
