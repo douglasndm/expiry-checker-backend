@@ -12,8 +12,8 @@ import AppError from '@errors/AppError';
 
 import { createStore } from '@utils/Stores/Create';
 import { addUserToStore } from '@utils/Stores/Users';
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('User stores on team process', () => {
     let user: User | null = null;

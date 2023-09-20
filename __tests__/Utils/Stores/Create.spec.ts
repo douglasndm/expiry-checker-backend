@@ -7,8 +7,8 @@ import { addUserToTeam } from '@utils/Team/Roles/Create';
 
 import AppError from '@errors/AppError';
 
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Creation of store proccess', () => {
     let user: User | null = null;

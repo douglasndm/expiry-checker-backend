@@ -10,8 +10,8 @@ import { updateBatch } from '@utils/Product/Batch/Update';
 
 import AppError from '@errors/AppError';
 
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Update of a batch process', () => {
     let user: User | null = null;

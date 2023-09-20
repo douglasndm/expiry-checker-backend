@@ -1,82 +1,8 @@
-import { getRepository } from 'typeorm';
 import { compareAsc, parseISO } from 'date-fns';
 
-import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
 
 import { sortBatchesByExpDate } from '@utils/Product/Batch/Sort';
-
-interface checkIfProductAlreadyExistsProps {
-    name: string;
-    code?: string;
-    team_id: string;
-    store_id?: string;
-}
-
-export async function checkIfProductAlreadyExists({
-    name,
-    code,
-    team_id,
-    store_id,
-}: checkIfProductAlreadyExistsProps): Promise<boolean> {
-    const productTeamRepository = getRepository(ProductTeams);
-
-    if (code) {
-        const products = await productTeamRepository
-            .createQueryBuilder('prods')
-            .leftJoinAndSelect('prods.product', 'product')
-            .leftJoinAndSelect('prods.team', 'team')
-            .leftJoinAndSelect('product.store', 'store')
-            .where('product.code = :code', {
-                code,
-            })
-            .andWhere('team.id = :team_id', { team_id })
-            .getMany();
-
-        if (store_id) {
-            const exists = products.find(
-                prod => prod.product.store?.id === store_id,
-            );
-
-            if (exists) return true;
-            return false;
-        }
-
-        const productsWithoutStores = products.filter(
-            prod => !prod.product.store,
-        );
-
-        if (productsWithoutStores.length > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    const products = await productTeamRepository
-        .createQueryBuilder('prods')
-        .leftJoinAndSelect('prods.product', 'product')
-        .leftJoinAndSelect('prods.team', 'team')
-        .leftJoinAndSelect('product.store', 'store')
-        .where('LOWER(product.name) = LOWER(:product_name)', {
-            product_name: name.trim(),
-        })
-        .andWhere('team.id = :team_id', { team_id })
-        .getMany();
-
-    if (store_id) {
-        const exists = products.find(
-            prod => prod.product.store?.id === store_id,
-        );
-
-        if (exists) return true;
-        return false;
-    }
-
-    const productsWithoutStores = products.filter(prod => !prod.product.store);
-
-    return productsWithoutStores.length > 0;
-}
 
 export function sortProductsByBatchesExpDate(
     products: Array<Product>,

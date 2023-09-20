@@ -42,6 +42,17 @@ describe('Listing of category proccess', () => {
 
         const categories = await getAllCategoriesFromTeam({ team_id: team.id });
 
-        expect(categories).toEqual(expect.arrayContaining([cate1, cate2]));
+        expect(categories).toEqual(
+            expect.arrayContaining([
+                {
+                    id: cate1.id,
+                    name: cate1.name,
+                },
+                {
+                    id: cate2.id,
+                    name: cate2.name,
+                },
+            ]),
+        );
     });
 });

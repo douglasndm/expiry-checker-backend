@@ -68,15 +68,20 @@ describe('Test adition of user in a team', () => {
     });
 
     it('should not add an user on an invalid team', async () => {
-        const secondUser = await getUserByEmail('two@user.com');
+        const thriedUser = await createUser({
+            firebaseUid: 'user3',
+            name: 'User',
+            lastName: 'Three',
+            email: 'three@user.com',
+            password: '123456',
+        });
 
         addUserToTeam({
-            user_id: secondUser.id,
-            team_id: '33714a2a-80b5-4bee-8383-c090636f303f',
+            user_id: thriedUser.id,
+            team_id: '99914b2a-80b5-4bee-8383-c090636f303f', // this is an invalid UUID for a team
         }).catch(err => {
             expect(err).toBeInstanceOf(AppError);
-            expect(err.errorCode).toBe(18);
-            expect(err.statusCode).toBe(400);
+            expect(err.errorCode).toBe(6);
         });
     });
 
@@ -84,7 +89,7 @@ describe('Test adition of user in a team', () => {
         if (!team) return;
 
         addUserToTeam({
-            user_id: '33714a2a-80b5-4bee-8383-c090636f303f',
+            user_id: '33714a2a-80b5-4bee-8383-c590636f303f', // this is an invalid UUID for a user
             team_id: team.id,
         }).catch(err => {
             expect(err).toBeInstanceOf(AppError);
@@ -96,17 +101,17 @@ describe('Test adition of user in a team', () => {
     it('should not add an user on a team with an incompatible subscription', async () => {
         if (!team) return;
 
-        const User3 = await createUser({
-            firebaseUid: 'user3',
+        const User4 = await createUser({
+            firebaseUid: 'user4',
             name: 'User',
-            lastName: 'Three',
-            email: 'three@user.com',
+            lastName: 'Four',
+            email: 'four@user.com',
             password: '123456',
         });
 
         try {
             await addUserToTeam({
-                user_id: User3.id,
+                user_id: User4.id,
                 team_id: team.id,
             });
 

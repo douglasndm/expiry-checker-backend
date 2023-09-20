@@ -9,8 +9,8 @@ import {
 import AppError from '@errors/AppError';
 
 import { createUser } from '@utils/User/Create';
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Find user process', () => {
     let user: User | null = null;

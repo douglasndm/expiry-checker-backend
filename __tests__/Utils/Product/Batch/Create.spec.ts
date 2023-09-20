@@ -6,8 +6,8 @@ import User from '@models/User';
 
 import AppError from '@errors/AppError';
 
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Create of batch process', () => {
     let user: User | null = null;
@@ -59,7 +59,7 @@ describe('Create of batch process', () => {
         }
     });
 
-    it('should not create a batch with invalid product id', async () => {
+    it('should not create a batch with invalid product uuid', async () => {
         if (!team || !user) return;
 
         try {
@@ -78,6 +78,29 @@ describe('Create of batch process', () => {
 
             if (err instanceof AppError) {
                 expect(err.errorCode).toBe(8);
+            }
+        }
+    });
+
+    it('should not create a batch with invalid product id', async () => {
+        if (!team || !user) return;
+
+        try {
+            const exp_date = new Date();
+            await createBatch({
+                product_id: 'basaco apsodk1',
+                name: 'abc 123',
+                exp_date,
+                amount: 15,
+                price: 3.99,
+            });
+
+            expect(false).toBeTruthy();
+        } catch (err) {
+            expect(err).toBeInstanceOf(AppError);
+
+            if (err instanceof AppError) {
+                expect(err.errorCode).toBe(1);
             }
         }
     });

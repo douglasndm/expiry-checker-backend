@@ -55,7 +55,7 @@ async function removeUserFromAllStoresFromTeam({
         .createQueryBuilder('userRoles')
         .leftJoinAndSelect('userRoles.user', 'user')
         .leftJoinAndSelect('userRoles.team', 'team')
-        .leftJoinAndSelect('user.stores', 'storesUser')
+        .leftJoinAndSelect('user.store', 'storesUser')
         .leftJoinAndSelect('storesUser.store', 'store')
         .leftJoinAndSelect('store.team', 'teamStore')
         .where('team.id = :team_id', { team_id })

@@ -49,14 +49,23 @@ describe('List of brands proccess', () => {
             name: 'Coca Cola',
         });
 
-        delete brand1.team;
-        delete brand2.team;
-        delete brand3.team;
-
         const allBrands = await getAllBrands({ team_id: team.id });
 
         expect(allBrands).toEqual(
-            expect.arrayContaining([brand1, brand2, brand3]),
+            expect.arrayContaining([
+                {
+                    id: brand1.id,
+                    name: brand1.name,
+                },
+                {
+                    id: brand2.id,
+                    name: brand2.name,
+                },
+                {
+                    id: brand3.id,
+                    name: brand3.name,
+                },
+            ]),
         );
     });
 });

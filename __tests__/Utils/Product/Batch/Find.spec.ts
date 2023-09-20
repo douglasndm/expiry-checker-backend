@@ -9,8 +9,8 @@ import User from '@models/User';
 import AppError from '@errors/AppError';
 
 import { findBatchById } from '@utils/Product/Batch/Find';
-import connection from '~tests/Services/Database';
-import { setup } from '~tests/setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Find a batch process', () => {
     let user: User | null = null;

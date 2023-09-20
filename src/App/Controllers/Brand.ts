@@ -1,12 +1,8 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
-import {
-    createBrand,
-    deleteBrand,
-    getAllBrands,
-    updateBrand,
-} from '@utils/Brand';
+import { deleteBrand } from '@utils/Brands/Delete';
+import { createBrand, getAllBrands, updateBrand } from '@utils/Brand';
 import { getAllProductsFromBrand } from '@utils/Brands/Products';
 import { sortBrands } from '@utils/Brands/Sort';
 import { getUserByFirebaseId } from '@utils/User/Find';
