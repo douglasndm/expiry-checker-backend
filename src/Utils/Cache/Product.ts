@@ -4,7 +4,7 @@ import { findProductById } from '@utils/Product/Find';
 
 async function clearProductCache(product_id: string): Promise<void> {
     const product = await findProductById(product_id);
-    const { team } = product;
+    const { team } = product.team;
 
     const cache = new Cache();
     await cache.invalidade(`team_products:${team.id}`);

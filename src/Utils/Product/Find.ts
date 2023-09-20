@@ -24,7 +24,8 @@ async function findProductById(product_id: string): Promise<Product> {
     const productRepository = getRepository(Product);
     const product = await productRepository
         .createQueryBuilder('product')
-        .leftJoinAndSelect('product.team', 'team')
+        .leftJoinAndSelect('product.team', 'prodTeam')
+        .leftJoinAndSelect('prodTeam.team', 'team')
         .leftJoinAndSelect('product.store', 'store')
         .where('product.id = :product_id', { product_id })
         .getOne();
