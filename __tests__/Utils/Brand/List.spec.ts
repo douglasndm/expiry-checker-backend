@@ -49,10 +49,6 @@ describe('List of brands proccess', () => {
             name: 'Coca Cola',
         });
 
-        delete brand1.team;
-        delete brand2.team;
-        delete brand3.team;
-
         const allBrands = await getAllBrands({ team_id: team.id });
 
         expect(allBrands).toEqual(

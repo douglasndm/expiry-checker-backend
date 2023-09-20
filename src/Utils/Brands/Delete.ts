@@ -27,12 +27,6 @@ async function deleteBrand({
             internalErrorCode: 32,
         });
     }
-    if (!brand.team) {
-        throw new AppError({
-            message: 'Team not found',
-            internalErrorCode: 6,
-        });
-    }
 
     const userRole = await getUserRoleInTeam({
         user_id,

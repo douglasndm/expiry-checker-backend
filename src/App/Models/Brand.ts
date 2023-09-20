@@ -20,7 +20,7 @@ export default class Brand {
 
     @ManyToOne(() => Team, team => team.brands)
     @JoinColumn({ name: 'team_id' })
-    team?: Team;
+    team: Team;
 
     @CreateDateColumn()
     created_at: Date;

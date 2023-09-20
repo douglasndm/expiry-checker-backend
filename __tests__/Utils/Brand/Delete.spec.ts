@@ -1,8 +1,10 @@
 import User from '@models/User';
 import Team from '@models/Team';
 
+import { createUser } from '@utils/User/Create';
 import { deleteBrand } from '@utils/Brands/Delete';
 import { createBrand } from '@utils/Brand';
+import { addUserToTeam } from '@utils/Team/Roles/Create';
 
 import AppError from '@errors/AppError';
 
@@ -62,6 +64,44 @@ describe('Delete of brand proccess', () => {
 
             if (err instanceof AppError) {
                 expect(err.errorCode).toBe(32);
+            }
+        }
+    });
+
+    it('should not delete a brand if user is not manager or supervisor', async () => {
+        if (!team || !user) return;
+
+        const newUser = await createUser({
+            firebaseUid: 'user2',
+            name: 'User',
+            lastName: 'Two',
+            email: 'two@user.com',
+            password: '123456',
+        });
+
+        await addUserToTeam({
+            user_id: newUser.id,
+            team_id: team.id,
+        });
+
+        const brand = await createBrand({
+            team_id: team.id,
+            user_id: user.id,
+            name: 'Pespisco',
+        });
+
+        try {
+            await deleteBrand({
+                brand_id: brand.id,
+                user_id: newUser.id,
+            });
+
+            expect(true).toBe(false);
+        } catch (err) {
+            expect(err).toBeInstanceOf(AppError);
+
+            if (err instanceof AppError) {
+                expect(err.errorCode).toBe(2);
             }
         }
     });
