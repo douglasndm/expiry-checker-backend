@@ -12,11 +12,10 @@ import { deleteTeamFromS3 } from '@services/AWS/Team';
 import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
-import { getTeamById } from '@utils/Team/Find';
 import { getTeamFromUser } from '@utils/User/Team';
+import { deleteTeam } from '@utils/Team/Delete';
 
-import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
-import { deleteAllProducts } from '@functions/Team/Products';
+import { checkIfTeamIsActive } from '@functions/Team';
 
 import Team from '@models/Team';
 
@@ -195,8 +194,7 @@ class TeamController {
 
         const { team_id } = req.params;
 
-        await deleteAllProducts({ team_id });
-        await deleteTeam({ team_id, user_id: req.userId });
+        await deleteTeam(team_id);
 
         const cache = new Cache();
         await cache.invalidadeTeamCache(team_id);
