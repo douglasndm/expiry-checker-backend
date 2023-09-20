@@ -23,13 +23,11 @@ async function checkIfUserIsOnTeam({
     return false;
 }
 
-interface getAllUsersFromTeamWithDevices {
-    team_id: string;
-}
-
-async function getAllUsersFromTeamWithDevices({
-    team_id,
-}: getAllUsersFromTeamWithDevices): Promise<User[]> {
+// user devices has the token to send a notification for user
+// so this is used to send a notification for a team
+async function getAllUsersFromTeamWithDevices(
+    team_id: string,
+): Promise<User[]> {
     const userRepository = getRepository(User);
 
     const users = await userRepository

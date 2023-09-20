@@ -58,9 +58,7 @@ async function batchNotification({
         });
     }
 
-    const users = await getAllUsersFromTeamWithDevices({
-        team_id: team.id,
-    });
+    const users = await getAllUsersFromTeamWithDevices(team.id);
 
     const messages: ITokenMessagePush[] = [];
 
