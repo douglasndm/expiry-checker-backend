@@ -1,9 +1,15 @@
 import Cache from '@services/Cache';
 
-import { findProductById } from '@utils/Product/Find';
+import { getProductById } from '@utils/Product/Get';
 
 async function clearProductCache(product_id: string): Promise<void> {
-    const product = await findProductById(product_id);
+    const product = await getProductById({
+        product_id,
+        includeBrand: true,
+        includeCategory: true,
+        includeStore: true,
+    });
+
     const { team } = product.team;
 
     const cache = new Cache();
