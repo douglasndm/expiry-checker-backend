@@ -15,7 +15,7 @@ class ProductTeams {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => Product, product => product.team)
+    @OneToOne(() => Product, product => product.team, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'product_id' })
     product: Product;
 

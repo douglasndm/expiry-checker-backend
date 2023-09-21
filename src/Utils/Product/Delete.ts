@@ -5,6 +5,7 @@ import Product from '@models/Product';
 import Cache from '@services/Cache';
 import { removeProductImageFromS3 } from '@services/AWS';
 
+import { clearProductCache } from '@utils/Cache/Product';
 import { getProductById } from './Get';
 
 interface deleteProductProps {
@@ -19,25 +20,9 @@ async function deleteProduct(props: deleteProductProps): Promise<void> {
         includeStore: true,
     });
 
-    const cache = new Cache();
+    await clearProductCache(product.id);
 
     const { team } = product.team;
-
-    if (product.brand) {
-        await cache.invalidade(`brand_products:${team.id}:${product.brand.id}`);
-    }
-    if (product.category) {
-        await cache.invalidade(
-            `category_products:${team.id}:${product.category.category.id}`,
-        );
-    }
-    if (product.store) {
-        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
-    }
-
-    await cache.invalidade(`team_products:${team.id}`);
-    await cache.invalidade(`product:${team.id}:${product.id}`);
-
     if (product.image) {
         removeProductImageFromS3({
             fileName: product.image,
