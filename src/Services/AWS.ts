@@ -70,6 +70,7 @@ function removeProductImageFromS3({
 }
 
 function removeManyImages(files: string[], team_id: string): void {
+    if (files.length <= 0) return; // this fixes "The XML you provided was not well-formed or did not validate against our published schema" from aws sdk
     const path = `teams/${team_id}/products/`;
 
     try {
