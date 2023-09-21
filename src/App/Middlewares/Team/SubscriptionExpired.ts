@@ -16,7 +16,7 @@ async function subscriptionExpiredCheck(
     if (expired) {
         throw new AppError({
             message: 'Subscription is expired',
-            statusCode: 429,
+            statusCode: 402,
             internalErrorCode: 5,
         });
     }
