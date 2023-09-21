@@ -34,7 +34,9 @@ export default class Product {
     @JoinColumn({ name: 'brand_id' })
     brand?: Brand | null;
 
-    @OneToOne(() => ProductCategory, prodCat => prodCat.product)
+    @OneToOne(() => ProductCategory, prodCat => prodCat.product, {
+        onDelete: 'CASCADE',
+    })
     category?: ProductCategory;
 
     @OneToMany(() => Batch, batch => batch.product)
