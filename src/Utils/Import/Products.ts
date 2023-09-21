@@ -8,13 +8,17 @@ import Batch from '@models/Batch';
 import ProductCategory from '@models/ProductCategory';
 
 import { createManyBrands } from '@utils/Brands/CreateMany';
-import { createManyCategories } from '@utils/Categories/CreateMany';
+import {
+    createManyCategories,
+    createManyProductCategories,
+} from '@utils/Categories/CreateMany';
 import { createManyStores } from '@utils/Stores/CreateMany';
 import { getAllBrands } from '@utils/Brand';
 import { getAllCategoriesFromTeam } from '@utils/Categories/List';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
 import { getTeamById } from '@utils/Team/Find';
 import { createManyProducts } from '@utils/Product/CreateMany';
+import { createManyBatches } from '@utils/Batches/CreateMany';
 
 interface IBackupFile {
     brands: IBaseAppBrand[];
@@ -56,6 +60,9 @@ async function importProducts(
 
     const team = await getTeamById(team_id);
 
+    const prodCategories: ProductCategory[] = [];
+    const batchesToCreate: Batch[] = [];
+
     const productsToCreate = products.map(prod => {
         const product = new Product();
         product.name = prod.name;
@@ -90,6 +97,8 @@ async function importProducts(
                     productCategory.category = newCategory;
 
                     product.category = productCategory;
+
+                    prodCategories.push(productCategory);
                 }
             }
         }
@@ -127,6 +136,8 @@ async function importProducts(
             newBatch.created_at = parseISO(batch.created_at || date);
             newBatch.updated_at = parseISO(batch.updated_at || date);
 
+            batchesToCreate.push(newBatch);
+
             return newBatch;
         });
 
@@ -140,6 +151,9 @@ async function importProducts(
         products: productsToCreate,
         team_id,
     });
+
+    await createManyProductCategories(prodCategories);
+    await createManyBatches(batchesToCreate);
 
     const cache = new Cache();
     await cache.invalidadeTeamCache(team_id);

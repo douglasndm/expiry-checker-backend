@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import Cache from '@services/Cache';
 
 import Category from '@models/Category';
+import ProductCategory from '@models/ProductCategory';
 
 import { getAllCategoriesFromTeam } from '@utils/Categories/List';
 import { getTeamById } from '@utils/Team/Find';
@@ -49,4 +50,13 @@ async function createManyCategories(
     return createdCategories;
 }
 
-export { createManyCategories };
+async function createManyProductCategories(
+    prodCategories: ProductCategory[],
+): Promise<ProductCategory[]> {
+    const repository = getRepository(ProductCategory);
+    const createdCategories = await repository.save(prodCategories);
+
+    return createdCategories;
+}
+
+export { createManyCategories, createManyProductCategories };
