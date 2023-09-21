@@ -54,7 +54,6 @@ class TeamController {
         const fixedCategories = products.map(p => {
             return {
                 ...p,
-                brand: p.brand?.id,
                 category: p.category ? p.category.category : null,
                 categories: p.category ? [p.category?.category] : [],
             };

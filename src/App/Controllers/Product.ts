@@ -19,14 +19,6 @@ import AppError from '@errors/AppError';
 
 class ProductController {
     async index(req: Request, res: Response): Promise<Response> {
-        if (!req.userId) {
-            throw new AppError({
-                message: 'Provide the user id',
-                statusCode: 401,
-                internalErrorCode: 2,
-            });
-        }
-
         const { product_id, team_id } = req.params;
 
         const product = await getProduct({
@@ -47,7 +39,6 @@ class ProductController {
 
         const productWithFixCat = {
             ...product,
-            brand: product.brand?.id,
             category: product.category?.category,
             thumbnail,
         };
