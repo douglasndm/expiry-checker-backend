@@ -1,29 +1,40 @@
-interface CVBatch {
+interface BaseAppBatch {
     id: number;
     name: string;
     exp_date: string;
     amount: number;
     price: number;
+    price_tmp?: number;
     status: 'Tratado' | 'Não tratado';
+    created_at?: string;
+    updated_at?: string;
 }
 
-interface CVProduct {
+interface BaseAppProduct {
     id: number;
     name: string;
     code?: string;
-    brand?: string;
+    daysToBeNext?: number;
     photo?: string;
+    brand?: string;
+    category?: string;
     store?: string;
-    categories: Array<string>;
-    batches: Array<CVBatch>;
+    created_at?: string;
+    updated_at?: string;
+    batches: Array<BaseAppBatch>;
 }
 
-interface CVCategory {
+interface BaseAppCategory {
     id: string;
     name: string;
 }
 
-interface ICVBrand {
+interface IBaseAppBrand {
+    id: string;
+    name: string;
+}
+
+interface IBaseAppStore {
     id: string;
     name: string;
 }
