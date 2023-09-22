@@ -12,11 +12,8 @@ import { deleteTeamFromS3 } from '@services/AWS/Team';
 import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
 import { getUserByFirebaseId } from '@utils/User/Find';
-import { getTeamById } from '@utils/Team/Find';
 import { getTeamFromUser } from '@utils/User/Team';
-
-import { checkIfTeamIsActive, deleteTeam } from '@functions/Team';
-import { deleteAllProducts } from '@functions/Team/Products';
+import { deleteTeam } from '@utils/Team/Delete';
 
 import Team from '@models/Team';
 
@@ -42,16 +39,6 @@ class TeamController {
         const { team_id } = req.params;
         const { removeCheckedBatches, sortByBatches, page } = req.query;
 
-        const subscription = await checkIfTeamIsActive({ team_id });
-
-        if (!subscription) {
-            throw new AppError({
-                message: "Team doesn't have an active subscription",
-                statusCode: 401,
-                internalErrorCode: 5,
-            });
-        }
-
         const user = await getUserByFirebaseId(req.userId || '');
 
         const pg = Number(page) <= 0 ? 0 : Number(page);
@@ -67,7 +54,6 @@ class TeamController {
         const fixedCategories = products.map(p => {
             return {
                 ...p,
-                brand: p.brand?.id,
                 category: p.category ? p.category.category : null,
                 categories: p.category ? [p.category?.category] : [],
             };
@@ -195,8 +181,7 @@ class TeamController {
 
         const { team_id } = req.params;
 
-        await deleteAllProducts({ team_id });
-        await deleteTeam({ team_id, user_id: req.userId });
+        await deleteTeam(team_id);
 
         const cache = new Cache();
         await cache.invalidadeTeamCache(team_id);

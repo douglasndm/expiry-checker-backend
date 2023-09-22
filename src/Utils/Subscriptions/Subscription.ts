@@ -82,7 +82,7 @@ function handleMembersLimit(
     };
 }
 
-// return true while expired
+// return true when expired
 function checkExpiredSubscription(expire_date: Date): boolean {
     const date = endOfDay(expire_date);
     const today = endOfDay(new Date());

@@ -31,7 +31,7 @@ export default class Batch {
     status: 'checked' | 'unchecked';
 
     @Column('money', { name: 'tmp_price' })
-    price_tmp: number;
+    price_tmp: number | null;
 
     @ManyToOne(() => Product, product => product.batches)
     @JoinColumn({ name: 'product_id' })

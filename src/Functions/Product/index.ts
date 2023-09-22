@@ -6,7 +6,6 @@ import { sortBatchesByExpDate } from '@utils/Product/Batch/Sort';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
-import ProductCategory from '@models/ProductCategory';
 
 import AppError from '@errors/AppError';
 

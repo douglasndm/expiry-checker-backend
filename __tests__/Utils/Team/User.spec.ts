@@ -4,8 +4,8 @@ import Team from '@models/Team';
 import { createUser } from '@utils/User/Create';
 import { checkIfUserIsOnTeam } from '@utils/Team/Users';
 
-import connection from '../../Services/Database';
-import { setup } from '../../setup';
+import connection from '@tests/Services/Database';
+import { setup } from '@tests/setup';
 
 describe('Test of user in a team', () => {
     let user: User | null = null;

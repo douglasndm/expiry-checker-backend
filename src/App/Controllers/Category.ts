@@ -7,23 +7,11 @@ import { updateCategory } from '@utils/Categories/Update';
 import { deleteCategory } from '@utils/Categories/Delete';
 import { sortCategories } from '@utils/Categories/Sort';
 
-import { checkIfTeamIsActive } from '@functions/Team';
-
 import AppError from '@errors/AppError';
 
 class CategoryController {
     async index(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
-
-        const subscription = await checkIfTeamIsActive({ team_id });
-
-        if (!subscription) {
-            throw new AppError({
-                message: "Team doesn't have an active subscription",
-                statusCode: 402,
-                internalErrorCode: 5,
-            });
-        }
 
         const categories = await getAllCategoriesFromTeam({ team_id });
 
