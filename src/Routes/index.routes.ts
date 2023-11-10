@@ -48,8 +48,6 @@ routes.delete('/users', User.delete);
 
 routes.get('/user/teams', UserTeams.index);
 
-routes.use('/batches', batchRoutes);
-
 routes.post('/team', Team.store);
 routes.use('/team/:team_id', teamRoutes);
 

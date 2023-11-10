@@ -55,7 +55,6 @@ class TeamController {
             return {
                 ...p,
                 category: p.category ? p.category.category : null,
-                categories: p.category ? [p.category?.category] : [],
             };
         });
 
