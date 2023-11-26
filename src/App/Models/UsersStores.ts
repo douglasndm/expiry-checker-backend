@@ -15,7 +15,7 @@ class UserStores {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => User, user => user.roles)
+    @ManyToOne(() => User, user => user.role)
     @JoinColumn({ name: 'user_id' })
     user: User;
 

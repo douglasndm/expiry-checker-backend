@@ -6,7 +6,7 @@ import AppError from '@errors/AppError';
 
 import { getAllUsersFromTeam, UserResponse } from '@functions/Team/Users';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 
 import Cache from '@services/Cache';
 
@@ -67,7 +67,7 @@ class TeamUsersController {
 
         const cache = new Cache();
 
-        const userRolesRepositoy = getRepository(UserRoles);
+        const userRolesRepositoy = getRepository(UserTeam);
         const roles = await userRolesRepositoy
             .createQueryBuilder('userRoles')
             .leftJoinAndSelect('userRoles.team', 'team')

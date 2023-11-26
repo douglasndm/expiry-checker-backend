@@ -1,14 +1,14 @@
 import { getRepository } from 'typeorm';
 
 import Team from '@models/Team';
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import User from '@models/User';
 
 import AppError from '@errors/AppError';
 
 async function createTeam({ name, admin_id }: createTeamProps): Promise<Team> {
     const teamRepository = getRepository(Team);
-    const userRolesRepository = getRepository(UserRoles);
+    const userRolesRepository = getRepository(UserTeam);
     const userRepository = getRepository(User);
 
     const user = await userRepository.findOne({
@@ -67,7 +67,7 @@ async function createTeam({ name, admin_id }: createTeamProps): Promise<Team> {
 
     const savedTeam = await teamRepository.save(team);
 
-    const userRole = new UserRoles();
+    const userRole = new UserTeam();
     userRole.team = savedTeam;
     userRole.user = user;
     userRole.role = 'Manager';

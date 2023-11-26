@@ -8,7 +8,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import UserRoles from './UserRoles';
+import UserTeam from './UserTeam';
 import UserStore from './UsersStores';
 import UserLogin from './UserLogin';
 import UserLogs from './UserLogs';
@@ -33,8 +33,8 @@ export default class User {
     @Column()
     password?: string;
 
-    @OneToMany(() => UserRoles, userRoles => userRoles.user)
-    roles: Array<UserRoles>;
+    @OneToOne(() => UserTeam, userTeam => userTeam.user)
+    role: UserTeam;
 
     @OneToOne(() => UserStore, userStore => userStore.user)
     store: UserStore;

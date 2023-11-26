@@ -30,17 +30,17 @@ class UserController {
         const user = await repository
             .createQueryBuilder('user')
             .where('user.firebaseUid = :id', { id: req.userId })
-            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('user.role', 'role')
             .leftJoinAndSelect('user.store', 'userStore')
             .leftJoinAndSelect('userStore.store', 'store')
             .leftJoinAndSelect('user.login', 'login')
-            .leftJoinAndSelect('roles.team', 'team')
+            .leftJoinAndSelect('role.team', 'team')
             .leftJoinAndSelect('team.subscriptions', 'subscriptions')
             .select([
                 'user',
-                'roles.role',
-                'roles.code',
-                'roles.status',
+                'role.role',
+                'role.code',
+                'role.status',
 
                 'userStore',
                 'store.id',
@@ -71,12 +71,11 @@ class UserController {
             last_name: user.lastName,
         };
 
-        if (user.roles.length > 0) {
+        if (user.role) {
             organizedUser = {
                 ...organizedUser,
-                role: user.roles[0],
                 store:
-                    user.store && user.roles[0].role.toLowerCase() !== 'manager'
+                    user.store && user.role.role.toLowerCase() !== 'manager'
                         ? user.store.store
                         : null,
             };

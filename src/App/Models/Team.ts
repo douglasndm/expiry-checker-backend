@@ -13,7 +13,7 @@ import ProductTeams from './ProductTeams';
 import Store from './Store';
 import TeamSubscription from './TeamSubscription';
 import UserLogs from './UserLogs';
-import UserRoles from './UserRoles';
+import UserTeam from './UserTeam';
 
 @Entity({ name: 'teams' })
 export default class Team {
@@ -26,8 +26,8 @@ export default class Team {
     @OneToMany(() => Category, category => category.team)
     categories: Array<Category>;
 
-    @OneToMany(() => UserRoles, userRoles => userRoles.user)
-    users: Array<UserRoles>;
+    @OneToMany(() => UserTeam, userTeam => userTeam.user)
+    users: Array<UserTeam>;
 
     @OneToMany(() => ProductTeams, productTeams => productTeams.team)
     products: Array<ProductTeams>;

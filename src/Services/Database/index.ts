@@ -7,7 +7,7 @@ import Brand from '@models/Brand';
 import Team from '@models/Team';
 import Store from '@models/Store';
 import User from '@models/User';
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import ProductTeams from '@models/ProductTeams';
 import ProductCategory from '@models/ProductCategory';
 import TeamSubscriptions from '@models/TeamSubscription';
@@ -28,7 +28,7 @@ export const entities = [
     Team,
     Store,
     User,
-    UserRoles,
+    UserTeam,
     ProductTeams,
     ProductCategory,
     TeamSubscriptions,

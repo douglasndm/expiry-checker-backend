@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 
 import AppError from '@errors/AppError';
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import UserStores from '@models/UsersStores';
 
 async function getUserStoreOnTeam({
@@ -50,7 +50,7 @@ async function removeUserFromAllStoresFromTeam({
         });
     }
 
-    const userRolesRepository = getRepository(UserRoles);
+    const userRolesRepository = getRepository(UserTeam);
     const userRoles = await userRolesRepository
         .createQueryBuilder('userRoles')
         .leftJoinAndSelect('userRoles.user', 'user')

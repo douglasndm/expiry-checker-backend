@@ -32,9 +32,9 @@ async function getAllUsersFromTeamWithDevices(
 
     const users = await userRepository
         .createQueryBuilder('user')
-        .leftJoinAndSelect('user.roles', 'roles')
+        .leftJoinAndSelect('user.role', 'role')
         .leftJoinAndSelect('user.login', 'login')
-        .leftJoinAndSelect('roles.team', 'team')
+        .leftJoinAndSelect('role.team', 'team')
         .where('team.id = :team_id', { team_id })
         .getMany();
 
