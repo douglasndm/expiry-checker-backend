@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 
 import { deleteTeam } from '@utils/Team/Delete';
 
@@ -12,8 +12,8 @@ interface getAllTeamsUserIsProps {
 
 export async function getAllTeamsUserIs({
     user_id,
-}: getAllTeamsUserIsProps): Promise<Array<UserRoles>> {
-    const userTeamsRepository = getRepository(UserRoles);
+}: getAllTeamsUserIsProps): Promise<Array<UserTeam>> {
+    const userTeamsRepository = getRepository(UserTeam);
 
     const teams = await userTeamsRepository
         .createQueryBuilder('userTeams')
@@ -32,7 +32,7 @@ interface removeUserFromAllTeamsProps {
 export async function removeUserFromAllTeams({
     user_id,
 }: removeUserFromAllTeamsProps): Promise<void> {
-    const userTeamsRepository = getRepository(UserRoles);
+    const userTeamsRepository = getRepository(UserTeam);
 
     const teams = await getAllTeamsUserIs({ user_id });
 

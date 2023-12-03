@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import User from '@models/User';
 
 import { getTeamFromUser } from '@utils/User/Team';
@@ -23,11 +23,11 @@ async function addUserToTeam({
     user_id,
     team_id,
     bypassCode,
-}: addUserToTeamProps): Promise<UserRoles> {
-    const userRolesRepository = getRepository(UserRoles);
+}: addUserToTeamProps): Promise<UserTeam> {
+    const userRolesRepository = getRepository(UserTeam);
 
     const cache = new Cache();
-    const cachedUsers = await cache.get<Array<UserRoles>>(
+    const cachedUsers = await cache.get<Array<UserTeam>>(
         `team_users:${team_id}`,
     );
 
@@ -106,7 +106,7 @@ async function addUserToTeam({
         });
     }
 
-    const teamUser = new UserRoles();
+    const teamUser = new UserTeam();
     teamUser.user = user;
     teamUser.team = team;
     teamUser.role = 'Repositor';

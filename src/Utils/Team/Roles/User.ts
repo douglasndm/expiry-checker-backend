@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 
 import Cache from '@services/Cache';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 
 import { removeFromALlStores } from '@utils/Stores/Users';
 
@@ -20,7 +20,7 @@ async function updateRole({
     role,
     user_id,
     team_id,
-}: updateRoleProps): Promise<UserRoles> {
+}: updateRoleProps): Promise<UserTeam> {
     const fixedRole = role.toLowerCase().trim();
 
     if (
@@ -34,7 +34,7 @@ async function updateRole({
         });
     }
 
-    const roleRepository = getRepository(UserRoles);
+    const roleRepository = getRepository(UserTeam);
 
     const findedRole = await getUserRole({ user_id, team_id });
 
@@ -57,7 +57,7 @@ async function removeUser({
     user_id,
     team_id,
 }: removeUserProps): Promise<void> {
-    const roleRepository = getRepository(UserRoles);
+    const roleRepository = getRepository(UserTeam);
     const role = await getUserRole({ user_id, team_id });
 
     if (role.role.toLowerCase() === 'manager') {

@@ -4,19 +4,20 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import Team from './Team';
 import User from './User';
 
-@Entity({ name: 'users_team_relationship' })
-class UserRoles {
+@Entity({ name: 'users_teams' })
+class UserTeam {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, user => user.roles)
-    @JoinColumn({ name: 'user_id', referencedColumnName: 'firebaseUid' })
+    @OneToOne(() => User, user => user.role)
+    @JoinColumn({ name: 'user_id' })
     user: User;
 
     @ManyToOne(() => Team, team => team.users)
@@ -39,4 +40,4 @@ class UserRoles {
     updated_at: Date;
 }
 
-export default UserRoles;
+export default UserTeam;

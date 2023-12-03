@@ -34,11 +34,7 @@ class CategoryController {
                 });
         }
         const { name } = req.body;
-        let { team_id } = req.body; // shoulb be removed soon
-
-        if (!team_id) {
-            team_id = req.params.team_id;
-        }
+        const { team_id } = req.params;
 
         const savedCategory = await createCategory({
             name,

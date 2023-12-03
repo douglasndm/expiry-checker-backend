@@ -1,12 +1,12 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import User from '@models/User';
 
 import AppError from '@errors/AppError';
 
-export async function getAllUserRoles(): Promise<UserRoles[]> {
-    const userRolesRepository = getRepository(UserRoles);
+export async function getAllUserRoles(): Promise<UserTeam[]> {
+    const userRolesRepository = getRepository(UserTeam);
 
     const roles = await userRolesRepository
         .createQueryBuilder('roles')
@@ -25,7 +25,7 @@ export async function getUserRoleInTeam({
     user_id,
     team_id,
 }: getUserRoleInTeamProps): Promise<IRoles> {
-    const userRolesRepository = getRepository(UserRoles);
+    const userRolesRepository = getRepository(UserTeam);
 
     const roles = await userRolesRepository
         .createQueryBuilder('roles')
@@ -54,7 +54,7 @@ export async function getUserRoleInTeam({
 }
 
 export async function getTeamAdmin(team_id: string): Promise<User> {
-    const userRolesRepository = getRepository(UserRoles);
+    const userRolesRepository = getRepository(UserTeam);
 
     const users = await userRolesRepository
         .createQueryBuilder('roles')

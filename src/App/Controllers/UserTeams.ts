@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import TeamSubscription from '@models/TeamSubscription';
 
 import { getSubscription } from '@utils/Subscriptions/Subscription';
@@ -18,7 +18,7 @@ class UserTeams {
             });
         }
 
-        const userRolesRepo = getRepository(UserRoles);
+        const userRolesRepo = getRepository(UserTeam);
 
         const userRoles = await userRolesRepo
             .createQueryBuilder('userRoles')

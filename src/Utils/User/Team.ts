@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 
-async function getTeamFromUser(user_id: string): Promise<UserRoles | null> {
-    const roleRepository = getRepository(UserRoles);
+async function getTeamFromUser(user_id: string): Promise<UserTeam | null> {
+    const roleRepository = getRepository(UserTeam);
 
     const role = await roleRepository
         .createQueryBuilder('role')

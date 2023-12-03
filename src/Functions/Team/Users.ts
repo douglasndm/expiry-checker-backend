@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import Store from '@models/Store';
 
 import Cache from '@services/Cache';
@@ -27,16 +27,16 @@ export async function getAllUsersFromTeam({
 }: getAllUsersFromTeamProps): Promise<UserResponse[]> {
     const cache = new Cache();
 
-    const cachedUsers = await cache.get<Array<UserRoles>>(
+    const cachedUsers = await cache.get<Array<UserTeam>>(
         `team_users:${team_id}`,
     );
 
-    let usersFromTeam: Array<UserRoles> = [];
+    let usersFromTeam: Array<UserTeam> = [];
 
     if (cachedUsers) {
         usersFromTeam = cachedUsers;
     } else {
-        const userTeamsRepository = getRepository(UserRoles);
+        const userTeamsRepository = getRepository(UserTeam);
 
         const usersTeam = await userTeamsRepository
             .createQueryBuilder('usersTeam')

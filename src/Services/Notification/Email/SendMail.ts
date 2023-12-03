@@ -3,7 +3,7 @@ import { addDays, format, isBefore } from 'date-fns';
 import { getAllUsersIDAllowedToSendEmail } from '@services/Notification/Email';
 import BackgroundJob from '@services/Background';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 import Store from '@models/Store';
 
 import { getAllUserRoles } from '@utils/UserRoles';
@@ -28,7 +28,7 @@ async function sendMail(): Promise<void> {
     });
 
     // remove duplicades team before get all products
-    const teams: UserRoles[] = [];
+    const teams: UserTeam[] = [];
 
     filtedUsersTeams.forEach(item => {
         const alreadyInArray = teams.find(i => i.team.id === item.team.id);

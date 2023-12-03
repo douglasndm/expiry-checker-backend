@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 
 import AppError from '@errors/AppError';
 
@@ -12,8 +12,8 @@ interface getUserRoleProps {
 async function getUserRole({
     user_id,
     team_id,
-}: getUserRoleProps): Promise<UserRoles> {
-    const roleRepository = getRepository(UserRoles);
+}: getUserRoleProps): Promise<UserTeam> {
+    const roleRepository = getRepository(UserTeam);
 
     const findedRole = await roleRepository
         .createQueryBuilder('role')

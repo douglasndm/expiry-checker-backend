@@ -29,7 +29,7 @@ async function getAllUsersFromStore({
 
     const users = await userRepository
         .createQueryBuilder('user')
-        .leftJoinAndSelect('user.stores', 'usersStores')
+        .leftJoinAndSelect('user.store', 'usersStores')
         .leftJoinAndSelect('usersStores.store', 'store')
         .where('store.id = :store_id', { store_id })
         .select([
@@ -39,7 +39,6 @@ async function getAllUsersFromStore({
             'user.id',
             'user.name',
             'user.lastName',
-            'user.firebaseUid',
         ])
         .getMany();
 

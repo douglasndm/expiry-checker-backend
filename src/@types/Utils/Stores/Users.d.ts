@@ -10,7 +10,7 @@ interface getAllUsersFromStoreResponse {
     firebaseUid: string;
     email: string;
     password?: string | undefined;
-    roles: UserRoles[];
+    role: UserRole;
     created_at: Date;
     updated_at: Date;
 }

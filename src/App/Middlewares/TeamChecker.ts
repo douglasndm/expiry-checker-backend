@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import UserRoles from '@models/UserRoles';
+import UserTeam from '@models/UserTeam';
 
 import AppError from '@errors/AppError';
 
@@ -41,7 +41,7 @@ export async function checkIfUserIsPending(
         });
     }
 
-    const userRolesRepo = getRepository(UserRoles);
+    const userRolesRepo = getRepository(UserTeam);
 
     const { team_id } = req.params;
 

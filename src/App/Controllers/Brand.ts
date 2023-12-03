@@ -23,7 +23,6 @@ class BrandController {
     async store(req: Request, res: Response): Promise<Response> {
         const schema = Yup.object().shape({
             name: Yup.string().required(),
-            team_id: Yup.string().required().uuid(),
         });
 
         try {
@@ -35,7 +34,8 @@ class BrandController {
                 });
         }
 
-        const { name, team_id } = req.body;
+        const { name } = req.body;
+        const { team_id } = req.params;
 
         const user = await getUserByFirebaseId(req.userId || '');
 
