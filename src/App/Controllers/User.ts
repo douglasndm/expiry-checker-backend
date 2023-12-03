@@ -69,6 +69,7 @@ class UserController {
             email: user.email,
             name: user.name,
             last_name: user.lastName,
+            role: user.role,
         };
 
         if (user.role) {
