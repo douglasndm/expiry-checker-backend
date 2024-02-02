@@ -16,3 +16,6 @@ newrelic.js
 newrelic_agent.log
 
 *.pkg
+
+# Sentry Config File
+.sentryclirc

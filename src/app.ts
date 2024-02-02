@@ -11,7 +11,8 @@ import AppError from './Errors/AppError';
 
 import App from './start';
 
-if (process.env.DEV_MODE === 'false') {
+if (process.env.DEV_MODE !== 'true') {
+    console.log('Sentry is enabled');
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
     });

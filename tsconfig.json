@@ -9,6 +9,7 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "baseUrl": "./src",
+
         "paths": {
             "~types/*": ["@types/*"],
             "@tests/*": ["../__tests__/*"],
@@ -22,11 +23,19 @@
             "@jobs/*": ["Jobs/*"],
             "@errors/*": ["Errors/*"]
         },
+
         "types": ["jest"],
         "esModuleInterop": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": true,
+        "inlineSources": true,
+
+        // Set `sourceRoot` to  "/" to strip the build path prefix
+        // from generated source code references.
+        // This improves issue grouping in Sentry.
+        "sourceRoot": "/"
     }
 }
