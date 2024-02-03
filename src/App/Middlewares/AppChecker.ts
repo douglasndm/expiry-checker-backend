@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import admin from 'firebase-admin';
 
+import { firebaseApp, firebaseAppExpiryChecker } from '@services/Firebase';
+
 import AppError from '@errors/AppError';
 
 async function appChecker(
@@ -17,13 +19,21 @@ async function appChecker(
     }
 
     try {
-        await admin.appCheck().verifyToken(appCheckToken);
+        await admin.appCheck(firebaseApp).verifyToken(appCheckToken);
         return next();
     } catch (err) {
-        throw new AppError({
-            message: 'Invalid AppChecker ID',
-            statusCode: 401,
-        });
+        // If appCheck fails with the teams tokens, try with the expiry checker app
+        try {
+            await admin
+                .appCheck(firebaseAppExpiryChecker)
+                .verifyToken(appCheckToken);
+            return next();
+        } catch (error) {
+            throw new AppError({
+                message: 'Invalid AppChecker ID',
+                statusCode: 401,
+            });
+        }
     }
 }
 
