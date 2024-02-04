@@ -28,7 +28,7 @@ routes.use('/internal', internalRoutes);
 routes.get('/products/search', ProductSearch.index);
 // This is be removed very soon, waiting apple aproval
 
-routes.use(AppCheck);
+// routes.use(AppCheck);
 
 routes.post('/users', User.store);
 
