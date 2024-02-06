@@ -11,7 +11,7 @@ dotenv.config();
 const limiter = new RateLimiterRedis({
     storeClient: redisClient,
     keyPrefix: 'rateLimit',
-    points: 5,
+    points: 7,
     duration: 1,
     blockDuration: 10,
 });
