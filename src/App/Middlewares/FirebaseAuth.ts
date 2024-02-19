@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import * as admin from 'firebase-admin';
+import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 
-import { getUserByFirebaseId } from '@utils/User/Find';
+import { firebaseAppExpiryChecker } from '@services/Firebase';
 
 import AppError from '@errors/AppError';
 
@@ -14,9 +15,16 @@ export default async function checkFirebaseAuth(
         try {
             const [, token] = req.headers.authorization.split(' ');
 
-            const auth = admin.auth();
-            const verifyToken = await auth.verifyIdToken(token);
+            let verifyToken: DecodedIdToken | undefined;
 
+            // First try to login using base app firebase project
+            try {
+                const auth = admin.auth(firebaseAppExpiryChecker);
+                verifyToken = await auth.verifyIdToken(token);
+            } catch (error) {
+                const auth = admin.auth();
+                verifyToken = await auth.verifyIdToken(token);
+            }
             req.userId = verifyToken.uid;
             req.userEmail = verifyToken.email;
 
