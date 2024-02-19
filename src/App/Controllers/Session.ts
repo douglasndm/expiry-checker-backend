@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { compareAsc, endOfDay } from 'date-fns';
-import * as admin from 'firebase-admin';
 
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { registerDevice } from '@utils/User/Login';
@@ -44,12 +43,6 @@ class SessionController {
         if (req.headers.authorization) {
             try {
                 const device_id = req.headers.deviceid;
-                const [, token] = req.headers.authorization.split(' ');
-
-                const auth = admin.auth();
-                const verifyToken = await auth.verifyIdToken(token);
-
-                req.userId = verifyToken.uid;
 
                 const { firebaseToken } = req.body;
 
