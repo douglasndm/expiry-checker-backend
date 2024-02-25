@@ -5,7 +5,7 @@ const redisClient = new IORedis({
     port: Number(process.env.REDIS_PORT),
     password: process.env.REDIS_PASS || undefined,
 
-    maxRetriesPerRequest: null,
+    maxRetriesPerRequest: 30,
     enableReadyCheck: false,
 });
 
