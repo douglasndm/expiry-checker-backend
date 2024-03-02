@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import {
-    getExternalSubscriptionByTeamIdOrAdminId,
+    getExternalSubscriptionByTeamId,
     getSubscription,
 } from '@utils/Subscriptions/Subscription';
 import { deleteSubscription } from '@utils/Subscriptions/Delete';
@@ -26,9 +26,7 @@ class SubscriptionController {
     async storeData(req: Request, res: Response): Promise<Response> {
         const { team_id } = req.params;
 
-        const response = await getExternalSubscriptionByTeamIdOrAdminId(
-            team_id,
-        );
+        const response = await getExternalSubscriptionByTeamId(team_id);
 
         return res.json(response);
     }
