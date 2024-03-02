@@ -2,8 +2,6 @@ import { compareAsc, parseISO, endOfDay } from 'date-fns';
 
 import TeamSubscription from '@models/TeamSubscription';
 
-import { getTeamAdmin } from '@utils/UserRoles';
-
 import AppError from '@errors/AppError';
 
 import { getExternalSubscription } from './External';
@@ -96,27 +94,16 @@ function checkExpiredSubscription(expire_date: Date): boolean {
     return true;
 }
 
-async function getExternalSubscriptionByTeamIdOrAdminId(
-    id: string,
+async function getExternalSubscriptionByTeamId(
+    team_id: string,
 ): Promise<IRevenueCatSubscription[]> {
-    let externalSubscription = await getExternalSubscription(id);
+    const externalSubscription = await getExternalSubscription(team_id);
 
-    // Check if subscriptions object is empty for TEAM ID, if true
-    // check for subscription for the manager id
-    if (externalSubscription.length <= 0) {
-        const teamAdmin = await getTeamAdmin(id);
-
-        externalSubscription = await getExternalSubscription(
-            teamAdmin.firebaseUid,
-        );
-    }
     return externalSubscription;
 }
 
 async function getSubscription(team_id: string): Promise<TeamSubscription> {
-    let teamSubscription: TeamSubscription | null = null;
-
-    teamSubscription = await getTeamSubscription({ team_id });
+    const teamSubscription = await getTeamSubscription({ team_id });
 
     let isExpired = true;
 
@@ -125,8 +112,9 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
     }
 
     if (!teamSubscription || isExpired) {
-        const externalSubscription =
-            await getExternalSubscriptionByTeamIdOrAdminId(team_id);
+        const externalSubscription = await getExternalSubscriptionByTeamId(
+            team_id,
+        );
 
         const subscriptions = externalSubscription.map(sub =>
             handleMembersLimit(sub),
@@ -183,7 +171,7 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
 
         throw new AppError({
             statusCode: 402,
-            message: "Team or admin doesn't have an active subscription",
+            message: "Team doesn't have an active subscription",
             internalErrorCode: 5,
         });
     }
@@ -191,7 +179,7 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
     if (isExpired) {
         throw new AppError({
             statusCode: 402,
-            message: "Team or admin doesn't have an active subscription",
+            message: "Team doesn't have an active subscription",
             internalErrorCode: 5,
         });
     }
@@ -201,7 +189,7 @@ async function getSubscription(team_id: string): Promise<TeamSubscription> {
 
 export {
     getSubscription,
-    getExternalSubscriptionByTeamIdOrAdminId,
+    getExternalSubscriptionByTeamId,
     checkExpiredSubscription,
     handleMembersLimit,
 };
