@@ -1,6 +1,7 @@
 import { Redis as RedisClient } from 'ioredis';
 
 import { redisClient } from '@services/Redis';
+import { captureException } from '@services/ExceptionsHandler';
 
 // team_products:team_id
 // team_brands:team_id
@@ -24,6 +25,50 @@ export default class RedisCache {
     private client: RedisClient;
 
     constructor() {
+        // Enviando o comando INFO para obter informações sobre o servidor Redis
+        redisClient.info((err, info) => {
+            if (err || !info) {
+                console.error(
+                    'Erro ao recuperar informações do servidor Redis:',
+                    err,
+                );
+
+                if (err instanceof Error) {
+                    captureException(err);
+                }
+                return;
+            }
+
+            // Analisando as informações retornadas
+            const lines = info.split('\r\n');
+            let usedMemoryBytes = 0;
+
+            // Iterando sobre as linhas para encontrar a quantidade de memória usada
+            lines.forEach(line => {
+                if (line.startsWith('used_memory:')) {
+                    const parts = line.split(':');
+                    usedMemoryBytes = parseInt(parts[1]);
+                }
+            });
+
+            // Convertendo para MB
+            const usedMemoryMB = usedMemoryBytes / (1024 * 1024);
+
+            if (usedMemoryMB > 29) {
+                console.log(
+                    'Memória usada no Redis:',
+                    usedMemoryMB.toFixed(2),
+                    'MB',
+                );
+
+                console.log('Limpando cache do Redis');
+                redisClient.flushall();
+            }
+
+            // Fechando a conexão com o Redis
+            // redis.quit();
+        });
+
         this.client = redisClient;
     }
 
