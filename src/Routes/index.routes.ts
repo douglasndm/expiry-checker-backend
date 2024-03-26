@@ -11,6 +11,8 @@ import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
 import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
+import DeleteAll from '@controllers/BaseApp/DeleteAll';
+
 import AppCheck from '@middlewares/AppChecker';
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
@@ -39,6 +41,8 @@ routes.get('/product/image/:ean', ImageController.index);
 
 // from now on all routes need authentication
 routes.use(FirebaseAuth);
+
+routes.delete('/baseApp/allData', AppCheck, DeleteAll.delete);
 
 routes.post('/sessions', SessionController.store);
 
