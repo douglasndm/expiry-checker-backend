@@ -50,14 +50,27 @@ function handleMembersLimit(
     }
 
     // Revenuecat dashboard code
+    // second check if for stripe subscription id
     if (members <= 0) {
-        if (subscription.name.includes('TeamFor10')) {
+        if (
+            subscription.name.includes('TeamFor10') ||
+            subscription.name.includes('prod_KSPJXoR3vfGOr9')
+        ) {
             members = 10;
-        } else if (subscription.name.includes('TeamFor15')) {
+        } else if (
+            subscription.name.includes('TeamFor15') ||
+            subscription.name.includes('prod_KSPJVIjOEZaBXx')
+        ) {
             members = 15;
-        } else if (subscription.name.includes('TeamOf20')) {
+        } else if (
+            subscription.name.includes('TeamOf20') ||
+            subscription.name.includes('prod_Lro9sZhxM2Xpjr')
+        ) {
             members = 20;
-        } else if (subscription.name.includes('TeamWith30')) {
+        } else if (
+            subscription.name.includes('TeamWith30') ||
+            subscription.name.includes('prod_LuO5bR3QYbDFba')
+        ) {
             members = 30;
         } else if (subscription.name.includes('TeamWith45')) {
             members = 45;
@@ -65,11 +78,20 @@ function handleMembersLimit(
             members = 60;
         } else if (subscription.name.includes('TeamFor1')) {
             members = 1;
-        } else if (subscription.name.includes('TeamFor2')) {
+        } else if (
+            subscription.name.includes('TeamFor2') ||
+            subscription.name.includes('prod_KSPHJEAKRHe5fz')
+        ) {
             members = 2;
-        } else if (subscription.name.includes('TeamFor3')) {
+        } else if (
+            subscription.name.includes('TeamFor3') ||
+            subscription.name.includes('prod_KSPHMouTnhJD5a')
+        ) {
             members = 3;
-        } else if (subscription.name.includes('TeamFor5')) {
+        } else if (
+            subscription.name.includes('TeamFor5') ||
+            subscription.name.includes('prod_KSPIuuHORmjckQ')
+        ) {
             members = 5;
         }
     }
