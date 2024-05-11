@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 
@@ -8,9 +8,7 @@ async function getAllProductsFromBrand({
     brand_id,
     team_id,
 }: getAllProductsFromBrand): Promise<Product[]> {
-    const cache = new Cache();
-
-    let productsInBrand = await cache.get<Product[]>(
+    let productsInBrand = await getFromCache<Product[]>(
         `brand_products:${team_id}:${brand_id}`,
     );
 
@@ -40,7 +38,7 @@ async function getAllProductsFromBrand({
             ])
             .getMany();
 
-        await cache.save(
+        await saveOnCache(
             `brand_products:${team_id}:${brand_id}`,
             productsInBrand,
         );

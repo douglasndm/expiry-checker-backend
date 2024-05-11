@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
 import { sortBatchesByExpDate } from '@utils/Product/Batch/Sort';
 
@@ -18,11 +18,10 @@ export async function getProduct({
     product_id,
     team_id,
 }: getProductProps): Promise<Product> {
-    const cache = new Cache();
     // We use team id cause when product is in a category and user remove it ou add it into a category
     // all products with that team id will be removed from cache
     if (team_id) {
-        const cachedProd = await cache.get<Product>(
+        const cachedProd = await getFromCache<Product>(
             `product:${team_id}:${product_id}`,
         );
 
@@ -91,7 +90,7 @@ export async function getProduct({
     };
 
     if (team_id) {
-        await cache.save(`product:${team_id}:${product_id}`, organizedProduct);
+        await saveOnCache(`product:${team_id}:${product_id}`, organizedProduct);
     }
 
     return organizedProduct;

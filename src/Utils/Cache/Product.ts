@@ -1,4 +1,4 @@
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import { getProductById } from '@utils/Product/Get';
 
@@ -12,21 +12,20 @@ async function clearProductCache(product_id: string): Promise<void> {
 
     const { team } = product.team;
 
-    const cache = new Cache();
-    await cache.invalidade(`team_products:${team.id}`);
-    await cache.invalidade(`product:${team.id}:${product.id}`);
+    await invalidadeCache(`team_products:${team.id}`);
+    await invalidadeCache(`product:${team.id}:${product.id}`);
 
     if (product.brand) {
-        await cache.invalidade(`brand_products:${team.id}:${product.brand.id}`);
+        await invalidadeCache(`brand_products:${team.id}:${product.brand.id}`);
     }
 
     if (product.category) {
-        await cache.invalidade(
+        await invalidadeCache(
             `category_products:${team.id}:${product.category.category.id}`,
         );
     }
     if (product.store) {
-        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
+        await invalidadeCache(`store_products:${team.id}:${product.store.id}`);
     }
 }
 

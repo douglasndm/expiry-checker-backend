@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import { invalidadeCache } from '@services/Cache/Redis';
+
 import Batch from '@models/Batch';
 
 import { checkIfUserHasAccessToAProduct } from '@functions/UserAccessProduct';
 import { getProductTeam } from '@functions/Product/Team';
-
-import Cache from '@services/Cache';
 
 import AppError from '@errors/AppError';
 
@@ -71,10 +71,8 @@ class BatchDiscount {
 
         const team = await getProductTeam(batch.product);
 
-        const cache = new Cache();
-
-        await cache.invalidade(`team_products:${team.id}`);
-        await cache.invalidade(`product:${team.id}:${batch.product.id}`);
+        await invalidadeCache(`team_products:${team.id}`);
+        await invalidadeCache(`product:${team.id}:${batch.product.id}`);
 
         return res.status(201).json(updatedBatch);
     }

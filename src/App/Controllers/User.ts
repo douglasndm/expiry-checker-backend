@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { compareAsc, endOfDay } from 'date-fns';
 import * as Yup from 'yup';
+
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import User from '@models/User';
 
@@ -10,8 +11,6 @@ import { createUser } from '@utils/User/Create';
 import { updateUser } from '@utils/User/Update';
 
 import { deleteUser } from '@functions/Users';
-
-import Cache from '@services/Cache';
 
 import AppError from '@errors/AppError';
 
@@ -142,7 +141,7 @@ class UserController {
             password,
         });
 
-        await cache.invalidade('users_devices');
+        await invalidadeCache('users_devices');
 
         return res.status(201).json(savedUser);
     }
@@ -194,8 +193,7 @@ class UserController {
 
         await deleteUser({ user_id: req.userId });
 
-        const cache = new Cache();
-        await cache.invalidade('users_devices');
+        await invalidadeCache('users_devices');
 
         return res.status(204).send();
     }

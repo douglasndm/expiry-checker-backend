@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
+
 import { removeManyImages } from '@services/AWS';
 
 import Product from '@models/Product';
@@ -30,7 +31,6 @@ export async function deleteManyProducts({
         await productRepository.remove(products);
         removeManyImages(imagesToDelete, team_id);
 
-        const cache = new Cache();
-        await cache.invalidadeTeamCache(team_id);
+        await invalidadeTeamCache(team_id);
     }
 }

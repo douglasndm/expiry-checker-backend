@@ -3,7 +3,8 @@ import axios from 'axios';
 import * as Yup from 'yup';
 import { formatInTimeZone } from 'date-fns-tz';
 
-import Cache from '@services/Cache';
+import { saveOnCache, getFromCache } from '@services/Cache/Redis';
+
 import BackgroundJob from '@services/Background';
 import { getProductImageURL } from '@services/AWS';
 
@@ -32,9 +33,7 @@ async function findProductByEAN({
         }
     }
 
-    const cache = new Cache();
-
-    const cachedProduct = await cache.get<ProductDetails>(
+    const cachedProduct = await getFromCache<ProductDetails>(
         `product_suggestion:${code}`,
     );
 
@@ -53,7 +52,9 @@ async function findProductByEAN({
         .getOne();
 
     if (!product) {
-        const blockRequest = await cache.get<boolean>('external_api_request');
+        const blockRequest = await getFromCache<boolean>(
+            'external_api_request',
+        );
 
         let externalProduct: null | findProductByEANExternalResponse = null;
 
@@ -83,7 +84,7 @@ async function findProductByEAN({
                         console.log('Blocking for external api request');
                         console.log(formatedDate);
 
-                        await cache.save('external_api_request', true);
+                        await saveOnCache('external_api_request', true);
                     }
                 } else if (err instanceof Error) {
                     console.log(
@@ -126,7 +127,7 @@ async function findProductByEAN({
         photo = getProductImageURL(code);
     }
 
-    cache.save(`product_suggestion:${code}`, {
+    saveOnCache(`product_suggestion:${code}`, {
         ...product,
     });
 

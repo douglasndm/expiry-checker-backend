@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
+import { invalidadeCache } from '@services/Cache/Redis';
+
 import AppError from '@errors/AppError';
 
 import { getAllUsersFromTeam, UserResponse } from '@functions/Team/Users';
 
 import UserTeam from '@models/UserTeam';
-
-import Cache from '@services/Cache';
 
 class TeamUsersController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -65,8 +65,6 @@ class TeamUsersController {
         const { team_id } = req.params;
         const { code } = req.body;
 
-        const cache = new Cache();
-
         const userRolesRepositoy = getRepository(UserTeam);
         const roles = await userRolesRepositoy
             .createQueryBuilder('userRoles')
@@ -97,7 +95,7 @@ class TeamUsersController {
         roles.status = 'Completed';
 
         const updatedRole = await userRolesRepositoy.save(roles);
-        await cache.invalidade(`team_users:${team_id}`);
+        await invalidadeCache(`team_users:${team_id}`);
 
         return res.status(200).json(updatedRole);
     }

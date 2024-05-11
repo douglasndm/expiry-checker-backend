@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import UserLogin from '@models/UserLogin';
 
@@ -62,8 +62,7 @@ async function registerDevice({
 
     const savedUserLogin = await userLoginRepository.save(userLogin);
 
-    const cache = new Cache();
-    await cache.invalidade('users_logins');
+    await invalidadeCache('users_logins');
 
     return savedUserLogin;
 }

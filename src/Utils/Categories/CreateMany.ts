@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import Category from '@models/Category';
 import ProductCategory from '@models/ProductCategory';
@@ -44,8 +44,7 @@ async function createManyCategories(
     const repository = getRepository(Category);
     const createdCategories = await repository.save(categories);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_categories:${team_id}`);
+    await invalidadeCache(`team_categories:${team_id}`);
 
     return createdCategories;
 }

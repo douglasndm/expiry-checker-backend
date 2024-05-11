@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 import ProductCategory from '@models/ProductCategory';
@@ -19,9 +19,7 @@ async function getAllProductsFromCategory({
     category_id,
     team_id,
 }: getAllProductsFromCategoryProps): Promise<getAllProductsFromCategoryResponse> {
-    const cache = new Cache();
-
-    let productsInCategory = await cache.get<ProductCategory[]>(
+    let productsInCategory = await getFromCache<ProductCategory[]>(
         `category_products:${team_id}:${category_id}`,
     );
 
@@ -60,7 +58,7 @@ async function getAllProductsFromCategory({
             .orderBy('batches.exp_date', 'ASC')
             .getMany();
 
-        await cache.save(
+        await saveOnCache(
             `category_products:${team_id}:${category_id}`,
             productsInCategory,
         );

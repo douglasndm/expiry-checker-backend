@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm';
 
-import Product from '@models/Product';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
 
-import Cache from '@services/Cache';
+import Product from '@models/Product';
 
 import { getProductById } from '../Get';
 
@@ -16,8 +16,7 @@ async function removeStoreFromProduct(product_id: string): Promise<void> {
 
         await repository.save(prod);
 
-        const cache = new Cache();
-        await cache.invalidadeTeamCache(prod.team.team.id);
+        await invalidadeTeamCache(prod.team.team.id);
     }
 }
 

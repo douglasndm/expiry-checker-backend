@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import UserTeam from '@models/UserTeam';
 
@@ -42,8 +42,7 @@ async function updateRole({
 
     const updatedRole = await roleRepository.save(findedRole);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_users:${team_id}`);
+    await invalidadeCache(`team_users:${team_id}`);
 
     return updatedRole;
 }
@@ -71,7 +70,6 @@ async function removeUser({
     await removeFromALlStores(user_id);
     await roleRepository.remove(role);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_users:${team_id}`);
+    await invalidadeCache(`team_users:${team_id}`);
 }
 export { updateRole, removeUser };

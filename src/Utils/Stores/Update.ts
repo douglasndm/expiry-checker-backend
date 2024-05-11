@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import Cache from '@services/Cache';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
 
 import Store from '@models/Store';
 
@@ -69,8 +69,7 @@ async function updateStore({
 
     const updatedStore = await storeRepository.save(store);
 
-    const cache = new Cache();
-    await cache.invalidadeTeamCache(`${team_id}`);
+    await invalidadeTeamCache(`${team_id}`);
 
     return updatedStore;
 }

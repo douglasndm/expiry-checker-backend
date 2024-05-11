@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
@@ -29,8 +29,7 @@ async function createManyProducts({
     const repository = getRepository(ProductTeams);
     const createdProductsTeams = await repository.save(productsTeams);
 
-    const cache = new Cache();
-    await cache.invalidadeTeamCache(team_id);
+    await invalidadeTeamCache(team_id);
 
     return createdProductsTeams;
 }
