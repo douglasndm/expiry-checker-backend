@@ -48,6 +48,54 @@ async function connectToRedis(): Promise<void> {
     }
 }
 
+async function checkAndClear() {
+    if (!redis) {
+        return;
+    }
+
+    redis.info((err, info) => {
+        if (err || !info) {
+            console.error(
+                'Erro ao recuperar informações do servidor Redis:',
+                err,
+            );
+
+            if (err instanceof Error) {
+                captureException(err);
+            }
+            return;
+        }
+
+        // Analisando as informações retornadas
+        const lines = info.split('\r\n');
+        let usedMemoryBytes = 0;
+
+        // Iterando sobre as linhas para encontrar a quantidade de memória usada
+        lines.forEach(line => {
+            if (line.startsWith('used_memory:')) {
+                const parts = line.split(':');
+                usedMemoryBytes = parseInt(parts[1]);
+            }
+        });
+
+        // Convertendo para MB
+        const usedMemoryMB = usedMemoryBytes / (1024 * 1024);
+
+        if (usedMemoryMB > 29) {
+            console.log(
+                'Memória usada no Redis:',
+                usedMemoryMB.toFixed(2),
+                'MB',
+            );
+
+            if (redis) {
+                console.log('Limpando cache do Redis');
+                redis.flushall();
+            }
+        }
+    });
+}
+
 async function getFromCache<T>(key: string): Promise<T | null> {
     // Se não estiver conectado, tenta conectar novamente
     if (!redis) {
@@ -67,8 +115,6 @@ async function getFromCache<T>(key: string): Promise<T | null> {
         if (!data) {
             return null;
         }
-
-        console.log('Vindo do cache');
 
         const parsedData = JSON.parse(data) as T;
 
@@ -96,6 +142,8 @@ async function saveOnCache(key: string, value: any): Promise<void> {
     }
 
     try {
+        await checkAndClear();
+
         await redis.set(key, JSON.stringify(value));
     } catch (error) {
         if (error instanceof Error) {
