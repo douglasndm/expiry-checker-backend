@@ -1,13 +1,18 @@
 import Queue from 'bull';
-import * as Sentry from '@sentry/node';
 
-import { redisOptions } from '@services/Redis';
+import { captureException } from '@services/ExceptionsHandler';
 
 import * as Jobs from '@jobs/Index';
 
 const queues = Object.values(Jobs).map(job => ({
     bull: new Queue(job.key, {
-        redis: redisOptions,
+        redis: {
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT),
+            password: process.env.REDIS_PASS || undefined,
+
+            maxRetriesPerRequest: 30,
+        },
     }),
     name: job.key,
     handle: job.handle,
@@ -26,7 +31,7 @@ export default {
 
             queue.bull.on('failed', (job, err) => {
                 console.log(`Job failed: ${queue.name}`, job.data);
-                Sentry.captureException(err);
+                captureException(err);
             });
         });
     },

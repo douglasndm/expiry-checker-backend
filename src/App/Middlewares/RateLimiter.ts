@@ -27,7 +27,7 @@ try {
 
 export default async function rateLimiter(
     request: Request,
-    response: Response,
+    _: Response,
     next: NextFunction,
 ): Promise<void> {
     try {
@@ -37,6 +37,13 @@ export default async function rateLimiter(
 
         return next();
     } catch (err) {
+        if (err instanceof Error) {
+            captureException(err);
+            if (err.message.includes('Connection is closed')) {
+                // there is a problem between app and redis (not client fauly)
+                return next();
+            }
+        }
         throw new AppError({ message: 'Too many requests', statusCode: 429 });
     }
 }

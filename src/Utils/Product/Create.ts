@@ -1,12 +1,11 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
 import Store from '@models/Store';
 
-import { isProductDuplicate } from '@utils/Product/FindDuplicate';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
 import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getAllBrands } from '@utils/Brand';
@@ -88,17 +87,15 @@ async function createProduct({
     prod.name = name;
     prod.code = code || null;
 
-    const cache = new Cache();
-
     if (findedBrand) {
         prod.brand = findedBrand;
-        await cache.invalidade(`brand_products:${team_id}:${findedBrand.id}`);
+        await invalidadeCache(`brand_products:${team_id}:${findedBrand.id}`);
     }
 
     if (userStore) {
         prod.store = userStore;
 
-        await cache.invalidade(`store_products:${team_id}:${userStore.id}`);
+        await invalidadeCache(`store_products:${team_id}:${userStore.id}`);
     }
 
     const savedProd = await repository.save(prod);
@@ -115,10 +112,10 @@ async function createProduct({
             category_id,
         });
 
-        await cache.invalidade(`category_products:${team_id}:${category_id}`);
+        await invalidadeCache(`category_products:${team_id}:${category_id}`);
     }
 
-    await cache.invalidade(`team_products:${team_id}`);
+    await invalidadeCache(`team_products:${team_id}`);
 
     return savedProd;
 }

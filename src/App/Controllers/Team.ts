@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import Cache from '@services/Cache';
 import {
     getProductImageURL,
     getProductImageURLByFileName,
 } from '@services/AWS';
 import { deleteTeamFromS3 } from '@services/AWS/Team';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
 
 import { createTeam } from '@utils/Team/Create';
 import { getProductsFromTeam } from '@utils/Team/Products';
@@ -182,8 +182,7 @@ class TeamController {
 
         await deleteTeam(team_id);
 
-        const cache = new Cache();
-        await cache.invalidadeTeamCache(team_id);
+        await invalidadeTeamCache(team_id);
 
         await deleteTeamFromS3(team_id);
 

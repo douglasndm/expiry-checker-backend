@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 
@@ -41,8 +41,6 @@ async function updateProduct({
         includeStore: true,
     });
 
-    const cache = new Cache();
-
     const team = await getProductTeam(product);
 
     const brands = await getAllBrands({ team_id: team.id });
@@ -57,18 +55,18 @@ async function updateProduct({
     if (image || image === null) product.image = image;
 
     if (product.category) {
-        await cache.invalidade(
+        await invalidadeCache(
             `category_products:${team.id}:${product.category.category.id}`,
         );
     }
 
     // This invalidade the old brand products and the new one
     if (product.brand) {
-        await cache.invalidade(`brand_products:${team.id}:${product.brand.id}`);
+        await invalidadeCache(`brand_products:${team.id}:${product.brand.id}`);
     }
 
     if (product.store) {
-        await cache.invalidade(`store_products:${team.id}:${product.store.id}`);
+        await invalidadeCache(`store_products:${team.id}:${product.store.id}`);
     }
     product.brand = findedBrand || null;
 

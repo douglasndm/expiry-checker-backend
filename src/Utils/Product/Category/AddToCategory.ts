@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import Cache from '@services/Cache';
+import { invalidadeCache, invalidadePrefix } from '@services/Cache/Redis';
 
 import ProductCategory from '@models/ProductCategory';
 
@@ -62,9 +62,8 @@ async function addToCategory({
 
     await prodCategoryRepository.save(productCategory);
 
-    const cache = new Cache();
-    await cache.invalidadePrefix(`product:${category.team.id}:${product_id}`);
-    await cache.invalidade(
+    await invalidadePrefix(`product:${category.team.id}:${product_id}`);
+    await invalidadeCache(
         `category_products:${category.team.id}:${category_id}`,
     );
 }

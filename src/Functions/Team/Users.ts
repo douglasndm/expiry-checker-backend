@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
 
+import { getFromCache, saveOnCache } from '@services/Cache/Redis';
+
 import UserTeam from '@models/UserTeam';
 import Store from '@models/Store';
-
-import Cache from '@services/Cache';
 
 interface getAllUsersFromTeamProps {
     team_id: string;
@@ -25,11 +25,7 @@ export interface UserResponse {
 export async function getAllUsersFromTeam({
     team_id,
 }: getAllUsersFromTeamProps): Promise<UserResponse[]> {
-    const cache = new Cache();
-
-    const cachedUsers = await cache.get<Array<UserTeam>>(
-        `team_users:${team_id}`,
-    );
+    const cachedUsers = await getFromCache<UserTeam[]>(`team_users:${team_id}`);
 
     let usersFromTeam: Array<UserTeam> = [];
 
@@ -47,7 +43,7 @@ export async function getAllUsersFromTeam({
             .where('team.id = :team_id', { team_id })
             .getMany();
 
-        await cache.save(`team_users:${team_id}`, usersTeam);
+        await saveOnCache(`team_users:${team_id}`, usersTeam);
 
         usersFromTeam = usersTeam;
     }

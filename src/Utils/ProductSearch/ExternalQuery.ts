@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { formatInTimeZone } from 'date-fns-tz';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 async function brasilAPI(
     query: string,
@@ -72,8 +72,7 @@ async function allowExternalQuery(): Promise<void> {
     console.log('Removing block for external api request');
     console.log(formatedDate);
 
-    const cache = new Cache();
-    await cache.invalidade('external_api_request');
+    await invalidadeCache('external_api_request');
 }
 
 export { findProductByEANExternal, allowExternalQuery };

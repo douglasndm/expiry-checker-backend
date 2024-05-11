@@ -7,7 +7,7 @@ import { getTeamFromUser } from '@utils/User/Team';
 
 import { checkMembersLimit } from '@functions/Team';
 
-import Cache from '@services/Cache';
+import { getFromCache, invalidadeCache } from '@services/Cache/Redis';
 
 import AppError from '@errors/AppError';
 
@@ -26,10 +26,7 @@ async function addUserToTeam({
 }: addUserToTeamProps): Promise<UserTeam> {
     const userRolesRepository = getRepository(UserTeam);
 
-    const cache = new Cache();
-    const cachedUsers = await cache.get<Array<UserTeam>>(
-        `team_users:${team_id}`,
-    );
+    const cachedUsers = await getFromCache<UserTeam[]>(`team_users:${team_id}`);
 
     // Check if user is already on team
     // #region
@@ -119,7 +116,7 @@ async function addUserToTeam({
     }
 
     const savedRole = await userRolesRepository.save(teamUser);
-    await cache.invalidade(`team_users:${team_id}`);
+    await invalidadeCache(`team_users:${team_id}`);
 
     return savedRole;
 }

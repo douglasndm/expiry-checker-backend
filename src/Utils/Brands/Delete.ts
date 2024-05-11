@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
 
+import { invalidadeCache, invalidadeTeamCache } from '@services/Cache/Redis';
+
 import Product from '@models/Product';
 import Brand from '@models/Brand';
-
-import Cache from '@services/Cache';
 
 import AppError from '@errors/AppError';
 
@@ -58,9 +58,8 @@ async function deleteBrand({
 
     await brandRepository.remove(brand);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_products:${brand.team.id}`);
-    await cache.invalidade(`team_brands:${brand.team.id}`);
+    await invalidadeCache(`team_products:${brand.team.id}`);
+    await invalidadeCache(`team_brands:${brand.team.id}`);
 }
 
 async function deleteAllBrandsFromTeam(team_id: string): Promise<void> {
@@ -74,8 +73,7 @@ async function deleteAllBrandsFromTeam(team_id: string): Promise<void> {
 
     await repository.remove(brands);
 
-    const cache = new Cache();
-    await cache.invalidadeTeamCache(team_id);
+    await invalidadeTeamCache(team_id);
 }
 
 export { deleteBrand, deleteAllBrandsFromTeam };

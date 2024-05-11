@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { invalidadeCache } from '@services/Cache/Redis';
 
 import Brand from '@models/Brand';
 
@@ -43,8 +43,7 @@ async function createManyBrands(
     const repository = getRepository(Brand);
     const createdBrands = await repository.save(brands);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_brands:${team_id}`);
+    await invalidadeCache(`team_brands:${team_id}`);
 
     return createdBrands;
 }

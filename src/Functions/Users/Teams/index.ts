@@ -1,10 +1,10 @@
 import { getRepository } from 'typeorm';
 
+import { invalidadeCache } from '@services/Cache/Redis';
+
 import UserTeam from '@models/UserTeam';
 
 import { deleteTeam } from '@utils/Team/Delete';
-
-import Cache from '@services/Cache';
 
 interface getAllTeamsUserIsProps {
     user_id: string;
@@ -51,8 +51,7 @@ export async function removeUserFromAllTeams({
     // Remove o usuário de todos os times dos quais ele não é gerente
     await userTeamsRepository.remove(notManagersTeams);
 
-    const cache = new Cache();
     notManagersTeams.forEach(async role => {
-        await cache.invalidade(`team_users:${role.team.id}`);
+        await invalidadeCache(`team_users:${role.team.id}`);
     });
 }

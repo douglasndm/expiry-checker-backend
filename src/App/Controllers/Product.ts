@@ -9,7 +9,7 @@ import { deleteProduct } from '@utils/Product/Delete';
 
 import { getProduct } from '@functions/Product';
 
-import Cache from '@services/Cache';
+
 import {
     getProductImageURL,
     getProductImageURLByFileName,

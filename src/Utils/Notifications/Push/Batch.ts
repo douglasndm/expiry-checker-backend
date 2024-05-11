@@ -1,5 +1,6 @@
 import Firebase from 'firebase-admin';
-import * as Sentry from '@sentry/node';
+
+import { captureException } from '@services/ExceptionsHandler';
 
 export interface ITokenMessagePush {
     notification: {
@@ -19,7 +20,7 @@ async function sendNotificationByFirebase(
     const response = await messaging.sendAll(messages);
 
     if (response.failureCount > 0) {
-        Sentry.captureException(response);
+        captureException(response);
     }
 }
 

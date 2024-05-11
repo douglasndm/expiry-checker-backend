@@ -3,10 +3,12 @@ import express from 'express';
 import dotenv from 'dotenv';
 
 import './Services/Firebase';
-import './Services/Redis';
+import './Services/Cache/Redis';
 import './Services/Database';
 import './Services/Cron';
 import './Services/AWS';
+
+require('newrelic');
 
 dotenv.config();
 

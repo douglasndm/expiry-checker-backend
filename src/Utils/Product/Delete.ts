@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
 
-import Product from '@models/Product';
-
-import Cache from '@services/Cache';
 import { removeProductImageFromS3 } from '@services/AWS';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
+
+import Product from '@models/Product';
 
 import { clearProductCache } from '@utils/Cache/Product';
 import { getProductById } from './Get';
@@ -46,8 +46,7 @@ async function deleteAllProductsFromTeam(team_id: string): Promise<void> {
 
     await productRepository.remove(products);
 
-    const cache = new Cache();
-    await cache.invalidadeTeamCache(team_id);
+    await invalidadeTeamCache(team_id);
 }
 
 export { deleteProduct, deleteAllProductsFromTeam };

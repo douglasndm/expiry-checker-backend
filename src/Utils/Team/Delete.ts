@@ -1,12 +1,12 @@
 import { getRepository } from 'typeorm';
 
+import { invalidadeTeamCache } from '@services/Cache/Redis';
+
 import Team from '@models/Team';
 
 import { deleteAllProductsFromTeam } from '@utils/Product/Delete';
 import { deleteAllBrandsFromTeam } from '@utils/Brands/Delete';
 import { deleteAllLogsFromTeam } from '@utils/Team/Management/Logs/Delete';
-
-import Cache from '@services/Cache';
 
 import { getTeamById } from './Find';
 
@@ -21,8 +21,7 @@ async function deleteTeam(team_id: string): Promise<void> {
 
     await teamRepository.remove(team);
 
-    const cache = new Cache();
-    await cache.invalidadeTeamCache(team_id);
+    await invalidadeTeamCache(team_id);
 }
 
 export { deleteTeam };

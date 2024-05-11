@@ -2,9 +2,9 @@ import { Router } from 'express';
 import admin from 'firebase-admin';
 
 import { sendMail } from '@services/Notification/Email/SendMail';
+import { invalidadeAllCache } from '@services/Cache/Redis';
 
 import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
-import { clearAllCache } from '@utils/Admin/Cache';
 
 import InternalCheck from '@middlewares/InternalCheck';
 
@@ -24,7 +24,7 @@ routes.post('/pn', async (req, res) => {
 });
 
 routes.post('/rc', async (req, res) => {
-    await clearAllCache();
+    await invalidadeAllCache();
 
     return res.send('Done');
 });

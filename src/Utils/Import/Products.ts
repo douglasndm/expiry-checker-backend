@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import { endOfDay, parseISO } from 'date-fns';
 
-import Cache from '@services/Cache';
+import { invalidadeTeamCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
@@ -16,7 +16,6 @@ import { createManyStores } from '@utils/Stores/CreateMany';
 import { getAllBrands } from '@utils/Brand';
 import { getAllCategoriesFromTeam } from '@utils/Categories/List';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
-import { getTeamById } from '@utils/Team/Find';
 import { createManyProducts } from '@utils/Product/CreateMany';
 import { createManyBatches } from '@utils/Batches/CreateMany';
 
@@ -57,8 +56,6 @@ async function importProducts(
     const brandsFromTeam = await getAllBrands({ team_id });
     const categoriesFromTeam = await getAllCategoriesFromTeam({ team_id });
     const storesFromTeam = await getAllStoresFromTeam({ team_id });
-
-    const team = await getTeamById(team_id);
 
     const prodCategories: ProductCategory[] = [];
     const batchesToCreate: Batch[] = [];
@@ -155,8 +152,7 @@ async function importProducts(
     await createManyProductCategories(prodCategories);
     await createManyBatches(batchesToCreate);
 
-    const cache = new Cache();
-    await cache.invalidadeTeamCache(team_id);
+    await invalidadeTeamCache(team_id);
 }
 
 export { importProducts };

@@ -1,6 +1,10 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import {
+    getFromCache,
+    saveOnCache,
+    invalidadeCache,
+} from '@services/Cache/Redis';
 
 import Brand from '@models/Brand';
 
@@ -12,9 +16,9 @@ import { getTeamById } from './Team/Find';
 export async function getAllBrands({
     team_id,
 }: getAllBrandsProps): Promise<Brand[]> {
-    const cache = new Cache();
-
-    const teamBrandsCache = await cache.get<Brand[]>(`team_brands:${team_id}`);
+    const teamBrandsCache = await getFromCache<Brand[]>(
+        `team_brands:${team_id}`,
+    );
 
     if (teamBrandsCache) {
         return teamBrandsCache;
@@ -28,7 +32,7 @@ export async function getAllBrands({
         .select(['brand.id', 'brand.name'])
         .getMany();
 
-    await cache.save(`team_brands:${team_id}`, brands);
+    await saveOnCache(`team_brands:${team_id}`, brands);
 
     return brands;
 }
@@ -67,8 +71,7 @@ export async function createBrand({
 
     const createdBrand = await brandRepository.save(brand);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_brands:${team_id}`);
+    await invalidadeCache(`team_brands:${team_id}`);
 
     return createdBrand;
 }
@@ -116,8 +119,7 @@ export async function updateBrand({
 
     const updatedBrand = await brandRepository.save(brand);
 
-    const cache = new Cache();
-    await cache.invalidade(`team_brands:${brand.team.id}`);
+    await invalidadeCache(`team_brands:${brand.team.id}`);
 
     return updatedBrand;
 }

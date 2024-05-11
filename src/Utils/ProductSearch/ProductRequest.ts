@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import { formatInTimeZone } from 'date-fns-tz';
 
-import Cache from '@services/Cache';
+import { getFromCache } from '@services/Cache/Redis';
 
 import ProductRequest from '@models/ProductRequest';
 
@@ -23,8 +23,7 @@ async function getProductsRequestsByRank(
 }
 
 async function callRemainingDailyAPICalls(): Promise<void> {
-    const cache = new Cache();
-    const blockRequest = await cache.get<boolean>('external_api_request');
+    const blockRequest = await getFromCache<boolean>('external_api_request');
 
     if (blockRequest !== true) {
         const requests = await getProductsRequestsByRank(100);

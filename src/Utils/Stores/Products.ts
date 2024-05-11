@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
 
-import Cache from '@services/Cache';
+import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 
@@ -29,9 +29,7 @@ async function getAllProductsFromStore({
         });
     }
 
-    const cache = new Cache();
-
-    let productsInStore = await cache.get<Product[]>(
+    let productsInStore = await getFromCache<Product[]>(
         `store_products:${team_id}:${store_id}`,
     );
 
@@ -60,7 +58,7 @@ async function getAllProductsFromStore({
             .orderBy('batches.exp_date', 'ASC')
             .getMany();
 
-        await cache.save(
+        await saveOnCache(
             `store_products:${team_id}:${store_id}`,
             productsInStore,
         );

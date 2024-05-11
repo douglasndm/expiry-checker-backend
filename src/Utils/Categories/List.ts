@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Cache from '@services/Cache';
+import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
 import Category from '@models/Category';
 
@@ -10,8 +10,7 @@ interface getAllCategoriesFromTeamProps {
 async function getAllCategoriesFromTeam({
     team_id,
 }: getAllCategoriesFromTeamProps): Promise<Category[]> {
-    const cache = new Cache();
-    const cached = await cache.get<Category[]>(`team_categories:${team_id}`);
+    const cached = await getFromCache<Category[]>(`team_categories:${team_id}`);
 
     if (cached) {
         return cached;
@@ -26,7 +25,7 @@ async function getAllCategoriesFromTeam({
         .select(['category.id', 'category.name'])
         .getMany();
 
-    await cache.save(`team_categories:${team_id}`, categories);
+    await saveOnCache(`team_categories:${team_id}`, categories);
 
     return categories;
 }
