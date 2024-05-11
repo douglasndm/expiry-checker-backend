@@ -1,6 +1,6 @@
 import Queue from 'bull';
-import * as Sentry from '@sentry/node';
 
+import { captureException } from '@services/ExceptionsHandler';
 import { redisOptions } from '@services/Redis';
 
 import * as Jobs from '@jobs/Index';
@@ -26,7 +26,7 @@ export default {
 
             queue.bull.on('failed', (job, err) => {
                 console.log(`Job failed: ${queue.name}`, job.data);
-                Sentry.captureException(err);
+                captureException(err);
             });
         });
     },
