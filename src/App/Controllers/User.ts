@@ -131,8 +131,6 @@ class UserController {
             });
         }
 
-        const cache = new Cache();
-
         const savedUser = await createUser({
             firebaseUid,
             email,
