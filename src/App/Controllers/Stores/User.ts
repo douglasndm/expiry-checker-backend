@@ -20,6 +20,11 @@ class StoreUsers {
         const { store_id } = req.params;
         const { user_id } = req.body;
 
+        // small fix, should be removed after apps update
+        if (store_id.toLowerCase() === 'nostore') {
+            return res.status(201).send();
+        }
+
         await addUserToStore({ user_id, store_id });
 
         return res.status(201).send();
