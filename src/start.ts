@@ -8,8 +8,6 @@ import './Services/Database';
 import './Services/Cron';
 import './Services/AWS';
 
-require('newrelic');
-
 dotenv.config();
 
 const App = express();
