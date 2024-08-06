@@ -12,7 +12,4 @@ ormconfig.json
 
 .DS_Store
 
-newrelic.js
-newrelic_agent.log
-
 *.pkg
