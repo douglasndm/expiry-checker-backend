@@ -101,7 +101,13 @@ async function importProducts(
         }
 
         if (prod.store) {
-            const oldStore = stores.find(s => s.id === prod.store);
+            let storeId = prod.store.id;
+
+            if (!storeId) {
+                storeId = prod.store;
+            }
+
+            const oldStore = stores.find(s => s.id === storeId);
 
             if (oldStore) {
                 const newStore = storesFromTeam.find(
