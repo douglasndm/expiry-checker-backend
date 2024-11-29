@@ -115,7 +115,7 @@ async function importProducts(
                 );
 
                 if (newStore) {
-                    product.store = newStore.id;
+                    product.store = newStore;
                 }
             }
         }
@@ -146,8 +146,6 @@ async function importProducts(
 
         return product;
     });
-
-    console.log(productsToCreate);
 
     const productRepository = getRepository(Product);
     await productRepository.save(productsToCreate);
