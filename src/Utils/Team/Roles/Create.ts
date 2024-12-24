@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import UserTeam from '@models/UserTeam';
 import User from '@models/User';
@@ -24,7 +24,7 @@ async function addUserToTeam({
     team_id,
     bypassCode,
 }: addUserToTeamProps): Promise<UserTeam> {
-    const userRolesRepository = getRepository(UserTeam);
+    const userRolesRepository = defaultDataSource.getRepository(UserTeam);
 
     const cachedUsers = await getFromCache<UserTeam[]>(`team_users:${team_id}`);
 
@@ -74,7 +74,7 @@ async function addUserToTeam({
     }
     // #endregion
 
-    const userRepository = getRepository(User);
+    const userRepository = defaultDataSource.getRepository(User);
 
     const team = await getTeamById(team_id);
 

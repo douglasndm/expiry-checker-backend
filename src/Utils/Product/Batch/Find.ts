@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import Batch from '@models/Batch';
 
@@ -21,7 +22,7 @@ async function findBatchById(batch_id: string): Promise<Batch> {
             });
     }
 
-    const repository = getRepository(Batch);
+    const repository = defaultDataSource.getRepository(Batch);
     const product = await repository
         .createQueryBuilder('batch')
         .leftJoinAndSelect('batch.product', 'product')

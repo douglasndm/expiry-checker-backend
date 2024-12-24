@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import Product from '@models/Product';
 
@@ -21,7 +22,7 @@ async function findProductById(product_id: string): Promise<Product> {
             });
     }
 
-    const productRepository = getRepository(Product);
+    const productRepository = defaultDataSource.getRepository(Product);
     const product = await productRepository
         .createQueryBuilder('product')
         .leftJoinAndSelect('product.team', 'prodTeam')

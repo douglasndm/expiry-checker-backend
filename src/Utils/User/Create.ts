@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import User from '@models/User';
 
@@ -10,7 +11,7 @@ export async function createUser({
     email,
     password,
 }: createUserProps): Promise<User> {
-    const userRepository = getRepository(User);
+    const userRepository = defaultDataSource.getRepository(User);
 
     const user = new User();
     user.firebaseUid = firebaseUid;

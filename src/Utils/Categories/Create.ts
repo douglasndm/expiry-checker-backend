@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -17,7 +17,7 @@ async function createCategory({
     team_id,
     name,
 }: createCategoryProps): Promise<Category> {
-    const categoryRepository = getRepository(Category);
+    const categoryRepository = defaultDataSource.getRepository(Category);
     const alreadyExists = await categoryRepository
         .createQueryBuilder('category')
         .where('LOWER(category.name) = LOWER(:name)', { name })

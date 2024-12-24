@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -10,7 +10,7 @@ export async function deleteManyProducts({
     productsIds,
     team_id,
 }: deleteManyProductsProps): Promise<void> {
-    const productRepository = getRepository(Product);
+    const productRepository = defaultDataSource.getRepository(Product);
 
     // to do
     // remove images from s3

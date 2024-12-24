@@ -1,11 +1,11 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import TeamSubscription from '@models/TeamSubscription';
 
 async function getSubscriptionFromTeam(
     team_id: string,
 ): Promise<TeamSubscription | null> {
-    const subRepository = getRepository(TeamSubscription);
+    const subRepository = defaultDataSource.getRepository(TeamSubscription);
 
     const sub = await subRepository
         .createQueryBuilder('sub')

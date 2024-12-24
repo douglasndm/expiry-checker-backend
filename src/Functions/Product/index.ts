@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
@@ -30,7 +30,7 @@ export async function getProduct({
         }
     }
 
-    const reposity = getRepository(Product);
+    const reposity = defaultDataSource.getRepository(Product);
 
     const product = await reposity
         .createQueryBuilder('product')

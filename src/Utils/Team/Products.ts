@@ -1,5 +1,7 @@
-import { Brackets, getRepository } from 'typeorm';
+import { Brackets } from 'typeorm';
 import { isValid, parseISO } from 'date-fns';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 import { isManager } from '@utils/Team/Roles/Manager';
@@ -35,7 +37,8 @@ async function getProductsFromTeam(
         search,
     } = props;
 
-    const productTeamsRepository = getRepository(ProductTeams);
+    const productTeamsRepository =
+        defaultDataSource.getRepository(ProductTeams);
 
     const userStores = await getAllStoresFromUser({ user_id });
 

@@ -1,8 +1,9 @@
 import Product from '@models/Product';
-import { getRepository } from 'typeorm';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 async function getAllProductsFromTeam(team_id: string): Promise<Product[]> {
-    const repository = getRepository(Product);
+    const repository = defaultDataSource.getRepository(Product);
 
     const products = await repository
         .createQueryBuilder('product')

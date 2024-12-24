@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -40,7 +40,7 @@ async function createManyStores(
         return store;
     });
 
-    const repository = getRepository(Store);
+    const repository = defaultDataSource.getRepository(Store);
     const createdStores = await repository.save(stores);
 
     await invalidadeCache(`team_stores:${team_id}`);

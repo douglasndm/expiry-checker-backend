@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import Team from '@models/Team';
 import UserTeam from '@models/UserTeam';
@@ -7,9 +7,9 @@ import User from '@models/User';
 import AppError from '@errors/AppError';
 
 async function createTeam({ name, admin_id }: createTeamProps): Promise<Team> {
-    const teamRepository = getRepository(Team);
-    const userRolesRepository = getRepository(UserTeam);
-    const userRepository = getRepository(User);
+    const teamRepository = defaultDataSource.getRepository(Team);
+    const userRolesRepository = defaultDataSource.getRepository(UserTeam);
+    const userRepository = defaultDataSource.getRepository(User);
 
     const user = await userRepository.findOne({
         where: {

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import User from '@models/User';
 
@@ -28,7 +28,7 @@ async function checkIfUserIsOnTeam({
 async function getAllUsersFromTeamWithDevices(
     team_id: string,
 ): Promise<User[]> {
-    const userRepository = getRepository(User);
+    const userRepository = defaultDataSource.getRepository(User);
 
     const users = await userRepository
         .createQueryBuilder('user')

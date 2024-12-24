@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { removeProductImageFromS3 } from '@services/AWS';
 import { invalidadeTeamCache } from '@services/Cache/Redis';
@@ -30,12 +30,12 @@ async function deleteProduct(props: deleteProductProps): Promise<void> {
         });
     }
 
-    const productRepository = getRepository(Product);
+    const productRepository = defaultDataSource.getRepository(Product);
     await productRepository.remove(product);
 }
 
 async function deleteAllProductsFromTeam(team_id: string): Promise<void> {
-    const productRepository = getRepository(Product);
+    const productRepository = defaultDataSource.getRepository(Product);
 
     const products = await productRepository
         .createQueryBuilder('product')

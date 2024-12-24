@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -41,7 +41,7 @@ async function createManyCategories(
         return category;
     });
 
-    const repository = getRepository(Category);
+    const repository = defaultDataSource.getRepository(Category);
     const createdCategories = await repository.save(categories);
 
     await invalidadeCache(`team_categories:${team_id}`);
@@ -52,7 +52,7 @@ async function createManyCategories(
 async function createManyProductCategories(
     prodCategories: ProductCategory[],
 ): Promise<ProductCategory[]> {
-    const repository = getRepository(ProductCategory);
+    const repository = defaultDataSource.getRepository(ProductCategory);
     const createdCategories = await repository.save(prodCategories);
 
     return createdCategories;

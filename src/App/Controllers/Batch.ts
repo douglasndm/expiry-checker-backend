@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import { parseISO, isValid, endOfDay } from 'date-fns';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import BackgroundJob from '@services/Background';
 
@@ -31,7 +32,7 @@ class BatchController {
 
         const { batch_id } = req.params;
 
-        const batchReposity = getRepository(Batch);
+        const batchReposity = defaultDataSource.getRepository(Batch);
 
         const batch = await batchReposity.findOne({
             where: { id: batch_id },

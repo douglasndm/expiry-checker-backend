@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -10,7 +10,7 @@ async function removeCategoryFromProduct(product_id: string): Promise<void> {
     const prod = await getProductById({ product_id, includeCategory: true });
 
     if (prod.category) {
-        const repository = getRepository(ProductCategory);
+        const repository = defaultDataSource.getRepository(ProductCategory);
         await repository.remove(prod.category);
 
         await invalidadeTeamCache(prod.team.team.id);

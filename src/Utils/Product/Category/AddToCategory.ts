@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeCache, invalidadePrefix } from '@services/Cache/Redis';
 
@@ -36,7 +37,8 @@ async function addToCategory({
         }
     }
 
-    const prodCategoryRepository = getRepository(ProductCategory);
+    const prodCategoryRepository =
+        defaultDataSource.getRepository(ProductCategory);
 
     const product = await findProductById(product_id);
     const category = await findCategoryById(category_id);

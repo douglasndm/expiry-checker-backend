@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { parseISO, startOfDay } from 'date-fns';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import TeamSubscription from '@models/TeamSubscription';
 
@@ -16,7 +17,7 @@ async function setTeamSubscription({
     subscription,
     members,
 }: setTeamSubscriptionProps): Promise<TeamSubscription> {
-    const repository = getRepository(TeamSubscription);
+    const repository = defaultDataSource.getRepository(TeamSubscription);
 
     const subscriptions = await repository
         .createQueryBuilder('teamSubs')

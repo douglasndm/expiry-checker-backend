@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import UserLogs from '@models/UserLogs';
 
@@ -29,7 +30,7 @@ async function getTeamLogs({
         }
     }
 
-    const repository = getRepository(UserLogs);
+    const repository = defaultDataSource.getRepository(UserLogs);
     const logs = await repository
         .createQueryBuilder('logs')
         .leftJoinAndSelect('logs.team', 'team')

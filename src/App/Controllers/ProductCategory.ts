@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import Category from '@models/Category';
 
@@ -52,7 +53,8 @@ class ProductCategoryController {
 
         if (productsInCategory.category_name === '') {
             // This will return the category name even if no results where found
-            const categoryRepository = getRepository(Category);
+            const categoryRepository =
+                defaultDataSource.getRepository(Category);
             const cate = await categoryRepository.findOne({
                 where: {
                     id: category_id,

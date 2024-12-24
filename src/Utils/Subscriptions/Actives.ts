@@ -1,10 +1,12 @@
-import { getRepository } from 'typeorm';
 import { compareAsc, endOfDay } from 'date-fns';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import TeamSubscription from '@models/TeamSubscription';
 
 async function getTeamsWithActiveSubscriptions(): Promise<TeamSubscription[]> {
-    const subscriptionRepository = getRepository(TeamSubscription);
+    const subscriptionRepository =
+        defaultDataSource.getRepository(TeamSubscription);
 
     const allSubscriptions = await subscriptionRepository
         .createQueryBuilder('sub')

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
@@ -16,7 +16,7 @@ async function getAllStoresFromTeam({
         return cached;
     }
 
-    const storeRepository = getRepository(Store);
+    const storeRepository = defaultDataSource.getRepository(Store);
 
     const stores = await storeRepository
         .createQueryBuilder('stores')

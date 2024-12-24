@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { endOfDay, parseISO } from 'date-fns';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -34,7 +35,11 @@ async function importProducts(
 
     const brandsNames = brands.map(b => b.name);
     const categoriesNames = categories.map(c => c.name);
-    const storesNames = stores.map(s => s.name);
+    let storesNames: string[] = [];
+
+    if (stores !== undefined) {
+        storesNames = stores.map(s => s.name);
+    }
 
     // this will create the missing brands, categories and stores
     // but if the team already had brands, categories and stores, it will not create the same again
@@ -147,7 +152,7 @@ async function importProducts(
         return product;
     });
 
-    const productRepository = getRepository(Product);
+    const productRepository = defaultDataSource.getRepository(Product);
     await productRepository.save(productsToCreate);
 
     await createManyProducts({

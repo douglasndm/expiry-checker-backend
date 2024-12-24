@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { addDays, compareAsc, startOfDay } from 'date-fns';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import Team from '@models/Team';
 import Batch from '@models/Batch';
@@ -19,7 +20,7 @@ interface getAllTeamsExpiredProductsResponse {
 export async function getAllTeamsExpiredProducts(): Promise<
     getAllTeamsExpiredProductsResponse[]
 > {
-    const teamRepository = getRepository(Team);
+    const teamRepository = defaultDataSource.getRepository(Team);
 
     const teamsData = await teamRepository
         .createQueryBuilder('team')

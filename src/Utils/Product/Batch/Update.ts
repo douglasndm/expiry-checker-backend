@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { findBatchById } from '@utils/Product/Batch/Find';
 import { clearProductCache } from '@utils/Cache/Product';
@@ -58,7 +59,7 @@ async function updateBatch({
             });
     }
 
-    const batchReposity = getRepository(Batch);
+    const batchReposity = defaultDataSource.getRepository(Batch);
 
     const batch = await findBatchById(batch_id);
 

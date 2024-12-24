@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
@@ -32,7 +32,7 @@ export async function getAllUsersFromTeam({
     if (cachedUsers) {
         usersFromTeam = cachedUsers;
     } else {
-        const userTeamsRepository = getRepository(UserTeam);
+        const userTeamsRepository = defaultDataSource.getRepository(UserTeam);
 
         const usersTeam = await userTeamsRepository
             .createQueryBuilder('usersTeam')

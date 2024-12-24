@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import Batch from '@models/Batch';
 
@@ -10,7 +10,7 @@ async function deleteBatch(batch_id: string): Promise<void> {
 
     await clearProductCache(batch.product.id);
 
-    const repository = getRepository(Batch);
+    const repository = defaultDataSource.getRepository(Batch);
     await repository.remove(batch);
 }
 

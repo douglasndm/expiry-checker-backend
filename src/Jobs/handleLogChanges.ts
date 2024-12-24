@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import UserLog from '@models/UserLogs';
 
@@ -27,7 +27,7 @@ async function logChange({ data }: logChangeProps): Promise<void> {
         const user = await getUserById(data.user_id);
         const team = await getTeamById(data.team_id);
 
-        const repository = getRepository(UserLog);
+        const repository = defaultDataSource.getRepository(UserLog);
 
         let product;
         let batch;

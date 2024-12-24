@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -52,7 +53,7 @@ async function updateStore({
         });
     }
 
-    const storeRepository = getRepository(Store);
+    const storeRepository = defaultDataSource.getRepository(Store);
     const store = await storeRepository
         .createQueryBuilder('store')
         .where('store.id = :store_id', { store_id })

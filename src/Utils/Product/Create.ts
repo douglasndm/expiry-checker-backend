@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -35,8 +35,8 @@ async function createProduct({
     category_id,
     store_id,
 }: createProductProps): Promise<Product> {
-    const repository = getRepository(Product);
-    const productTeamRepository = getRepository(ProductTeams);
+    const repository = defaultDataSource.getRepository(Product);
+    const productTeamRepository = defaultDataSource.getRepository(ProductTeams);
 
     const team = await getTeamById(team_id);
 

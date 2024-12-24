@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { addDays } from 'date-fns';
+
+import { testDataSource } from '@project/ormconfig';
 
 import TeamSubscription from '@models/TeamSubscription';
 
@@ -102,7 +103,8 @@ describe('Create of a team', () => {
             admin_id: 'testAdmin',
         });
 
-        const teamSubRepository = getRepository(TeamSubscription);
+        const teamSubRepository =
+            testDataSource.getRepository(TeamSubscription);
         const teamSub = new TeamSubscription();
         teamSub.team = team;
         teamSub.membersLimit = 10;

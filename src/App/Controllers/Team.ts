@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import {
     getProductImageURL,
@@ -140,7 +141,7 @@ class TeamController {
         const { team_id } = req.params;
         const { name } = req.body;
 
-        const teamRepository = getRepository(Team);
+        const teamRepository = defaultDataSource.getRepository(Team);
 
         const user = await getUserByFirebaseId(req.userId);
         const userRoles = await getTeamFromUser(user.id);

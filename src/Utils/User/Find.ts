@@ -1,11 +1,11 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import User from '@models/User';
 
 import AppError from '@errors/AppError';
 
 async function getUserByFirebaseId(firebase_id: string): Promise<User> {
-    const userReposity = getRepository(User);
+    const userReposity = defaultDataSource.getRepository(User);
 
     const user = await userReposity
         .createQueryBuilder('user')
@@ -30,7 +30,7 @@ async function getUserByFirebaseId(firebase_id: string): Promise<User> {
 }
 
 async function getUserById(id: string): Promise<User> {
-    const userReposity = getRepository(User);
+    const userReposity = defaultDataSource.getRepository(User);
 
     const user = await userReposity
         .createQueryBuilder('user')
@@ -48,7 +48,7 @@ async function getUserById(id: string): Promise<User> {
 }
 
 async function getUserByEmail(email: string): Promise<User> {
-    const userReposity = getRepository(User);
+    const userReposity = defaultDataSource.getRepository(User);
 
     const user = await userReposity
         .createQueryBuilder('user')

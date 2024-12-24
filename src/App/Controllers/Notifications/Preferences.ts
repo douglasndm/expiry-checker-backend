@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
@@ -19,7 +20,9 @@ class EmailPreferences {
 
         const user = await getUserByFirebaseId(req.userId);
 
-        const notificationRepository = getRepository(NotificationsPreferences);
+        const notificationRepository = defaultDataSource.getRepository(
+            NotificationsPreferences,
+        );
         const settings = await notificationRepository
             .createQueryBuilder('notification')
             .leftJoinAndSelect('notification.user', 'user')
@@ -60,7 +63,9 @@ class EmailPreferences {
 
         const { allowEmailNotification } = req.body;
 
-        const notificationRepository = getRepository(NotificationsPreferences);
+        const notificationRepository = defaultDataSource.getRepository(
+            NotificationsPreferences,
+        );
         const alreadyExists = await notificationRepository
             .createQueryBuilder('notification')
             .leftJoinAndSelect('notification.user', 'user')

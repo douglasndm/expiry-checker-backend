@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import User from '@models/User';
 
@@ -12,7 +12,7 @@ interface deleteUserProps {
     user_id: string;
 }
 export async function deleteUser({ user_id }: deleteUserProps): Promise<void> {
-    const userRepository = getRepository(User);
+    const userRepository = defaultDataSource.getRepository(User);
 
     await removeUserFromAllTeams({ user_id });
 

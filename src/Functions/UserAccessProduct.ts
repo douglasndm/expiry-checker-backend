@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import Team from '@models/Team';
 import ProductTeam from '@models/ProductTeams';
@@ -16,7 +16,7 @@ export async function checkIfUserHasAccessToAProduct({
     user_id,
     product_id,
 }: checkIfUserHasAccessToAProductProps): Promise<Team> {
-    const productTeamRepository = getRepository(ProductTeam);
+    const productTeamRepository = defaultDataSource.getRepository(ProductTeam);
 
     const productTeam = await productTeamRepository
         .createQueryBuilder('prodTeam')

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
@@ -13,7 +13,7 @@ async function getAllProductsFromBrand({
     );
 
     if (!productsInBrand) {
-        const productRepository = getRepository(Product);
+        const productRepository = defaultDataSource.getRepository(Product);
 
         productsInBrand = await productRepository
             .createQueryBuilder('prod')

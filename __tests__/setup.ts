@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { addDays } from 'date-fns';
+
+import { testDataSource } from '@project/ormconfig';
 
 import { createUser } from '@utils/User/Create';
 import { createTeam } from '@utils/Team/Create';
@@ -27,7 +28,7 @@ async function setup(teamMembersLimit?: number): Promise<setupResponse> {
         admin_id: '123456789asd',
     });
 
-    const teamSubRepository = getRepository(TeamSubscription);
+    const teamSubRepository = testDataSource.getRepository(TeamSubscription);
     const teamSub = new TeamSubscription();
     teamSub.team = team;
     teamSub.membersLimit = teamMembersLimit || 10;

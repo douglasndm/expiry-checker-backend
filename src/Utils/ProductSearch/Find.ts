@@ -1,7 +1,8 @@
-import { getRepository } from 'typeorm';
 import axios from 'axios';
 import * as Yup from 'yup';
 import { formatInTimeZone } from 'date-fns-tz';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { saveOnCache, getFromCache } from '@services/Cache/Redis';
 
@@ -44,7 +45,7 @@ async function findProductByEAN({
         };
     }
 
-    const productRepository = getRepository(ProductDetails);
+    const productRepository = defaultDataSource.getRepository(ProductDetails);
     const product = await productRepository
         .createQueryBuilder('product')
         .where('product.code = :code', { code: `${code}` })

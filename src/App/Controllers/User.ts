@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -24,7 +25,7 @@ class UserController {
             });
         }
 
-        const repository = getRepository(User);
+        const repository = defaultDataSource.getRepository(User);
 
         const user = await repository
             .createQueryBuilder('user')
@@ -121,7 +122,7 @@ class UserController {
             });
         }
 
-        const repository = getRepository(User);
+        const repository = defaultDataSource.getRepository(User);
         const existsUser = await repository.findOne({ where: { email } });
 
         if (existsUser) {

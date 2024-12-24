@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import UserTeam from '@models/UserTeam';
 
@@ -13,7 +13,7 @@ async function getUserRole({
     user_id,
     team_id,
 }: getUserRoleProps): Promise<UserTeam> {
-    const roleRepository = getRepository(UserTeam);
+    const roleRepository = defaultDataSource.getRepository(UserTeam);
 
     const findedRole = await roleRepository
         .createQueryBuilder('role')

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@project/ormconfig';
 
 import NotificationsPreferences from '@models/NotificationsPreferences';
 
@@ -10,7 +10,9 @@ interface userEmailResponse {
 export async function getAllUsersIDAllowedToSendEmail(): Promise<
     userEmailResponse[]
 > {
-    const notificationsPreferences = getRepository(NotificationsPreferences);
+    const notificationsPreferences = defaultDataSource.getRepository(
+        NotificationsPreferences,
+    );
 
     const allPreferences = await notificationsPreferences
         .createQueryBuilder('noti')

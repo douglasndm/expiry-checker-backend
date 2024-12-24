@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@project/ormconfig';
 
 import Batch from '@models/Batch';
 
@@ -44,7 +45,7 @@ async function createBatch({
 
     const product = await findProductById(product_id);
 
-    const batchReposity = getRepository(Batch);
+    const batchReposity = defaultDataSource.getRepository(Batch);
     const batch = new Batch();
     batch.name = name;
     batch.exp_date = exp_date;
