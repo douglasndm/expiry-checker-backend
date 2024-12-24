@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import 'express-async-errors';
 
+import '../loadEnv';
+
 import rateLimiter from './App/Middlewares/RateLimiter';
 
 import Routes from './Routes/index.routes';

@@ -20,11 +20,8 @@ import HandleSetUserId from '@middlewares/UserIdHandler';
 
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
-import internalRoutes from './internal.routes';
 
 const routes = Router();
-
-routes.use('/internal', internalRoutes);
 
 // temp with out check for auth for expiry checker
 routes.get('/products/search', ProductSearch.index);
