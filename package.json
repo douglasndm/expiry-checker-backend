@@ -34,7 +34,7 @@
     "reflect-metadata": "^0.1.14",
     "sharp": "^0.32.4",
     "stream-json": "^1.7.4",
-    "typeorm": "0.2.45",
+    "typeorm": "0.3.20",
     "yup": "^0.32.11"
   },
   "devDependencies": {
