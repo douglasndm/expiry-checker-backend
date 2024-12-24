@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as admin from 'firebase-admin';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 
-import { firebaseAppExpiryChecker } from '@services/Firebase';
+import { firebaseAppExpiryChecker, generateDevToken } from '@services/Firebase';
 
 import AppError from '@errors/AppError';
 
@@ -11,6 +11,19 @@ export default async function checkFirebaseAuth(
     res: Response,
     next: NextFunction,
 ): Promise<void | Response> {
+    if (process.env.DEV_MODE === 'true') {
+        // Gerar um token de desenvolvimento
+        const devToken = await generateDevToken(
+            String(process.env.FIREBASE_DEV_UID),
+        );
+        req.headers.authorization = `Bearer ${devToken}`;
+
+        req.userId = process.env.FIREBASE_DEV_UID;
+        req.userEmail = process.env.FIREBASE_DEV_EMAIL;
+
+        return next();
+    }
+
     if (req.headers.authorization) {
         try {
             const [, token] = req.headers.authorization.split(' ');
@@ -37,6 +50,7 @@ export default async function checkFirebaseAuth(
 
             return next();
         } catch (err) {
+            console.error(err);
             throw new AppError({
                 message: 'Unauthorized',
                 statusCode: 403,
