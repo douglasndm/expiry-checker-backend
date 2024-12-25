@@ -4,6 +4,8 @@ import 'express-async-errors';
 
 import '../loadEnv';
 
+import '@services/Sentry';
+
 import rateLimiter from './App/Middlewares/RateLimiter';
 
 import Routes from './Routes/index.routes';

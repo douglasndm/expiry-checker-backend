@@ -20,7 +20,7 @@ async function sendNotificationByFirebase(
     const response = await messaging.sendAll(messages);
 
     if (response.failureCount > 0) {
-        captureException(response);
+        captureException(new Error('Failed to send notifications'), response);
     }
 }
 
