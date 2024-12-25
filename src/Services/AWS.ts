@@ -1,25 +1,30 @@
 import fs from 'fs';
-import aws from 'aws-sdk';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Upload } from '@aws-sdk/lib-storage';
+import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 
 import AppError from '@errors/AppError';
 
-aws.config.update({
+const s3 = new S3({
     region: 'us-east-1',
 });
-
-const s3 = new aws.S3();
 
 const bucket = 'expirychecker-contents';
 const signedUrlExpireSeconds = 60 * 5;
 
-function getProductImageURL(code: string): string {
+async function getProductImageURL(code: string): Promise<string> {
     const path = `products/${code}.jpg`;
 
-    const url = s3.getSignedUrl('getObject', {
-        Bucket: bucket,
-        Key: path,
-        Expires: signedUrlExpireSeconds,
-    });
+    const url = await getSignedUrl(
+        s3,
+        new GetObjectCommand({
+            Bucket: bucket,
+            Key: path,
+        }),
+        {
+            expiresIn: signedUrlExpireSeconds,
+        },
+    );
 
     return url;
 }
@@ -29,17 +34,22 @@ interface getProductImageURLByFileNameProps {
     team_id: string;
 }
 
-function getProductImageURLByFileName({
+async function getProductImageURLByFileName({
     fileName,
     team_id,
-}: getProductImageURLByFileNameProps): string {
+}: getProductImageURLByFileNameProps): Promise<string> {
     const path = `teams/${team_id}/products/${fileName}`;
 
-    const url = s3.getSignedUrl('getObject', {
-        Bucket: bucket,
-        Key: path,
-        Expires: signedUrlExpireSeconds,
-    });
+    const url = await getSignedUrl(
+        s3,
+        new GetObjectCommand({
+            Bucket: bucket,
+            Key: path,
+        }),
+        {
+            expiresIn: signedUrlExpireSeconds,
+        },
+    );
 
     return url;
 }
@@ -59,7 +69,7 @@ function removeProductImageFromS3({
         s3.deleteObject({
             Bucket: bucket,
             Key: path,
-        }).promise();
+        });
     } catch (error) {
         if (error instanceof Error) {
             throw new AppError({
@@ -81,7 +91,7 @@ function removeManyImages(files: string[], team_id: string): void {
                     Key: path + file,
                 })),
             },
-        }).promise();
+        });
     } catch (error) {
         if (error instanceof Error) {
             throw new AppError({
@@ -107,14 +117,16 @@ async function uploadToS3({
     const path = `teams/${team_id}/products/${filename}`;
 
     try {
-        const response = await s3
-            .upload({
+        const response = await new Upload({
+            client: s3,
+
+            params: {
                 Bucket: bucket,
                 Key: path,
                 Body: file,
                 ContentType: 'image/jpeg',
-            })
-            .promise();
+            },
+        }).done();
 
         return response.Location;
     } catch (error) {
