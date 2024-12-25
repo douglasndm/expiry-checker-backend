@@ -38,10 +38,12 @@ async function findProductByEAN({
         `product_suggestion:${code}`,
     );
 
+    const thumbnail = await getProductImageURL(code);
+
     if (cachedProduct?.name) {
         return {
             ...cachedProduct,
-            thumbnail: getProductImageURL(code),
+            thumbnail,
         };
     }
 
@@ -125,7 +127,7 @@ async function findProductByEAN({
     }
 
     if (!photo && product) {
-        photo = getProductImageURL(code);
+        photo = await getProductImageURL(code);
     }
 
     saveOnCache(`product_suggestion:${code}`, {

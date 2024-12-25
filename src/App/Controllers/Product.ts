@@ -9,7 +9,6 @@ import { deleteProduct } from '@utils/Product/Delete';
 
 import { getProduct } from '@functions/Product';
 
-
 import {
     getProductImageURL,
     getProductImageURLByFileName,
@@ -29,12 +28,12 @@ class ProductController {
         let thumbnail: string | null = null;
 
         if (product.image) {
-            thumbnail = getProductImageURLByFileName({
+            thumbnail = await getProductImageURLByFileName({
                 fileName: product.image,
                 team_id,
             });
         } else if (product.code) {
-            thumbnail = getProductImageURL(product.code);
+            thumbnail = await getProductImageURL(product.code);
         }
 
         const productWithFixCat = {

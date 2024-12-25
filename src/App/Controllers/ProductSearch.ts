@@ -43,7 +43,7 @@ class ProductSearchController {
                     let photo: undefined | string;
 
                     if (!photo && products[0].code) {
-                        photo = getProductImageURL(products[0].code);
+                        photo = await getProductImageURL(products[0].code);
                     }
 
                     return res.json({
