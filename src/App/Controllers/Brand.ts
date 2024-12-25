@@ -49,13 +49,17 @@ class BrandController {
     }
 
     async update(req: Request, res: Response): Promise<Response> {
+        const paramsSchema = Yup.object().shape({
+            brand_id: Yup.string().uuid(),
+        });
         const schema = Yup.object().shape({
             name: Yup.string().required(),
-            brand_id: Yup.string().required().uuid(),
+            brand_id: Yup.string().uuid(),
         });
 
         try {
             await schema.validate(req.body);
+            await paramsSchema.validate(req.params);
         } catch (err) {
             if (err instanceof Error)
                 throw new AppError({
@@ -64,12 +68,13 @@ class BrandController {
         }
 
         const { name, brand_id } = req.body;
+        const { brand_id: brandId } = req.params;
 
         const user = await getUserByFirebaseId(req.userId || '');
 
         const brand = await updateBrand({
             name,
-            brand_id,
+            brand_id: brandId || brand_id,
             user_id: user.id,
         });
 
