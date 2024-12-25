@@ -8,6 +8,10 @@ import ManagerCheck from '@middlewares/ManagerChecker';
 
 const routes = Router({ mergeParams: true });
 
+// This route should be on top because if it is not, it will be caught by the
+// delete with store_id route
+routes.delete('/users', ManagerCheck, StoreUsers.deleteAll);
+
 routes.get('/', Store.index);
 routes.post('/', Store.create);
 routes.put('/:store_id', Store.update);
@@ -18,9 +22,8 @@ routes.get('/:store_id/products', StoreProducts.index);
 routes.get('/:store_id/users', StoreUsers.index);
 
 routes.use(ManagerCheck);
+
 routes.post('/:store_id/users', StoreUsers.store);
 routes.delete('/:store_id/users', StoreUsers.delete);
-
-routes.delete('/users', StoreUsers.deleteAll);
 
 export default routes;
