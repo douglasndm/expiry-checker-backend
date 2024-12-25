@@ -1,32 +1,19 @@
-import { createConnection, getConnection, getConnectionOptions } from 'typeorm';
-
-import { entities } from '@services/Database/index';
+import { testDataSource } from '@project/ormconfig';
 
 const connection = {
     async create(): Promise<void> {
-        const defaultOptions = await getConnectionOptions('test');
-
-        const conn = {
-            ...defaultOptions,
-            dropSchema: true,
-            migrationsRun: true,
-            entities,
-            name: 'default',
-        };
-
-        await createConnection(Object.assign(conn));
+        await testDataSource.initialize();
     },
 
     async close(): Promise<void> {
-        await getConnection().close();
+        await testDataSource.destroy();
     },
 
     async clear(): Promise<void> {
-        const conn = getConnection();
-        const entitiesLocal = conn.entityMetadatas;
+        const entitiesLocal = testDataSource.entityMetadatas;
 
         const entityDeletionPromises = entitiesLocal.map(entity => async () => {
-            const repository = conn.getRepository(entity.name);
+            const repository = testDataSource.getRepository(entity.name);
             await repository.query(`DELETE FROM ${entity.tableName}`);
         });
         await Promise.all(entityDeletionPromises);

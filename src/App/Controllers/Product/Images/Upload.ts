@@ -11,7 +11,7 @@ import { getProduct } from '@functions/Product';
 import AppError from '@errors/AppError';
 
 class UploadController {
-    async store(req: Request, res: Response): Promise<Response> {
+    async store(req: Request, res: Response): Promise<void> {
         if (!req.file) {
             throw new AppError({
                 message: 'File was not sent',
@@ -68,11 +68,9 @@ class UploadController {
             .finally(() => {
                 unlinkSync(newPath);
             });
-
-        return res.json({ message: 'Uploaded' });
     }
 
-    async delete(req: Request, res: Response): Promise<Response> {
+    async delete(req: Request, res: Response): Promise<void> {
         const { team_id, product_id } = req.params;
 
         const product = await getProduct({
@@ -87,8 +85,6 @@ class UploadController {
             id: product_id,
             image: null,
         });
-
-        return res.send();
     }
 }
 
