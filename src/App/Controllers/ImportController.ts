@@ -7,7 +7,7 @@ import { importProducts } from '@utils/Import/Products';
 import AppError from '@errors/AppError';
 
 class ImportController {
-    async store(req: Request, res: Response): Promise<void> {
+    async store(req: Request, res: Response): Promise<Response> {
         if (!process.env.APPLICATION_SECRET_BACKUP_CRYPT) {
             throw new AppError({
                 message: 'Server is missing decrypt key',
@@ -46,6 +46,8 @@ class ImportController {
         const parsedFile = JSON.parse(originalFile);
 
         await importProducts(parsedFile, team_id);
+
+        return res.status(201).json({ message: 'Import completed' });
     }
 }
 

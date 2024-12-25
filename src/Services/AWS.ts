@@ -109,7 +109,7 @@ interface uploadToS3Props {
 async function uploadToS3({
     filePath,
     team_id,
-}: uploadToS3Props): Promise<string | null> {
+}: uploadToS3Props): Promise<string | undefined> {
     const file = fs.readFileSync(filePath);
 
     const filename = filePath.split('/').pop();
@@ -136,8 +136,6 @@ async function uploadToS3({
             });
         }
     }
-
-    return null;
 }
 
 export {

@@ -31,6 +31,15 @@ export default async function rateLimiter(
     next: NextFunction,
 ): Promise<void> {
     try {
+        if (!request.ip) {
+            captureException(new Error('Request IP not found'));
+
+            throw new AppError({
+                message: 'Request IP not found',
+                statusCode: 429,
+            });
+        }
+
         if (limiter) {
             await limiter.consume(request.ip);
         }
