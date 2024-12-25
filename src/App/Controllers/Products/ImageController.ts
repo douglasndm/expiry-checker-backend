@@ -31,7 +31,7 @@ class ImageController {
             });
         }
 
-        const url = getProductImageURL(ean);
+        const url = await getProductImageURL(ean);
 
         return res.json({ url });
     }
