@@ -18,6 +18,7 @@ import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
 import HandleSetUserId from '@middlewares/UserIdHandler';
 
+import usersRoutes from './users.routes';
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
 
@@ -46,9 +47,7 @@ routes.post('/sessions', SessionController.store);
 routes.use(HandleSetUserId);
 routes.use(DeviceChecker);
 
-routes.get('/users', User.index);
-routes.put('/users', User.update);
-routes.delete('/users', User.delete);
+routes.use('/users', usersRoutes);
 
 routes.get('/user/teams', UserTeams.index);
 
