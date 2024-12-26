@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import 'express-async-errors';
 
-import '../loadEnv';
+import './loadEnv';
 
 import '@services/Sentry';
 

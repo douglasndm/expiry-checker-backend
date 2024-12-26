@@ -15,6 +15,6 @@ console.log('Loading environment variables...');
 
 // Carregar variáveis de ambiente de múltiplos arquivos
 loadEnvFiles([
-    '.env', // Caminho para o primeiro arquivo .env
-    '../../.env', // Caminho para o segundo arquivo .env
+    '../.env', // Caminho para o primeiro arquivo .env
+    '../../../.env', // Caminho para o segundo arquivo .env
 ]);
