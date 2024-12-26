@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as Yup from 'yup';
 import { formatInTimeZone } from 'date-fns-tz';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { saveOnCache, getFromCache } from '@services/Cache/Redis';
 

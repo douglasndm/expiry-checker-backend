@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import User from '@models/User';
 

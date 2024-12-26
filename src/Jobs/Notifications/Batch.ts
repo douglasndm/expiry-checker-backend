@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import Batch from '@models/Batch';
 

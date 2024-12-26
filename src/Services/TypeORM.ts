@@ -1,0 +1,71 @@
+import { DataSource } from 'typeorm';
+
+import Batch from '@models/Batch';
+import Category from '@models/Category';
+import Product from '@models/Product';
+import Brand from '@models/Brand';
+import Team from '@models/Team';
+import Store from '@models/Store';
+import User from '@models/User';
+import UserTeam from '@models/UserTeam';
+import ProductTeams from '@models/ProductTeams';
+import ProductCategory from '@models/ProductCategory';
+import TeamSubscriptions from '@models/TeamSubscription';
+import ProductDetails from '@models/ProductDetails';
+import ProductRequest from '@models/ProductRequest';
+import UsersStores from '@models/UsersStores';
+import UserLogin from '@models/UserLogin';
+import UserLogs from '@models/UserLogs';
+import TeamPreferences from '@models/TeamPreferences';
+import NotificationsPreferences from '@models/NotificationsPreferences';
+
+const entities = [
+    Batch,
+    Category,
+    Product,
+    Brand,
+    Team,
+    Store,
+    User,
+    UserTeam,
+    ProductTeams,
+    ProductCategory,
+    TeamSubscriptions,
+    ProductDetails,
+    ProductRequest,
+    UsersStores,
+    UserLogin,
+    UserLogs,
+    TeamPreferences,
+    NotificationsPreferences,
+];
+
+export const defaultDataSource = new DataSource({
+    name: 'default',
+    type: 'postgres',
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    entities,
+    migrations: ['packages/app/src/Services/Database/Typeorm/migrations/*.ts'],
+    synchronize: false,
+    logging: false,
+});
+
+export const testDataSource = new DataSource({
+    name: 'test',
+    type: 'postgres',
+    host: process.env.DB_TEST_HOST,
+    port: Number(process.env.DB_TEST_PORT),
+    username: process.env.DB_TEST_USER,
+    password: process.env.DB_TEST_PASS,
+    database: process.env.DB_TEST_NAME,
+    entities,
+    migrations: ['packages/app/src/Services/Database/Typeorm/migrations/*.ts'],
+    dropSchema: true,
+    logging: false,
+    synchronize: true,
+    migrationsRun: true,
+});

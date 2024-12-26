@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache, invalidadePrefix } from '@services/Cache/Redis';
 

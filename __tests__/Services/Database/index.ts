@@ -1,4 +1,4 @@
-import { testDataSource } from '@project/ormconfig';
+import { testDataSource } from '@services/TypeORM';
 
 const connection = {
     async create(): Promise<void> {

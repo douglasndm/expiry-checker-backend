@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 

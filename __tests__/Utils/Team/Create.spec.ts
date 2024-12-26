@@ -1,6 +1,6 @@
 import { addDays } from 'date-fns';
 
-import { testDataSource } from '@project/ormconfig';
+import { testDataSource } from '@services/TypeORM';
 
 import TeamSubscription from '@models/TeamSubscription';
 

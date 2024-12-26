@@ -1,6 +1,6 @@
 import { endOfDay, parseISO } from 'date-fns';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 

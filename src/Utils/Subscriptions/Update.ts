@@ -1,6 +1,6 @@
 import { parseISO, startOfDay } from 'date-fns';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import TeamSubscription from '@models/TeamSubscription';
 

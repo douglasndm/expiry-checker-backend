@@ -1,7 +1,7 @@
 import { Brackets } from 'typeorm';
 import { isValid, parseISO } from 'date-fns';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 import { isManager } from '@utils/Team/Roles/Manager';

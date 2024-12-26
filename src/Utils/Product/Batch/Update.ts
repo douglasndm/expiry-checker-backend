@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { findBatchById } from '@utils/Product/Batch/Find';
 import { clearProductCache } from '@utils/Cache/Product';

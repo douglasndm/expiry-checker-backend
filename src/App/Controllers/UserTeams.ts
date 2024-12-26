@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import UserTeam from '@models/UserTeam';
 import TeamSubscription from '@models/TeamSubscription';

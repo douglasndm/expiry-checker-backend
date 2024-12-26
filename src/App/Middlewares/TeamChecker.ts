@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as Yup from 'yup';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import UserTeam from '@models/UserTeam';
 

@@ -1,6 +1,6 @@
 import { formatInTimeZone } from 'date-fns-tz';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { getFromCache } from '@services/Cache/Redis';
 

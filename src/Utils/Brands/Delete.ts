@@ -1,4 +1,4 @@
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache, invalidadeTeamCache } from '@services/Cache/Redis';
 

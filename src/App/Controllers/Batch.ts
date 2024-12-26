@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { parseISO, isValid, endOfDay } from 'date-fns';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import BackgroundJob from '@services/Background';
 

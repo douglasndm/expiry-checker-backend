@@ -1,4 +1,4 @@
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import UserTeam from '@models/UserTeam';
 

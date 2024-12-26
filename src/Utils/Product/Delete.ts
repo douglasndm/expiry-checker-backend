@@ -1,4 +1,4 @@
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { removeProductImageFromS3 } from '@services/AWS';
 import { invalidadeTeamCache } from '@services/Cache/Redis';

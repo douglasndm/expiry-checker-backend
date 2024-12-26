@@ -1,6 +1,6 @@
 import { addDays, compareAsc, startOfDay } from 'date-fns';
 
-import { defaultDataSource } from '@project/ormconfig';
+import { defaultDataSource } from '@services/TypeORM';
 
 import Team from '@models/Team';
 import Batch from '@models/Batch';
