@@ -51,7 +51,7 @@ class UserTeams {
                 const sub = subscription;
                 return {
                     ...team.team,
-                    role: team.role,
+                    role: team.role.toLowerCase(),
                     subscription: sub || null,
                 };
             }
