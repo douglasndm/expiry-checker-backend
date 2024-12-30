@@ -13,7 +13,6 @@
         "paths": {
             "~types/*": ["@types/*"],
             "@tests/*": ["../__tests__/*"],
-            "@project/*": ["../../../*"],
             "@controllers/*": ["App/Controllers/*"],
             "@middlewares/*": ["App/Middlewares/*"],
             "@models/*": ["App/Models/*"],
