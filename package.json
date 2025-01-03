@@ -8,7 +8,7 @@
         "dev": "yarn dev:server && yarn dev:queue",
         "dev:server": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
         "dev:queue": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/queue.ts",
-        "typeorm": "node --require ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+        "typeorm": "node --require ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/Services/TypeORM.ts",
         "test": "jest",
         "test:watch": "jest --watch --verbose=true"
     },

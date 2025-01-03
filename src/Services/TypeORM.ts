@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import dotenv from 'dotenv';
 
 import Batch from '@models/Batch';
 import Category from '@models/Category';
@@ -18,6 +19,8 @@ import UserLogin from '@models/UserLogin';
 import UserLogs from '@models/UserLogs';
 import TeamPreferences from '@models/TeamPreferences';
 import NotificationsPreferences from '@models/NotificationsPreferences';
+
+dotenv.config({ path: '../../.env' });
 
 const entities = [
     Batch,
@@ -49,23 +52,23 @@ export const defaultDataSource = new DataSource({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     entities,
-    migrations: ['packages/app/src/Services/Database/Typeorm/migrations/*.ts'],
+    migrations: ['./src/Services/Database/Typeorm/migrations/*.ts'],
     synchronize: false,
     logging: false,
 });
 
-export const testDataSource = new DataSource({
-    name: 'test',
-    type: 'postgres',
-    host: process.env.DB_TEST_HOST,
-    port: Number(process.env.DB_TEST_PORT),
-    username: process.env.DB_TEST_USER,
-    password: process.env.DB_TEST_PASS,
-    database: process.env.DB_TEST_NAME,
-    entities,
-    migrations: ['packages/app/src/Services/Database/Typeorm/migrations/*.ts'],
-    dropSchema: true,
-    logging: false,
-    synchronize: true,
-    migrationsRun: true,
-});
+// export const testDataSource = new DataSource({
+//     name: 'test',
+//     type: 'postgres',
+//     host: process.env.DB_TEST_HOST,
+//     port: Number(process.env.DB_TEST_PORT),
+//     username: process.env.DB_TEST_USER,
+//     password: process.env.DB_TEST_PASS,
+//     database: process.env.DB_TEST_NAME,
+//     entities,
+//     migrations: ['packages/app/src/Services/Database/Typeorm/migrations/*.ts'],
+//     dropSchema: true,
+//     logging: false,
+//     synchronize: true,
+//     migrationsRun: true,
+// });
