@@ -10,13 +10,7 @@ async function getSubscriptionFromTeam(
     const sub = await subRepository
         .createQueryBuilder('sub')
         .leftJoinAndSelect('sub.team', 'team')
-        .select([
-            'team.id',
-            'sub.id',
-            'sub.expireIn',
-            'sub.membersLimit',
-            'sub.isActive',
-        ])
+        .select(['team.id', 'sub.id', 'sub.expireIn', 'sub.membersLimit'])
         .where('team.id = :team_id', { team_id })
         .getOne();
 

@@ -33,7 +33,6 @@ async function setup(teamMembersLimit?: number): Promise<setupResponse> {
     teamSub.team = team;
     teamSub.membersLimit = teamMembersLimit || 10;
     teamSub.expireIn = addDays(new Date(), 7);
-    teamSub.isActive = true;
 
     await teamSubRepository.save(teamSub);
 

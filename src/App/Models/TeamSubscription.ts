@@ -25,9 +25,6 @@ class TeamSubscription {
     @Column({ name: 'members_limit' })
     membersLimit: number;
 
-    @Column({ name: 'is_active' })
-    isActive: boolean;
-
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

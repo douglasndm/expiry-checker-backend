@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
-import { compareAsc, endOfDay } from 'date-fns';
 
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { registerDevice } from '@utils/User/Login';
 import { createUser } from '@utils/User/Create';
 import { getTeamFromUser } from '@utils/User/Team';
-import { getSubscriptionFromTeam } from '@utils/Team/Subscription/Get';
 
 import AppError from '@errors/AppError';
 
@@ -58,25 +56,6 @@ class SessionController {
                 const userTeam = await getTeamFromUser(user.id);
 
                 const team = { ...userTeam };
-
-                if (userTeam) {
-                    const sub = await getSubscriptionFromTeam(userTeam.team.id);
-
-                    let isActive = false;
-
-                    if (sub) {
-                        if (
-                            compareAsc(
-                                endOfDay(new Date()),
-                                endOfDay(sub.expireIn),
-                            ) <= 0
-                        ) {
-                            isActive = true;
-                        }
-                    }
-
-                    team.team.isActive = isActive;
-                }
 
                 const response = {
                     ...user,

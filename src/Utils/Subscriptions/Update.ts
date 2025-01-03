@@ -33,7 +33,6 @@ async function setTeamSubscription({
 
     const teamSubscription = new TeamSubscription();
     teamSubscription.expireIn = startOfDay(parseISO(subscription.expires_date));
-    teamSubscription.isActive = true;
     teamSubscription.membersLimit = members;
     teamSubscription.team = team;
 
