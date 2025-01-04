@@ -41,7 +41,7 @@ async function connectToRedis(): Promise<void> {
         });
 
         await redis.ping(); // Verifica se a conexão está funcionando
-        console.log('Connected to Redis at: ', process.env.REDIS_HOST);
+        console.log('Connected to Redis at:', process.env.REDIS_HOST);
     } catch (error) {
         console.error('Erro ao conectar ao Redis:', error);
         redis = null;
