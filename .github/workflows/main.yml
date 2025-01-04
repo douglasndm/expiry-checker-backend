@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
-
+          
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -50,6 +50,7 @@ jobs:
         env:
           FIREBASE_FILE: ${{ secrets.FIREBASE_ACCOUNT_KEY }}
           FIREBASE_EXPIRYCHECKER_FILE: ${{ secrets.EXPIRY_CHECKER_FIREBASE_ACCOUNT_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           yarn build
           ls
