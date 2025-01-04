@@ -3,7 +3,6 @@ import Team from '@models/Team';
 
 import { createProduct } from '@utils/Product/Create';
 import { getProductById } from '@utils/Product/Get';
-import { removeCategoryFromProduct } from '@utils/Product/Category/Remove';
 import { createCategory } from '@utils/Categories/Create';
 
 import AppError from '@errors/AppError';

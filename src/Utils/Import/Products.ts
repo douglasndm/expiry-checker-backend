@@ -6,13 +6,9 @@ import { invalidadeTeamCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
-import ProductCategory from '@models/ProductCategory';
 
 import { createManyBrands } from '@utils/Brands/CreateMany';
-import {
-    createManyCategories,
-    createManyProductCategories,
-} from '@utils/Categories/CreateMany';
+import { createManyCategories } from '@utils/Categories/CreateMany';
 import { createManyStores } from '@utils/Stores/CreateMany';
 import { getAllBrands } from '@utils/Brand';
 import { getAllCategoriesFromTeam } from '@utils/Categories/List';
@@ -62,7 +58,6 @@ async function importProducts(
     const categoriesFromTeam = await getAllCategoriesFromTeam({ team_id });
     const storesFromTeam = await getAllStoresFromTeam({ team_id });
 
-    const prodCategories: ProductCategory[] = [];
     const batchesToCreate: Batch[] = [];
 
     const productsToCreate = products.map(prod => {
@@ -94,13 +89,7 @@ async function importProducts(
                 );
 
                 if (newCategory) {
-                    const productCategory = new ProductCategory();
-                    productCategory.product = product;
-                    productCategory.category = newCategory;
-
-                    product.category = productCategory;
-
-                    prodCategories.push(productCategory);
+                    product.category = newCategory;
                 }
             }
         }
@@ -160,7 +149,6 @@ async function importProducts(
         team_id,
     });
 
-    await createManyProductCategories(prodCategories);
     await createManyBatches(batchesToCreate);
 
     await invalidadeTeamCache(team_id);

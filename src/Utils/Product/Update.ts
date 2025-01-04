@@ -4,12 +4,10 @@ import { invalidadeCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 
-import { addToCategory } from '@utils/Product/Category/AddToCategory';
 import { getProductById } from '@utils/Product/Get';
 import { getAllBrands } from '@utils/Brand';
+import { getAllCategoriesFromTeam } from '@utils/Categories/List';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
-import { removeCategoryFromProduct } from '@utils/Product/Category/Remove';
-import { findCategoryById } from '@utils/Categories/Find';
 import { clearProductCache } from '@utils/Cache/Product';
 
 import { getProductTeam } from '@functions/Product/Team';
@@ -46,6 +44,9 @@ async function updateProduct({
     const brands = await getAllBrands({ team_id: team.id });
     const findedBrand = brands.find(b => b.id === brand_id);
 
+    const categories = await getAllCategoriesFromTeam({ team_id: team.id });
+    const findedCategory = categories.find(cat => cat.id === category_id);
+
     const stores = await getAllStoresFromTeam({ team_id: team.id });
     const findedStore = stores.find(store => store.id === store_id);
 
@@ -54,15 +55,15 @@ async function updateProduct({
     // image or NULL is ok, undefined is not, and it should not update
     if (image || image === null) product.image = image;
 
-    if (product.category) {
-        await invalidadeCache(
-            `category_products:${team.id}:${product.category.category.id}`,
-        );
-    }
-
     // This invalidade the old brand products and the new one
     if (product.brand) {
         await invalidadeCache(`brand_products:${team.id}:${product.brand.id}`);
+    }
+
+    if (product.category) {
+        await invalidadeCache(
+            `category_products:${team.id}:${product.category.id}`,
+        );
     }
 
     if (product.store) {
@@ -70,24 +71,15 @@ async function updateProduct({
     }
     product.brand = findedBrand || null;
 
+    if (category_id === null || findedCategory) {
+        product.category = findedCategory || null;
+    }
+
     if (store_id === null || findedStore) {
         product.store = findedStore || null;
     }
 
     const updatedProduct = await productRepository.save(product);
-
-    if (category_id !== undefined) {
-        await removeCategoryFromProduct(updatedProduct.id);
-
-        if (category_id) {
-            const category = await findCategoryById(category_id);
-
-            await addToCategory({
-                product_id: updatedProduct.id,
-                category_id: category.id,
-            });
-        }
-    }
 
     await clearProductCache(updatedProduct.id);
 

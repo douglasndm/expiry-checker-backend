@@ -20,8 +20,8 @@ class ProductDetails {
     @Column()
     brand?: string;
 
-    @Column()
-    thumbnail?: string;
+    @Column({ name: 'thumbnail', type: 'varchar', nullable: true })
+    thumbnail: string | null;
 
     @Column({ name: 'last_time_checked', type: 'timestamp' })
     lastTimeChecked: Date | null;

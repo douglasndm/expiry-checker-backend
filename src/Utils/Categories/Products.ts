@@ -3,7 +3,6 @@ import { defaultDataSource } from '@services/TypeORM';
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
-import ProductCategory from '@models/ProductCategory';
 
 interface getAllProductsFromCategoryProps {
     category_id: string;
@@ -19,25 +18,23 @@ async function getAllProductsFromCategory({
     category_id,
     team_id,
 }: getAllProductsFromCategoryProps): Promise<getAllProductsFromCategoryResponse> {
-    let productsInCategory = await getFromCache<ProductCategory[]>(
+    let productsInCategory = await getFromCache<Product[]>(
         `category_products:${team_id}:${category_id}`,
     );
 
     if (!productsInCategory) {
         const productCategoryRepository =
-            defaultDataSource.getRepository(ProductCategory);
+            defaultDataSource.getRepository(Product);
 
         productsInCategory = await productCategoryRepository
-            .createQueryBuilder('prod_cat')
-            .leftJoinAndSelect('prod_cat.product', 'product')
+            .createQueryBuilder('product')
             .leftJoinAndSelect('product.batches', 'batches')
             .leftJoinAndSelect('product.team', 'team')
+            .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.store', 'store')
             .leftJoinAndSelect('team.team', 'teamObj')
-            .leftJoinAndSelect('prod_cat.category', 'category')
             .where('category.id = :id', { id: category_id })
             .select([
-                'prod_cat',
                 'category.id',
                 'category.name',
 
@@ -65,14 +62,12 @@ async function getAllProductsFromCategory({
         );
     }
 
-    const products = productsInCategory.map(pc => pc.product);
-
     const response: getAllProductsFromCategoryResponse = {
         category_name:
             productsInCategory.length > 0
-                ? productsInCategory[0].category.name
+                ? productsInCategory[0]?.category?.name
                 : '',
-        products,
+        products: productsInCategory,
     };
 
     return response;

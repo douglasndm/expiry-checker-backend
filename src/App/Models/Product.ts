@@ -12,8 +12,8 @@ import {
 
 import Batch from './Batch';
 import ProductTeams from './ProductTeams';
-import ProductCategory from './ProductCategory';
 import Brand from './Brand';
+import Category from './Category';
 import Store from './Store';
 
 @Entity({ name: 'team_products' })
@@ -34,10 +34,9 @@ export default class Product {
     @JoinColumn({ name: 'brand_id' })
     brand?: Brand | null;
 
-    @OneToOne(() => ProductCategory, prodCat => prodCat.product, {
-        onDelete: 'CASCADE',
-    })
-    category?: ProductCategory;
+    @OneToOne(() => Category)
+    @JoinColumn({ name: 'category_id' })
+    category?: Category | null;
 
     @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;

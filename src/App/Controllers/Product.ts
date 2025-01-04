@@ -38,7 +38,6 @@ class ProductController {
 
         const productWithFixCat = {
             ...product,
-            category: product.category?.category,
             thumbnail,
         };
 
@@ -96,9 +95,9 @@ class ProductController {
             name: Yup.string(),
             code: Yup.string().nullable(),
             brand: Yup.string().uuid().nullable(),
+            brand_id: Yup.string().uuid().nullable(),
             store_id: Yup.string().uuid().nullable(),
             category_id: Yup.string().uuid().nullable(),
-            categories: Yup.array().of(Yup.string()),
         });
 
         try {
@@ -121,22 +120,15 @@ class ProductController {
         }
 
         const { product_id } = req.params;
-        const { name, code, brand, store_id, category_id, categories } =
-            req.body;
-
-        let cat_id: string = category_id;
-
-        if (!cat_id && categories && categories.length > 0) {
-            cat_id = String(categories[0]);
-        }
+        const { name, code, brand, brand_id, store_id, category_id } = req.body;
 
         const updatedProduct = await updateProduct({
             id: product_id,
             name,
             code,
-            brand_id: brand,
+            brand_id: brand_id || brand,
             store_id,
-            category_id: cat_id,
+            category_id,
         });
 
         return res.status(201).json(updatedProduct);

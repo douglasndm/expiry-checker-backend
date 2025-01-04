@@ -52,14 +52,7 @@ class TeamController {
             sortByBatches: sortByBatches === 'true',
         });
 
-        const fixedCategories = products.map(p => {
-            return {
-                ...p,
-                category: p.category ? p.category.category : null,
-            };
-        });
-
-        const productsWithImages = fixedCategories.map(p => {
+        const productsWithImages = products.map(p => {
             if (p.image) {
                 return {
                     ...p,

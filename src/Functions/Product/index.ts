@@ -37,9 +37,8 @@ export async function getProduct({
         .where('product.id = :product_id', { product_id })
         .leftJoinAndSelect('product.brand', 'brand')
         .leftJoinAndSelect('product.store', 'store')
-        .leftJoinAndSelect('product.category', 'prodCat')
+        .leftJoinAndSelect('product.category', 'category')
         .leftJoinAndSelect('product.batches', 'batches')
-        .leftJoinAndSelect('prodCat.category', 'category')
         .select([
             'product.id',
             'product.name',
@@ -53,8 +52,6 @@ export async function getProduct({
 
             'store.id',
             'store.name',
-
-            'prodCat',
 
             'category.id',
             'category.name',

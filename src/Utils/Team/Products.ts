@@ -51,8 +51,7 @@ async function getProductsFromTeam(
         .leftJoinAndSelect('product_teams.product', 'product')
         .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.brand', 'brand')
-        .leftJoinAndSelect('product.category', 'prodCat')
-        .leftJoinAndSelect('prodCat.category', 'category')
+        .leftJoinAndSelect('product.category', 'category')
         .leftJoinAndSelect('product.batches', 'batches')
         .select([
             'product_teams.id',
@@ -66,7 +65,6 @@ async function getProductsFromTeam(
 
             'store.id',
             'store.name',
-            'prodCat.id',
             'category.id',
             'category.name',
             'brand.id',

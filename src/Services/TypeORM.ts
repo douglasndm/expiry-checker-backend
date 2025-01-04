@@ -10,7 +10,6 @@ import Store from '@models/Store';
 import User from '@models/User';
 import UserTeam from '@models/UserTeam';
 import ProductTeams from '@models/ProductTeams';
-import ProductCategory from '@models/ProductCategory';
 import TeamSubscriptions from '@models/TeamSubscription';
 import ProductDetails from '@models/ProductDetails';
 import ProductRequest from '@models/ProductRequest';
@@ -32,7 +31,6 @@ const entities = [
     User,
     UserTeam,
     ProductTeams,
-    ProductCategory,
     TeamSubscriptions,
     ProductDetails,
     ProductRequest,

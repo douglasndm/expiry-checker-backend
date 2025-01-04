@@ -39,9 +39,7 @@ async function getProductById(props: Props): Promise<Product> {
         .where('product.id = :product_id', { product_id });
 
     if (includeCategory) {
-        query
-            .leftJoinAndSelect('product.category', 'prodCategory')
-            .leftJoinAndSelect('prodCategory.category', 'category');
+        query.leftJoinAndSelect('product.category', 'category');
     }
 
     if (includeStore) {
