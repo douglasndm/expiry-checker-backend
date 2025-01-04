@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -6,15 +6,14 @@ import Product from '@models/Product';
 import ProductTeams from '@models/ProductTeams';
 import Store from '@models/Store';
 
+import { getTeamById } from '@utils/Team/Find';
 import { getAllStoresFromTeam } from '@utils/Stores/List';
 import { getUserRoleInTeam } from '@utils/UserRoles';
 import { getAllBrands } from '@utils/Brand';
+import { getAllCategoriesFromTeam } from '@utils/Categories/List';
 import { getUserStoreOnTeam } from '@utils/Stores/Team';
 
 import AppError from '@errors/AppError';
-
-import { getTeamById } from '@utils/Team/Find';
-import { addToCategory } from './Category/AddToCategory';
 
 interface createProductProps {
     name: string;
@@ -35,8 +34,8 @@ async function createProduct({
     category_id,
     store_id,
 }: createProductProps): Promise<Product> {
-    const repository = getRepository(Product);
-    const productTeamRepository = getRepository(ProductTeams);
+    const repository = defaultDataSource.getRepository(Product);
+    const productTeamRepository = defaultDataSource.getRepository(ProductTeams);
 
     const team = await getTeamById(team_id);
 
@@ -83,6 +82,9 @@ async function createProduct({
     const allBrands = await getAllBrands({ team_id });
     const findedBrand = allBrands.find(b => b.id === brand_id);
 
+    const categories = await getAllCategoriesFromTeam({ team_id: team.id });
+    const findedCategory = categories.find(cat => cat.id === category_id);
+
     const prod: Product = new Product();
     prod.name = name;
     prod.code = code || null;
@@ -90,6 +92,13 @@ async function createProduct({
     if (findedBrand) {
         prod.brand = findedBrand;
         await invalidadeCache(`brand_products:${team_id}:${findedBrand.id}`);
+    }
+
+    if (findedCategory) {
+        prod.category = findedCategory;
+        await invalidadeCache(
+            `category_products:${team_id}:${findedCategory.id}`,
+        );
     }
 
     if (userStore) {
@@ -105,15 +114,6 @@ async function createProduct({
     productTeam.team = team;
 
     await productTeamRepository.save(productTeam);
-
-    if (category_id !== undefined) {
-        await addToCategory({
-            product_id: prod.id,
-            category_id,
-        });
-
-        await invalidadeCache(`category_products:${team_id}:${category_id}`);
-    }
 
     await invalidadeCache(`team_products:${team_id}`);
 

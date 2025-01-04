@@ -1,11 +1,11 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
 async function getTeamById(id: string): Promise<Team> {
-    const teamReposity = getRepository(Team);
+    const teamReposity = defaultDataSource.getRepository(Team);
 
     const team = await teamReposity
         .createQueryBuilder('team')

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -7,7 +7,7 @@ import UserLogin from '@models/UserLogin';
 import { getUserById } from '@utils/User/Find';
 
 async function getAllLoginsFromAllUsers(): Promise<UserLogin[]> {
-    const loginRepository = getRepository(UserLogin);
+    const loginRepository = defaultDataSource.getRepository(UserLogin);
 
     const logins = await loginRepository
         .createQueryBuilder('login')
@@ -20,7 +20,7 @@ async function getAllLoginsFromAllUsers(): Promise<UserLogin[]> {
 async function getUserDevice({
     user_id,
 }: getUserDeviceProps): Promise<UserLogin | null> {
-    const loginRepository = getRepository(UserLogin);
+    const loginRepository = defaultDataSource.getRepository(UserLogin);
     const login = await loginRepository
         .createQueryBuilder('login')
         .leftJoinAndSelect('login.user', 'user')
@@ -36,7 +36,7 @@ async function registerDevice({
     ip_address,
     firebaseToken,
 }: registerDeviceProps): Promise<UserLogin> {
-    const userLoginRepository = getRepository(UserLogin);
+    const userLoginRepository = defaultDataSource.getRepository(UserLogin);
 
     const prevLogin = await userLoginRepository
         .createQueryBuilder('login')

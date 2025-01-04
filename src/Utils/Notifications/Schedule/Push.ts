@@ -196,5 +196,5 @@ export async function dailyPushNotification(): Promise<void> {
     });
 
     const messaging = admin.messaging();
-    await messaging.sendAll(messages);
+    await messaging.sendEach(messages);
 }

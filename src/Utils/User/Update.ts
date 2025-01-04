@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import User from '@models/User';
 
@@ -12,7 +13,7 @@ export async function updateUser({
     email,
     password,
 }: updateUserProps): Promise<User> {
-    const repository = getRepository(User);
+    const repository = defaultDataSource.getRepository(User);
 
     const user = await repository.findOne({ where: { id } });
 

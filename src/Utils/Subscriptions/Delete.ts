@@ -1,9 +1,10 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import TeamSubscription from '@models/TeamSubscription';
 
 async function deleteSubscription(team_id: string): Promise<void> {
-    const subscriptionRepository = getRepository(TeamSubscription);
+    const subscriptionRepository =
+        defaultDataSource.getRepository(TeamSubscription);
 
     const subscription = await subscriptionRepository
         .createQueryBuilder('sub')

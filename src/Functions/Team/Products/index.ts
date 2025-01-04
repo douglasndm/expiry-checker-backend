@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import ProductTeams from '@models/ProductTeams';
 
@@ -9,7 +9,7 @@ interface getAllProductsFromManyTeams {
 export async function getAllProductsFromManyTeams({
     teams,
 }: getAllProductsFromManyTeams): Promise<ProductTeams[]> {
-    const productTeamsRepo = getRepository(ProductTeams);
+    const productTeamsRepo = defaultDataSource.getRepository(ProductTeams);
 
     const products = await productTeamsRepo
         .createQueryBuilder('prods')

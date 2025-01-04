@@ -1,17 +1,14 @@
-import { getRepository } from 'typeorm';
 import { endOfDay, parseISO } from 'date-fns';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
 import Batch from '@models/Batch';
-import ProductCategory from '@models/ProductCategory';
 
 import { createManyBrands } from '@utils/Brands/CreateMany';
-import {
-    createManyCategories,
-    createManyProductCategories,
-} from '@utils/Categories/CreateMany';
+import { createManyCategories } from '@utils/Categories/CreateMany';
 import { createManyStores } from '@utils/Stores/CreateMany';
 import { getAllBrands } from '@utils/Brand';
 import { getAllCategoriesFromTeam } from '@utils/Categories/List';
@@ -34,7 +31,11 @@ async function importProducts(
 
     const brandsNames = brands.map(b => b.name);
     const categoriesNames = categories.map(c => c.name);
-    const storesNames = stores.map(s => s.name);
+    let storesNames: string[] = [];
+
+    if (stores !== undefined) {
+        storesNames = stores.map(s => s.name);
+    }
 
     // this will create the missing brands, categories and stores
     // but if the team already had brands, categories and stores, it will not create the same again
@@ -57,7 +58,6 @@ async function importProducts(
     const categoriesFromTeam = await getAllCategoriesFromTeam({ team_id });
     const storesFromTeam = await getAllStoresFromTeam({ team_id });
 
-    const prodCategories: ProductCategory[] = [];
     const batchesToCreate: Batch[] = [];
 
     const productsToCreate = products.map(prod => {
@@ -89,13 +89,7 @@ async function importProducts(
                 );
 
                 if (newCategory) {
-                    const productCategory = new ProductCategory();
-                    productCategory.product = product;
-                    productCategory.category = newCategory;
-
-                    product.category = productCategory;
-
-                    prodCategories.push(productCategory);
+                    product.category = newCategory;
                 }
             }
         }
@@ -147,7 +141,7 @@ async function importProducts(
         return product;
     });
 
-    const productRepository = getRepository(Product);
+    const productRepository = defaultDataSource.getRepository(Product);
     await productRepository.save(productsToCreate);
 
     await createManyProducts({
@@ -155,7 +149,6 @@ async function importProducts(
         team_id,
     });
 
-    await createManyProductCategories(prodCategories);
     await createManyBatches(batchesToCreate);
 
     await invalidadeTeamCache(team_id);

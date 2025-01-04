@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import TeamPreferences from '@models/TeamPreferences';
 
@@ -14,7 +15,8 @@ interface getPreferencesFromTeamProps {
 async function getPreferencesFromTeam({
     team_id,
 }: getPreferencesFromTeamProps): Promise<TeamPreferences> {
-    const preferencesRepository = getRepository(TeamPreferences);
+    const preferencesRepository =
+        defaultDataSource.getRepository(TeamPreferences);
 
     let preferences = await preferencesRepository
         .createQueryBuilder('prefe')
@@ -59,7 +61,8 @@ async function updateTeamPreferences({
             });
     }
 
-    const preferencesRepository = getRepository(TeamPreferences);
+    const preferencesRepository =
+        defaultDataSource.getRepository(TeamPreferences);
 
     let preferences = await preferencesRepository
         .createQueryBuilder('prefe')

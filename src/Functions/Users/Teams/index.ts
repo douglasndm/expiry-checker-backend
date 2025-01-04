@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -13,7 +13,7 @@ interface getAllTeamsUserIsProps {
 export async function getAllTeamsUserIs({
     user_id,
 }: getAllTeamsUserIsProps): Promise<Array<UserTeam>> {
-    const userTeamsRepository = getRepository(UserTeam);
+    const userTeamsRepository = defaultDataSource.getRepository(UserTeam);
 
     const teams = await userTeamsRepository
         .createQueryBuilder('userTeams')
@@ -32,7 +32,7 @@ interface removeUserFromAllTeamsProps {
 export async function removeUserFromAllTeams({
     user_id,
 }: removeUserFromAllTeamsProps): Promise<void> {
-    const userTeamsRepository = getRepository(UserTeam);
+    const userTeamsRepository = defaultDataSource.getRepository(UserTeam);
 
     const teams = await getAllTeamsUserIs({ user_id });
 

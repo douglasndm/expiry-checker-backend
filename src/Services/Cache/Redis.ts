@@ -41,7 +41,7 @@ async function connectToRedis(): Promise<void> {
         });
 
         await redis.ping(); // Verifica se a conexão está funcionando
-        console.log('Conectado ao Redis');
+        console.log('Connected to Redis at:', process.env.REDIS_HOST);
     } catch (error) {
         console.error('Erro ao conectar ao Redis:', error);
         redis = null;
@@ -81,15 +81,15 @@ async function checkAndClear() {
         // Convertendo para MB
         const usedMemoryMB = usedMemoryBytes / (1024 * 1024);
 
-        if (usedMemoryMB > 29) {
-            console.log(
-                'Memória usada no Redis:',
-                usedMemoryMB.toFixed(2),
-                'MB',
-            );
+        if (redis) {
+            if (usedMemoryMB > 150) {
+                console.log(
+                    'Redis is using: ',
+                    usedMemoryMB.toFixed(2),
+                    'MB of memory',
+                );
 
-            if (redis) {
-                console.log('Limpando cache do Redis');
+                console.log('Clearing Redis cache...');
                 redis.flushall();
             }
         }

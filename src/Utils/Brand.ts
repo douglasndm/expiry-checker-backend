@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import {
     getFromCache,
@@ -24,7 +24,7 @@ export async function getAllBrands({
         return teamBrandsCache;
     }
 
-    const brandRepository = getRepository(Brand);
+    const brandRepository = defaultDataSource.getRepository(Brand);
 
     const brands = await brandRepository
         .createQueryBuilder('brand')
@@ -50,7 +50,7 @@ export async function createBrand({
 
     const team = await getTeamById(team_id);
 
-    const brandRepository = getRepository(Brand);
+    const brandRepository = defaultDataSource.getRepository(Brand);
 
     const alreadyExists = await brandRepository
         .createQueryBuilder('brand')
@@ -81,7 +81,7 @@ export async function updateBrand({
     user_id,
     name,
 }: updateBrandProps): Promise<Brand> {
-    const brandRepository = getRepository(Brand);
+    const brandRepository = defaultDataSource.getRepository(Brand);
 
     const brand = await brandRepository
         .createQueryBuilder('brand')

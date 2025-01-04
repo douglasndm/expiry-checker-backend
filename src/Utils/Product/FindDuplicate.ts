@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import ProductTeams from '@models/ProductTeams';
 
@@ -36,7 +37,7 @@ async function isProductDuplicate({
         }
     }
 
-    const productTeamRepository = getRepository(ProductTeams);
+    const productTeamRepository = defaultDataSource.getRepository(ProductTeams);
 
     if (code) {
         const query = productTeamRepository

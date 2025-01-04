@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { checkIfUserIsOnTeam } from '@utils/Team/Users';
 
@@ -25,7 +26,7 @@ async function getAllUsersFromStore({
         });
     }
 
-    const userRepository = getRepository(User);
+    const userRepository = defaultDataSource.getRepository(User);
 
     const users = await userRepository
         .createQueryBuilder('user')
@@ -66,7 +67,7 @@ async function getAllStoresFromUser({
         });
     }
 
-    const userStoresRepository = getRepository(UserStores);
+    const userStoresRepository = defaultDataSource.getRepository(UserStores);
     const userStores = await userStoresRepository
         .createQueryBuilder('userStores')
         .leftJoinAndSelect('userStores.user', 'user')
@@ -103,9 +104,9 @@ async function addUserToStore({
         });
     }
 
-    const userRepository = getRepository(User);
-    const storeRepository = getRepository(Store);
-    const userStoresRepository = getRepository(UserStores);
+    const userRepository = defaultDataSource.getRepository(User);
+    const storeRepository = defaultDataSource.getRepository(Store);
+    const userStoresRepository = defaultDataSource.getRepository(UserStores);
 
     const alreadyHaveStore = await userStoresRepository
         .createQueryBuilder('userStore')
@@ -176,7 +177,7 @@ async function removeUserFromStore({
         });
     }
 
-    const userStoresRepository = getRepository(UserStores);
+    const userStoresRepository = defaultDataSource.getRepository(UserStores);
 
     const userStore = await userStoresRepository
         .createQueryBuilder('userStore')
@@ -197,7 +198,7 @@ async function removeUserFromStore({
 }
 
 async function removeFromALlStores(user_id: string): Promise<void> {
-    const storeRepository = getRepository(UserStores);
+    const storeRepository = defaultDataSource.getRepository(UserStores);
     const stores = await storeRepository
         .createQueryBuilder('stores')
         .leftJoinAndSelect('stores.user', 'user')

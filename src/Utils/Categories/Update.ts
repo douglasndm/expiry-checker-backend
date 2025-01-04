@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -15,7 +15,7 @@ async function updateCategory({
     category_id,
     name,
 }: updateCategoryProps): Promise<Category> {
-    const categoryRepository = getRepository(Category);
+    const categoryRepository = defaultDataSource.getRepository(Category);
 
     const category = await categoryRepository
         .createQueryBuilder('category')

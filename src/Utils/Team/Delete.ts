@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -11,7 +11,7 @@ import { deleteAllLogsFromTeam } from '@utils/Team/Management/Logs/Delete';
 import { getTeamById } from './Find';
 
 async function deleteTeam(team_id: string): Promise<void> {
-    const teamRepository = getRepository(Team);
+    const teamRepository = defaultDataSource.getRepository(Team);
 
     const team = await getTeamById(team_id);
     // this is for fix "error: update or delete on table "brands" violates foreign key constraint"

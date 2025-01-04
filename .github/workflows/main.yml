@@ -2,7 +2,7 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
@@ -40,25 +40,25 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-          
+
       # INSTALAR DEPENDENCIAS NPM/Yarn
       - name: Instal dependencies
-        run: yarn
-        
+        run: corepack enable && yarn
+
       # Realização da build
       - name: Run build
         env:
-          FIREBASE_FILE: ${{ secrets.FIREBASE_ACCOUNT_KEY }}          
+          FIREBASE_FILE: ${{ secrets.FIREBASE_ACCOUNT_KEY }}
           FIREBASE_EXPIRYCHECKER_FILE: ${{ secrets.EXPIRY_CHECKER_FIREBASE_ACCOUNT_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           yarn build
           ls
-          echo $FIREBASE_FILE > ./dist/Config/Firebase/ServiceAccountKey.json          
+          echo $FIREBASE_FILE > ./dist/Config/Firebase/ServiceAccountKey.json
           echo $FIREBASE_EXPIRYCHECKER_FILE > ./dist/Config/Firebase/ExpiryCheckerServiceAccountKey.json
-          
-        
-      - name: Copy code to Digital Ocean
+
+
+      - name: Copy code to server
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -66,8 +66,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           source: ".,!node_modules"
-          target: "~/apps/expirychecker"
-                    
+          target: "/home/deploy/expirychecker/packages/app"
+
       - name: Run production scripts
         uses: appleboy/ssh-action@master
         with:
@@ -75,9 +75,15 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
-          script: |            
-            cd ~/apps/expirychecker
-            yarn            
+          script: |
+            echo "Starting deployment of root project"
+            cd /home/deploy/expirychecker
+            git pull
+            yarn
+            echo "Finished root project"
+            echo "Starting deployment of app project"
+            cd packages/app
+            yarn
             yarn typeorm migration:run
             pm2 restart expiry-checker
             pm2 restart expiry-checker-queues

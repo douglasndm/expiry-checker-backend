@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { formatInTimeZone } from 'date-fns-tz';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { getFromCache } from '@services/Cache/Redis';
 
@@ -10,7 +11,7 @@ import { findProductByEAN } from './Find';
 async function getProductsRequestsByRank(
     limit?: number,
 ): Promise<ProductRequest[]> {
-    const requestRepository = getRepository(ProductRequest);
+    const requestRepository = defaultDataSource.getRepository(ProductRequest);
 
     const products = await requestRepository
         .createQueryBuilder('request')

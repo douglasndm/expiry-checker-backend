@@ -21,7 +21,7 @@ async function clearProductCache(product_id: string): Promise<void> {
 
     if (product.category) {
         await invalidadeCache(
-            `category_products:${team.id}:${product.category.category.id}`,
+            `category_products:${team.id}:${product.category.id}`,
         );
     }
     if (product.store) {

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -65,7 +66,7 @@ class TeamUsersController {
         const { team_id } = req.params;
         const { code } = req.body;
 
-        const userRolesRepositoy = getRepository(UserTeam);
+        const userRolesRepositoy = defaultDataSource.getRepository(UserTeam);
         const roles = await userRolesRepositoy
             .createQueryBuilder('userRoles')
             .leftJoinAndSelect('userRoles.team', 'team')

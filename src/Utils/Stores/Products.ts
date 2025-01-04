@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
 
@@ -34,7 +35,7 @@ async function getAllProductsFromStore({
     );
 
     if (!productsInStore) {
-        const productRepository = getRepository(Product);
+        const productRepository = defaultDataSource.getRepository(Product);
 
         productsInStore = await productRepository
             .createQueryBuilder('product')

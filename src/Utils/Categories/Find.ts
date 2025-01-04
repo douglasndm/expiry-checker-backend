@@ -1,10 +1,10 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import Category from '@models/Category';
 import AppError from '@errors/AppError';
 
 async function findCategoryById(category_id: string): Promise<Category> {
-    const categoryRepository = getRepository(Category);
+    const categoryRepository = defaultDataSource.getRepository(Category);
 
     const category = await categoryRepository
         .createQueryBuilder('category')

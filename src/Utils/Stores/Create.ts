@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -53,7 +54,7 @@ async function createStore({
 
     const team = await getTeamById(team_id);
 
-    const storeRepository = getRepository(Store);
+    const storeRepository = defaultDataSource.getRepository(Store);
 
     const store = new Store();
     store.name = name.trim();

@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 
@@ -50,7 +51,7 @@ async function removeUserFromAllStoresFromTeam({
         });
     }
 
-    const userRolesRepository = getRepository(UserTeam);
+    const userRolesRepository = defaultDataSource.getRepository(UserTeam);
     const userRoles = await userRolesRepository
         .createQueryBuilder('userRoles')
         .leftJoinAndSelect('userRoles.user', 'user')
@@ -65,7 +66,8 @@ async function removeUserFromAllStoresFromTeam({
     const storesToRemove = userRoles?.user.store;
 
     if (storesToRemove) {
-        const userStoresRepository = getRepository(UserStores);
+        const userStoresRepository =
+            defaultDataSource.getRepository(UserStores);
         await userStoresRepository.remove(storesToRemove);
     }
 }

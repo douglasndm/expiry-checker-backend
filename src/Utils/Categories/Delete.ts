@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -12,7 +12,7 @@ interface deleteCategoryProps {
 async function deleteCategory({
     category_id,
 }: deleteCategoryProps): Promise<void> {
-    const categoryRepository = getRepository(Category);
+    const categoryRepository = defaultDataSource.getRepository(Category);
 
     const category = await categoryRepository
         .createQueryBuilder('category')

@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { addDays } from 'date-fns';
+
+import { testDataSource } from '@services/TypeORM';
 
 import TeamSubscription from '@models/TeamSubscription';
 
@@ -102,12 +103,12 @@ describe('Create of a team', () => {
             admin_id: 'testAdmin',
         });
 
-        const teamSubRepository = getRepository(TeamSubscription);
+        const teamSubRepository =
+            testDataSource.getRepository(TeamSubscription);
         const teamSub = new TeamSubscription();
         teamSub.team = team;
         teamSub.membersLimit = 10;
         teamSub.expireIn = addDays(new Date(), 7);
-        teamSub.isActive = true;
 
         await teamSubRepository.save(teamSub);
         // #endregion

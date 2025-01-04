@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { parseISO, startOfDay } from 'date-fns';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import TeamSubscription from '@models/TeamSubscription';
 
@@ -16,7 +17,7 @@ async function setTeamSubscription({
     subscription,
     members,
 }: setTeamSubscriptionProps): Promise<TeamSubscription> {
-    const repository = getRepository(TeamSubscription);
+    const repository = defaultDataSource.getRepository(TeamSubscription);
 
     const subscriptions = await repository
         .createQueryBuilder('teamSubs')
@@ -32,7 +33,6 @@ async function setTeamSubscription({
 
     const teamSubscription = new TeamSubscription();
     teamSubscription.expireIn = startOfDay(parseISO(subscription.expires_date));
-    teamSubscription.isActive = true;
     teamSubscription.membersLimit = members;
     teamSubscription.team = team;
 

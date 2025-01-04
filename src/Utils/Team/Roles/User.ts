@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -34,7 +34,7 @@ async function updateRole({
         });
     }
 
-    const roleRepository = getRepository(UserTeam);
+    const roleRepository = defaultDataSource.getRepository(UserTeam);
 
     const findedRole = await getUserRole({ user_id, team_id });
 
@@ -56,7 +56,7 @@ async function removeUser({
     user_id,
     team_id,
 }: removeUserProps): Promise<void> {
-    const roleRepository = getRepository(UserTeam);
+    const roleRepository = defaultDataSource.getRepository(UserTeam);
     const role = await getUserRole({ user_id, team_id });
 
     if (role.role.toLowerCase() === 'manager') {

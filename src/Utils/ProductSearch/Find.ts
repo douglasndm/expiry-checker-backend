@@ -1,7 +1,8 @@
-import { getRepository } from 'typeorm';
 import axios from 'axios';
 import * as Yup from 'yup';
 import { formatInTimeZone } from 'date-fns-tz';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { saveOnCache, getFromCache } from '@services/Cache/Redis';
 
@@ -37,14 +38,16 @@ async function findProductByEAN({
         `product_suggestion:${code}`,
     );
 
+    const thumbnail = await getProductImageURL(code);
+
     if (cachedProduct?.name) {
         return {
             ...cachedProduct,
-            thumbnail: getProductImageURL(code),
+            thumbnail,
         };
     }
 
-    const productRepository = getRepository(ProductDetails);
+    const productRepository = defaultDataSource.getRepository(ProductDetails);
     const product = await productRepository
         .createQueryBuilder('product')
         .where('product.code = :code', { code: `${code}` })
@@ -124,7 +127,7 @@ async function findProductByEAN({
     }
 
     if (!photo && product) {
-        photo = getProductImageURL(code);
+        photo = await getProductImageURL(code);
     }
 
     saveOnCache(`product_suggestion:${code}`, {

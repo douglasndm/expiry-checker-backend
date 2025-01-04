@@ -1,5 +1,6 @@
-import { getRepository } from 'typeorm';
 import { format } from 'date-fns';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import Batch from '@models/Batch';
 
@@ -26,7 +27,7 @@ async function batchNotification({
 }: batchNotificationProps): Promise<void> {
     const { batch_id, user_id } = data;
 
-    const batchRepository = getRepository(Batch);
+    const batchRepository = defaultDataSource.getRepository(Batch);
 
     const batch = await batchRepository
         .createQueryBuilder('batch')

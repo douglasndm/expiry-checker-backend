@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import {
     getProductImageURL,
@@ -51,14 +52,7 @@ class TeamController {
             sortByBatches: sortByBatches === 'true',
         });
 
-        const fixedCategories = products.map(p => {
-            return {
-                ...p,
-                category: p.category ? p.category.category : null,
-            };
-        });
-
-        const productsWithImages = fixedCategories.map(p => {
+        const productsWithImages = products.map(p => {
             if (p.image) {
                 return {
                     ...p,
@@ -140,7 +134,7 @@ class TeamController {
         const { team_id } = req.params;
         const { name } = req.body;
 
-        const teamRepository = getRepository(Team);
+        const teamRepository = defaultDataSource.getRepository(Team);
 
         const user = await getUserByFirebaseId(req.userId);
         const userRoles = await getTeamFromUser(user.id);

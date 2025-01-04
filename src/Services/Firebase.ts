@@ -17,4 +17,15 @@ const firebaseAppExpiryChecker = admin.initializeApp(
     'expiry_checker',
 );
 
-export { firebaseApp, firebaseAppExpiryChecker };
+async function generateDevToken(uid: string): Promise<string> {
+    const additionalClaims = {
+        email: process.env.FIREBASE_DEV_EMAIL,
+    };
+
+    const customToken = await admin
+        .auth()
+        .createCustomToken(uid, additionalClaims);
+    return customToken;
+}
+
+export { firebaseApp, firebaseAppExpiryChecker, generateDevToken };

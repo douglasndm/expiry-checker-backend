@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import * as Yup from 'yup';
+
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -38,7 +39,7 @@ class BatchDiscount {
 
         const { batch_id, temp_price } = req.body;
 
-        const batchRepository = getRepository(Batch);
+        const batchRepository = defaultDataSource.getRepository(Batch);
         const batch = await batchRepository
             .createQueryBuilder('batch')
             .leftJoinAndSelect('batch.product', 'product')

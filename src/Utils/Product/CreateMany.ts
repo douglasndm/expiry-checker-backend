@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -26,7 +26,7 @@ async function createManyProducts({
         return productTeams;
     });
 
-    const repository = getRepository(ProductTeams);
+    const repository = defaultDataSource.getRepository(ProductTeams);
     const createdProductsTeams = await repository.save(productsTeams);
 
     await invalidadeTeamCache(team_id);

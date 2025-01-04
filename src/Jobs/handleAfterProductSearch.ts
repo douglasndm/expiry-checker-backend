@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import ProductDetails from '@models/ProductDetails';
 import ProductRequest from '@models/ProductRequest';
@@ -12,8 +12,9 @@ async function handleAfterProductSearch({
 }: handleAfterProductSearchProps): Promise<void> {
     const { response, code } = data;
 
-    const productRepository = getRepository(ProductDetails);
-    const productRequestRepository = getRepository(ProductRequest);
+    const productRepository = defaultDataSource.getRepository(ProductDetails);
+    const productRequestRepository =
+        defaultDataSource.getRepository(ProductRequest);
 
     const request = await productRequestRepository
         .createQueryBuilder('request')

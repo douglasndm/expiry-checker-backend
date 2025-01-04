@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeCache, invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -13,7 +13,7 @@ async function deleteBrand({
     brand_id,
     user_id,
 }: deleteBrandProps): Promise<void> {
-    const brandRepository = getRepository(Brand);
+    const brandRepository = defaultDataSource.getRepository(Brand);
 
     const brand = await brandRepository
         .createQueryBuilder('brand')
@@ -40,7 +40,7 @@ async function deleteBrand({
         });
     }
 
-    const produtsInBrandRepository = getRepository(Product);
+    const produtsInBrandRepository = defaultDataSource.getRepository(Product);
     const produtsInBrand = await produtsInBrandRepository
         .createQueryBuilder('prod')
         .leftJoinAndSelect('prod.brand', 'brand')
@@ -63,7 +63,7 @@ async function deleteBrand({
 }
 
 async function deleteAllBrandsFromTeam(team_id: string): Promise<void> {
-    const repository = getRepository(Brand);
+    const repository = defaultDataSource.getRepository(Brand);
 
     const brands = await repository
         .createQueryBuilder('brand')

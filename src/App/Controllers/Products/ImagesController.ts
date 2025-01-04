@@ -23,14 +23,12 @@ class ImagesController {
 
         const { codes } = req.body;
 
-        const response = codes.map((code: string) => {
-            const url = getProductImageURL(code);
-
-            return {
-                code,
-                url,
-            };
-        });
+        const response = await Promise.all(
+            codes.map(async (code: string) => {
+                const url = await getProductImageURL(code);
+                return { code, url };
+            }),
+        );
 
         return res.json(response);
     }
