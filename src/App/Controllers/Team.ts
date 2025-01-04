@@ -5,7 +5,7 @@ import { defaultDataSource } from '@services/TypeORM';
 
 import {
     getProductImageURL,
-    getProductImageURLByFileName,
+    getTeamProductImageURLByFileName,
 } from '@services/AWS';
 import { deleteTeamFromS3 } from '@services/AWS/Team';
 import { invalidadeTeamCache } from '@services/Cache/Redis';
@@ -56,7 +56,7 @@ class TeamController {
             if (p.image) {
                 return {
                     ...p,
-                    thumbnail: getProductImageURLByFileName({
+                    thumbnail: getTeamProductImageURLByFileName({
                         fileName: p.image,
                         team_id,
                     }),
