@@ -50,7 +50,7 @@ export const defaultDataSource = new DataSource({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     entities,
-    migrations: ['./src/Services/Database/Typeorm/migrations/*.ts'],
+    migrations: ['./dist/src/Services/Database/Typeorm/migrations/*.js'],
     synchronize: false,
     logging: false,
 });
