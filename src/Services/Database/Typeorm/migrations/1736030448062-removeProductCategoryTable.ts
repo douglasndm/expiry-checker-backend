@@ -5,10 +5,14 @@ import {
     TableForeignKey,
 } from 'typeorm';
 
-export class createProductCategoryRelatiolship1620701356724
+export class RemoveProductCategoryTable1736030448062
     implements MigrationInterface
 {
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`DROP TABLE "product_category"`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
                 name: 'product_category',
@@ -49,7 +53,7 @@ export class createProductCategoryRelatiolship1620701356724
             new TableForeignKey({
                 columnNames: ['product_id'],
                 referencedColumnNames: ['id'],
-                referencedTableName: 'products',
+                referencedTableName: 'team_products',
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE',
             }),
@@ -65,11 +69,5 @@ export class createProductCategoryRelatiolship1620701356724
                 onUpdate: 'CASCADE',
             }),
         );
-    }
-
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropForeignKey('product_category', 'product_id');
-        await queryRunner.dropForeignKey('product_category', 'category_id');
-        await queryRunner.dropTable('product_category');
     }
 }
