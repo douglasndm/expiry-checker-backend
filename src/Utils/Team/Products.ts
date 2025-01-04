@@ -6,13 +6,13 @@ import { defaultDataSource } from '@services/TypeORM';
 import { getAllStoresFromUser } from '@utils/Stores/Users';
 import { isManager } from '@utils/Team/Roles/Manager';
 
-import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
 
 interface getProductsFromTeamProps {
     team_id: string;
     user_id: string;
     page?: number;
+    per_page?: number;
     removeCheckedBatches?: boolean;
     sortByBatches?: boolean;
     search?: string;
@@ -32,30 +32,27 @@ async function getProductsFromTeam(
         team_id,
         user_id,
         page,
+        per_page = 100,
         removeCheckedBatches,
         sortByBatches,
         search,
     } = props;
 
-    const productTeamsRepository =
-        defaultDataSource.getRepository(ProductTeams);
+    const productRepository = defaultDataSource.getRepository(Product);
 
     const userStores = await getAllStoresFromUser({ user_id });
 
-    let products: Product[] = [];
-    let productsTeam: ProductTeams[] = [];
+    const products: Product[] = [];
 
-    const query = productTeamsRepository
-        .createQueryBuilder('product_teams')
-        .where('product_teams.team_id = :team_id', { team_id })
-        .leftJoinAndSelect('product_teams.product', 'product')
+    const query = productRepository
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.team', 'team')
         .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.brand', 'brand')
         .leftJoinAndSelect('product.category', 'category')
         .leftJoinAndSelect('product.batches', 'batches')
+        .where('team.id = :team_id', { team_id })
         .select([
-            'product_teams.id',
-
             'product.id',
             'product.name',
             'product.code',
@@ -128,14 +125,10 @@ async function getProductsFromTeam(
     }
 
     if (page !== undefined) {
-        query.take(100).skip(page * 100);
+        query.take(per_page).skip(page * per_page);
     }
 
     const [prodsTeams, count] = await query.getManyAndCount();
-
-    productsTeam = prodsTeams;
-
-    products = productsTeam.map(p => p.product);
 
     // if user is manager they will get full products from any store
     const isAManager = await isManager({
@@ -147,7 +140,7 @@ async function getProductsFromTeam(
         page,
         per_page: 100,
         total: count,
-        products,
+        products: prodsTeams,
     };
 
     if (!isAManager) {

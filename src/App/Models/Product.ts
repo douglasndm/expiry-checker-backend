@@ -11,10 +11,10 @@ import {
 } from 'typeorm';
 
 import Batch from './Batch';
-import ProductTeams from './ProductTeams';
 import Brand from './Brand';
 import Category from './Category';
 import Store from './Store';
+import Team from './Team';
 
 @Entity({ name: 'team_products' })
 export default class Product {
@@ -41,12 +41,13 @@ export default class Product {
     @OneToMany(() => Batch, batch => batch.product)
     batches: Array<Batch>;
 
-    @OneToOne(() => ProductTeams, productTeams => productTeams.product)
-    team: ProductTeams;
-
     @ManyToOne(() => Store, store => store.products)
     @JoinColumn({ name: 'store_id' })
     store?: Store | null;
+
+    @OneToOne(() => Team)
+    @JoinColumn({ name: 'team_id' })
+    team: Team;
 
     @CreateDateColumn()
     created_at: Date;

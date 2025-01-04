@@ -66,24 +66,22 @@ async function sendMail(): Promise<void> {
     const batches: Array<batch> = [];
 
     productsTeams.forEach(productTeam => {
-        if (productTeam.product.batches) {
-            const onlyExpOrNextBatches = productTeam.product.batches.filter(
-                b => {
-                    if (b.status === 'checked') return false;
+        if (productTeam.batches) {
+            const onlyExpOrNextBatches = productTeam.batches.filter(b => {
+                if (b.status === 'checked') return false;
 
-                    if (isBefore(b.exp_date, addDays(new Date(), 30))) {
-                        return true;
-                    }
-                    return false;
-                },
-            );
+                if (isBefore(b.exp_date, addDays(new Date(), 30))) {
+                    return true;
+                }
+                return false;
+            });
 
             onlyExpOrNextBatches.forEach(b => {
                 batches.push({
                     team_id: productTeam.team.id,
-                    store: productTeam.product.store || undefined,
-                    productName: productTeam.product.name,
-                    code: productTeam.product.code || null,
+                    store: productTeam.store || undefined,
+                    productName: productTeam.name,
+                    code: productTeam.code || null,
                     amount: b.amount,
                     batch: b.name,
                     exp_date: format(b.exp_date, 'dd/MM/yyyy'),

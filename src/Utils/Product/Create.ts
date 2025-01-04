@@ -3,7 +3,6 @@ import { defaultDataSource } from '@services/TypeORM';
 import { invalidadeCache } from '@services/Cache/Redis';
 
 import Product from '@models/Product';
-import ProductTeams from '@models/ProductTeams';
 import Store from '@models/Store';
 
 import { getTeamById } from '@utils/Team/Find';
@@ -35,7 +34,6 @@ async function createProduct({
     store_id,
 }: createProductProps): Promise<Product> {
     const repository = defaultDataSource.getRepository(Product);
-    const productTeamRepository = defaultDataSource.getRepository(ProductTeams);
 
     const team = await getTeamById(team_id);
 
@@ -88,6 +86,7 @@ async function createProduct({
     const prod: Product = new Product();
     prod.name = name;
     prod.code = code || null;
+    prod.team = team;
 
     if (findedBrand) {
         prod.brand = findedBrand;
@@ -108,12 +107,6 @@ async function createProduct({
     }
 
     const savedProd = await repository.save(prod);
-
-    const productTeam = new ProductTeams();
-    productTeam.product = savedProd;
-    productTeam.team = team;
-
-    await productTeamRepository.save(productTeam);
 
     await invalidadeCache(`team_products:${team_id}`);
 

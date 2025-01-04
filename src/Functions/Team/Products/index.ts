@@ -1,6 +1,6 @@
 import { defaultDataSource } from '@services/TypeORM';
 
-import ProductTeams from '@models/ProductTeams';
+import Product from '@models/Product';
 
 interface getAllProductsFromManyTeams {
     teams: string[];
@@ -8,15 +8,14 @@ interface getAllProductsFromManyTeams {
 
 export async function getAllProductsFromManyTeams({
     teams,
-}: getAllProductsFromManyTeams): Promise<ProductTeams[]> {
-    const productTeamsRepo = defaultDataSource.getRepository(ProductTeams);
+}: getAllProductsFromManyTeams): Promise<Product[]> {
+    const productTeamsRepo = defaultDataSource.getRepository(Product);
 
     const products = await productTeamsRepo
-        .createQueryBuilder('prods')
-        .leftJoinAndSelect('prods.product', 'product')
+        .createQueryBuilder('product')
         .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.batches', 'batches')
-        .leftJoinAndSelect('prods.team', 'team')
+        .leftJoinAndSelect('product.team', 'team')
         .where('team.id IN (:...teamsIds)', { teamsIds: teams })
         .orderBy('batches.exp_date', 'ASC')
         .getMany();

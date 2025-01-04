@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 
 import { defaultDataSource } from '@services/TypeORM';
 
-import ProductTeams from '@models/ProductTeams';
+import Product from '@models/Product';
 
 import AppError from '@errors/AppError';
 
@@ -37,13 +37,12 @@ async function isProductDuplicate({
         }
     }
 
-    const productTeamRepository = defaultDataSource.getRepository(ProductTeams);
+    const productTeamRepository = defaultDataSource.getRepository(Product);
 
     if (code) {
         const query = productTeamRepository
-            .createQueryBuilder('prods')
-            .leftJoinAndSelect('prods.product', 'product')
-            .leftJoinAndSelect('prods.team', 'team')
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.team', 'team')
             .leftJoinAndSelect('product.store', 'store')
             .where('product.code = :code', {
                 code,
@@ -59,14 +58,12 @@ async function isProductDuplicate({
         const products = await query.getMany();
 
         if (store_id) {
-            const exists = products.find(
-                prod => prod.product.store?.id === store_id,
-            );
+            const exists = products.find(prod => prod.store?.id === store_id);
 
             if (exists) {
                 return {
                     isDuplicate: true,
-                    product_id: exists.product.id,
+                    product_id: exists.id,
                 };
             }
             return {
@@ -77,7 +74,7 @@ async function isProductDuplicate({
         if (products.length > 0) {
             return {
                 isDuplicate: true,
-                product_id: products[0].product.id,
+                product_id: products[0].id,
             };
         }
     }

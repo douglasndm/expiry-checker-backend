@@ -9,11 +9,11 @@ import {
 import Brand from './Brand';
 
 import Category from './Category';
-import ProductTeams from './ProductTeams';
 import Store from './Store';
 import TeamSubscription from './TeamSubscription';
 import UserLogs from './UserLogs';
 import UserTeam from './UserTeam';
+import Product from './Product';
 
 @Entity({ name: 'teams' })
 export default class Team {
@@ -29,8 +29,8 @@ export default class Team {
     @OneToMany(() => UserTeam, userTeam => userTeam.user)
     users: Array<UserTeam>;
 
-    @OneToMany(() => ProductTeams, productTeams => productTeams.team)
-    products: Array<ProductTeams>;
+    @OneToMany(() => Product, product => product.team)
+    products: Array<Product>;
 
     @OneToMany(() => Brand, brand => brand.team)
     brands: Array<Brand>;
