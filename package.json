@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
+    "type": "module",
     "scripts": {
         "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
         "dev": "yarn dev:server && yarn dev:queue",

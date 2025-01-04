@@ -28,8 +28,7 @@ async function findBatchById(batch_id: string): Promise<Batch> {
         .leftJoinAndSelect('batch.product', 'product')
         .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.brand', 'brand')
-        .leftJoinAndSelect('product.category', 'prodCat')
-        .leftJoinAndSelect('prodCat.category', 'category')
+        .leftJoinAndSelect('product.category', 'category')
         .where('batch.id = :batch_id', { batch_id })
         .getOne();
 
