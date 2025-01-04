@@ -25,6 +25,8 @@ class TeamController {
         const schemaQuerys = Yup.object().shape({
             removeCheckedBatches: Yup.string(),
             sortByBatches: Yup.string(),
+            page: Yup.number(),
+            per_page: Yup.number(),
         });
 
         try {
@@ -38,16 +40,22 @@ class TeamController {
                 });
         }
         const { team_id } = req.params;
-        const { removeCheckedBatches, sortByBatches, page } = req.query;
+        const { removeCheckedBatches, sortByBatches, page, per_page } =
+            req.query;
 
         const user = await getUserByFirebaseId(req.userId || '');
 
-        const pg = Number(page) <= 0 ? 0 : Number(page);
+        let pg = 0;
 
-        const { products, per_page, total } = await getProductsFromTeam({
+        if (page) {
+            pg = Number(page) <= 0 ? 0 : Number(page) - 1;
+        }
+
+        const { products, total } = await getProductsFromTeam({
             team_id,
             user_id: user.id,
-            page: page ? pg : undefined,
+            page: pg,
+            per_page: per_page ? Number(per_page) : undefined,
             removeCheckedBatches: removeCheckedBatches === 'true',
             sortByBatches: sortByBatches === 'true',
         });
