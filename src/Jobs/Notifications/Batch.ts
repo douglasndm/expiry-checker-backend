@@ -32,7 +32,7 @@ async function batchNotification({
     const batch = await batchRepository
         .createQueryBuilder('batch')
         .leftJoinAndSelect('batch.product', 'product')
-        .leftJoinAndSelect('product.team', 'prodTeams')
+        .leftJoinAndSelect('product.team', 'team')
         .where('batch.id = :batch_id', { batch_id })
         .getOne();
 
