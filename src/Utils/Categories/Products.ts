@@ -32,7 +32,6 @@ async function getAllProductsFromCategory({
             .leftJoinAndSelect('product.team', 'team')
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.store', 'store')
-            .leftJoinAndSelect('team.team', 'teamObj')
             .where('category.id = :id', { id: category_id })
             .select([
                 'category.id',

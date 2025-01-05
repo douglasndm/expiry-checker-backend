@@ -22,7 +22,7 @@ async function deleteProduct(props: deleteProductProps): Promise<void> {
 
     await clearProductCache(product.id);
 
-    const { team } = product.team;
+    const { team } = product;
     if (product.image) {
         removeProductImageFromS3({
             fileName: product.image,

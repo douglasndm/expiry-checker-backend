@@ -10,7 +10,7 @@ async function clearProductCache(product_id: string): Promise<void> {
         includeStore: true,
     });
 
-    const { team } = product.team;
+    const { team } = product;
 
     await invalidadeCache(`team_products:${team.id}`);
     await invalidadeCache(`product:${team.id}:${product.id}`);
