@@ -39,8 +39,7 @@ async function deleteAllProductsFromTeam(team_id: string): Promise<void> {
 
     const products = await productRepository
         .createQueryBuilder('product')
-        .leftJoinAndSelect('product.team', 'prodTeam')
-        .leftJoinAndSelect('prodTeam.team', 'team')
+        .leftJoinAndSelect('product.team', 'team')
         .where('team.id = :team_id', { team_id })
         .getMany();
 
