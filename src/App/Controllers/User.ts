@@ -76,9 +76,9 @@ class UserController {
             role: user.role,
         };
 
-        const { subscriptions } = user.role.team;
-
         if (user.role) {
+            const { subscriptions } = user.role.team;
+
             organizedUser = {
                 ...organizedUser,
                 role: {
