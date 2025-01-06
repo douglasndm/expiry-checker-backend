@@ -22,6 +22,90 @@ import AppError from '@errors/AppError';
 
 class UserController {
     async index(req: Request, res: Response): Promise<Response> {
+        if (!req.userId) {
+            throw new AppError({
+                message: 'Provide the user id',
+                statusCode: 401,
+                internalErrorCode: 1,
+            });
+        }
+
+        const repository = defaultDataSource.getRepository(User);
+
+        const user = await repository
+            .createQueryBuilder('user')
+            .where('user.firebaseUid = :id', { id: req.userId })
+            .leftJoinAndSelect('user.role', 'role')
+            .leftJoinAndSelect('user.store', 'userStore')
+            .leftJoinAndSelect('userStore.store', 'store')
+            .leftJoinAndSelect('user.login', 'login')
+            .leftJoinAndSelect('role.team', 'team')
+            .leftJoinAndSelect('team.subscriptions', 'subscriptions')
+            .select([
+                'user',
+                'role.role',
+                'role.code',
+                'role.status',
+
+                'userStore',
+                'store.id',
+                'store.name',
+
+                'team.id',
+                'team.name',
+
+                'subscriptions.expireIn',
+                'subscriptions.membersLimit',
+            ])
+            .getOne();
+
+        if (!user) {
+            throw new AppError({
+                message: 'User not found',
+                statusCode: 401,
+                internalErrorCode: 7,
+            });
+        }
+
+        let organizedUser = {
+            id: user.id,
+            fid: user.firebaseUid,
+            email: user.email,
+            name: user.name,
+            last_name: user.lastName,
+            role: user.role,
+        };
+
+        const { subscriptions } = user.role.team;
+
+        if (user.role) {
+            organizedUser = {
+                ...organizedUser,
+                role: {
+                    ...user.role,
+                    team: {
+                        ...user.role.team,
+                        subscriptions:
+                            subscriptions && subscriptions.length > 0
+                                ? [
+                                      {
+                                          ...subscriptions[0],
+                                          isActive: true,
+                                      },
+                                  ]
+                                : [],
+                    },
+                },
+                store:
+                    user.store && user.role.role.toLowerCase() !== 'manager'
+                        ? user.store.store
+                        : null,
+            };
+        }
+
+        return res.status(200).json(organizedUser);
+
+        /*
         if (!req.userUUID) {
             throw new AppError({
                 message: 'Provide the user id',
@@ -113,6 +197,7 @@ class UserController {
         }
 
         return res.status(200).json(response);
+        */
     }
 
     async store(req: Request, res: Response): Promise<Response> {
