@@ -31,7 +31,7 @@ async function getProductsFromTeam(
     const {
         team_id,
         user_id,
-        page,
+        page = 0,
         per_page = 100,
         removeCheckedBatches,
         sortByBatches,
@@ -125,7 +125,7 @@ async function getProductsFromTeam(
     }
 
     if (page !== undefined) {
-        query.take(per_page).skip(page * per_page);
+        // query.take(per_page).skip(page * per_page);
     }
 
     const [prodsTeams, count] = await query.getManyAndCount();
