@@ -96,7 +96,16 @@ class UserController {
                     team: {
                         id: role.team.id,
                         name: userTeam.team.name || '',
-                        subscriptions,
+                        isActive: true,
+                        subscriptions:
+                            subscriptions.length > 0
+                                ? [
+                                      {
+                                          ...subscriptions[0],
+                                          isActive: true,
+                                      },
+                                  ]
+                                : [],
                     },
                 },
                 store,
