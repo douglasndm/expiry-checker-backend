@@ -145,7 +145,7 @@ async function getProductsFromTeam(
 
     if (!isAManager) {
         if (userStores.length > 0) {
-            const prods = products.filter(p => {
+            const prods = prodsTeams.filter(p => {
                 if (p.store) {
                     if (p.store.id === userStores[0].store.id) {
                         return true;
