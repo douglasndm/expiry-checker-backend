@@ -6,7 +6,8 @@ import User from '@controllers/User';
 import ProductSearch from '@controllers/ProductSearch';
 import ProductInformation from '@controllers/ProductInformation';
 import ImageController from '@controllers/Products/ImageController';
-import SessionController from '@controllers/Session';
+import Session from '@controllers/Session';
+import SessionController from '@controllers/User/SessionController';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
 import NotificationsPreferences from '@controllers/Notifications/Preferences';
@@ -40,7 +41,8 @@ routes.use(FirebaseAuth);
 
 routes.delete('/baseApp/allData', AppCheck, DeleteAll.delete);
 
-routes.post('/sessions', SessionController.store);
+routes.post('/sessions', Session.store); // This is be removed very soon
+routes.post('/user/session', SessionController.store); // This is new
 
 routes.use(HandleSetUserId);
 routes.use(DeviceChecker);

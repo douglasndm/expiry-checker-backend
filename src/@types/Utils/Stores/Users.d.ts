@@ -3,7 +3,6 @@ interface getAllUsersFromStoreProps {
 }
 
 interface getAllUsersFromStoreResponse {
-    stores: Store[];
     id: string;
     name?: string | undefined;
     lastName?: string | undefined;
