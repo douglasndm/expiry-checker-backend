@@ -45,7 +45,10 @@ async function getAllUsersFromStore({
 
     const usersWithFixedStores = users.map(user => ({
         ...user,
-        stores: [user.store.store],
+        store: {
+            id: user.store.store.id,
+            name: user.store.store.name,
+        },
     }));
 
     return usersWithFixedStores;
@@ -73,6 +76,13 @@ async function getAllStoresFromUser({
         .leftJoinAndSelect('userStores.user', 'user')
         .leftJoinAndSelect('userStores.store', 'store')
         .leftJoinAndSelect('store.team', 'team')
+        .select([
+            'userStores',
+            'store.id',
+            'store.name',
+            'team.id',
+            'team.name',
+        ])
         .where('user.id = :user_id', { user_id })
         .getMany();
 
