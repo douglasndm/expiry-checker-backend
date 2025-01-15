@@ -1,9 +1,8 @@
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { registerDevice } from '@utils/User/Login';
-import { getAllStoresFromUser } from '@utils/Stores/Users';
+import { getUserStore } from '@utils/Stores/User/GetStore';
 import { getTeamFromUser } from '@utils/User/Team';
 
-import Store from '@models/Store';
 import Team from '@models/Team';
 
 interface Props {
@@ -23,7 +22,7 @@ interface Response {
         status: string | null;
         code: string | null;
         team?: Team;
-        store: Store | null;
+        store: IStore | null;
     };
 }
 
@@ -43,13 +42,8 @@ async function createSession(Props: Props): Promise<Response> {
 
     const team = { ...userTeam };
     const { role, status, code } = team;
-    let store: Store | null = null;
 
-    const stores = await getAllStoresFromUser({ user_id: user.id });
-
-    if (stores.length > 0) {
-        store = stores[0].store;
-    }
+    const store = await getUserStore(user.id);
 
     let response: Response = {
         id: user.id,
