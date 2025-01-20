@@ -9,10 +9,15 @@ class ProductInformationController {
         const { ean } = req.params;
 
         const product = await findProductByEAN({ code: String(ean) });
+        let thumbnail: string | null = null;
+
+        if (product?.code) {
+            thumbnail = await getProductImageURL(product.code);
+        }
 
         const productWithImage = {
             ...product,
-            thumbnail: product?.code ? getProductImageURL(product.code) : null,
+            thumbnail,
         };
 
         return res.json(productWithImage);

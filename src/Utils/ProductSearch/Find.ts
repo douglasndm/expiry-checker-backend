@@ -105,10 +105,11 @@ async function findProductByEAN({
 
         if (externalProduct) {
             const prod: ProductDetails = {
+                id: 'Generating',
                 name: externalProduct.name,
                 code: externalProduct.code,
                 brand: externalProduct.brand,
-                id: 'Generating',
+                thumbnail: null,
                 lastTimeChecked: null,
                 created_at: new Date(),
                 updated_at: new Date(),
@@ -140,7 +141,7 @@ async function findProductByEAN({
 
     return {
         ...product,
-        thumbnail: photo,
+        thumbnail: photo || null,
     };
 }
 
