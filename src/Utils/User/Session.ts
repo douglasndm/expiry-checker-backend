@@ -1,5 +1,7 @@
+import { invalidadeCache } from '@services/Cache/Redis';
+
 import { getUserByFirebaseId } from '@utils/User/Find';
-import { registerDevice } from '@utils/User/Login';
+import { registerDevice } from '@utils/User/Devices/Register';
 import { getUserStore } from '@utils/Stores/User/GetStore';
 import { getTeamFromUser } from '@utils/User/Team';
 
@@ -64,6 +66,8 @@ async function createSession(Props: Props): Promise<Response> {
             },
         };
     }
+
+    await invalidadeCache('users_logins');
 
     return response;
 }

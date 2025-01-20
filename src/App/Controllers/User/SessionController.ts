@@ -38,26 +38,18 @@ class SessionController {
         }
 
         if (req.headers.authorization) {
-            try {
-                const device_id = req.headers.deviceid;
+            const device_id = req.headers.deviceid;
 
-                const { firebaseToken } = req.body;
+            const { firebaseToken } = req.body;
 
-                const response = await createSession({
-                    firebaseUid: req.userId,
-                    firebaseToken,
-                    device_id: String(device_id),
-                    ip_address: req.socket.remoteAddress as string,
-                });
+            const response = await createSession({
+                firebaseUid: req.userId,
+                firebaseToken,
+                device_id: String(device_id),
+                ip_address: req.socket.remoteAddress as string,
+            });
 
-                return res.status(201).json(response);
-            } catch (err) {
-                throw new AppError({
-                    message: 'Unauthorized',
-                    statusCode: 403,
-                    internalErrorCode: 3,
-                });
-            }
+            return res.status(201).json(response);
         }
 
         throw new AppError({
