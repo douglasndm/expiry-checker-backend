@@ -1,7 +1,5 @@
 import { Router } from 'express';
 
-import Auth from '@controllers/Auth';
-
 import User from '@controllers/User';
 import ProductSearch from '@controllers/ProductSearch';
 import ProductInformation from '@controllers/ProductInformation';
@@ -24,7 +22,7 @@ import usersRoutes from './users.routes';
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
 
-const routes = Router();
+const routes = Router({ mergeParams: true });
 
 routes.use(LogRequests);
 
@@ -33,8 +31,6 @@ routes.get('/products/search', ProductSearch.index);
 // This is be removed very soon, waiting apple aproval
 
 routes.post('/users', User.store);
-
-routes.post('/auth', Auth.store);
 
 routes.get('/product/:ean', ProductInformation.index);
 routes.get('/product/image/:ean', ImageController.index);
