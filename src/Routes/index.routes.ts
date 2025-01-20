@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 import User from '@controllers/User';
-import ProductSearch from '@controllers/ProductSearch';
 import ProductInformation from '@controllers/ProductInformation';
 import ImageController from '@controllers/Products/ImageController';
 import Session from '@controllers/Session';
@@ -18,7 +17,6 @@ import FirebaseAuth from '@middlewares/FirebaseAuth';
 import LogRequests from '@middlewares/LogRequests';
 import HandleSetUserId from '@middlewares/UserIdHandler';
 
-import AppError from '@errors/AppError';
 import usersRoutes from './users.routes';
 import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
@@ -26,10 +24,6 @@ import filesRoutes from './files.routes';
 const routes = Router();
 
 routes.use(LogRequests);
-
-// temp with out check for auth for expiry checker
-routes.get('/products/search', ProductSearch.index);
-// This is be removed very soon, waiting apple aproval
 
 routes.post('/users', User.store);
 
