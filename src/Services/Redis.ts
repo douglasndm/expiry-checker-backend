@@ -9,10 +9,10 @@ try {
     redisClient = new IORedis({
         host: process.env.REDIS_HOST,
         port: Number(process.env.REDIS_PORT),
+        username: process.env.REDIS_USER,
         password: process.env.REDIS_PASS || undefined,
 
         maxRetriesPerRequest: 30,
-        enableReadyCheck: false,
         retryStrategy(times) {
             if (times > 3) {
                 return null;
