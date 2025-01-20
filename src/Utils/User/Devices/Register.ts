@@ -33,7 +33,6 @@ async function registerDevice({
         .getMany();
 
     if (prevLogin.length > 0) {
-        console.log('deleting');
         await repository.remove(prevLogin);
     }
 
