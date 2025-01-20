@@ -10,7 +10,12 @@ async function appChecker(
     res: Response,
     next: NextFunction,
 ): Promise<void> {
-    const appCheckToken = req.header('X-Firebase-AppCheck');
+    let appCheckToken = req.header('X-Firebase-AppCheck');
+
+    if (!appCheckToken) {
+        appCheckToken = req.header('x-firebase-appcheck');
+    }
+
     if (!appCheckToken) {
         throw new AppError({
             message: 'AppChecker ID was not send',
