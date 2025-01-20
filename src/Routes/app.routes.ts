@@ -15,8 +15,9 @@ import NotificationsPreferences from '@controllers/Notifications/Preferences';
 import DeleteAll from '@controllers/BaseApp/DeleteAll';
 
 import AppCheck from '@middlewares/AppChecker';
-import FirebaseAuth from '@middlewares/FirebaseAuth';
 import DeviceChecker from '@middlewares/DeviceChecker';
+import FirebaseAuth from '@middlewares/FirebaseAuth';
+import LogRequests from '@middlewares/LogRequests';
 import HandleSetUserId from '@middlewares/UserIdHandler';
 
 import usersRoutes from './users.routes';
@@ -24,6 +25,8 @@ import teamRoutes from './team.routes';
 import filesRoutes from './files.routes';
 
 const routes = Router();
+
+routes.use(LogRequests);
 
 // temp with out check for auth for expiry checker
 routes.get('/products/search', ProductSearch.index);
