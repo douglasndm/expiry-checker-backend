@@ -35,7 +35,7 @@ routes.use(FirebaseAuth);
 
 routes.delete('/baseApp/allData', AppCheck, DeleteAll.delete);
 
-routes.post('/session', AppCheck, SessionController.store); // This is new
+routes.post('/session', SessionController.store); // This is new
 routes.post('/sessions', Session.store); // This is be removed very soon
 
 routes.use(HandleSetUserId);
