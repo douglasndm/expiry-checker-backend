@@ -50,5 +50,5 @@ interface findProductByEANExternalResponse {
     name: string;
     code: string;
     brand?: string;
-    thumbnail?: string;
+    thumbnail: string | null;
 }

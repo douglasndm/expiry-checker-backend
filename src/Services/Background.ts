@@ -9,6 +9,7 @@ const queues = Object.values(Jobs).map(job => ({
         redis: {
             host: process.env.REDIS_HOST,
             port: Number(process.env.REDIS_PORT),
+            username: process.env.REDIS_USER,
             password: process.env.REDIS_PASS || undefined,
 
             maxRetriesPerRequest: 30,
@@ -30,8 +31,10 @@ export default {
             queue.bull.process(queue.handle);
 
             queue.bull.on('failed', (job, err) => {
-                console.log(`Job failed: ${queue.name}`, job.data);
-                captureException(err);
+                captureException(err, {
+                    queue: queue.name,
+                    data: job.data,
+                });
             });
         });
     },
