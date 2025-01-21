@@ -1,3 +1,4 @@
+import './Services/Sentry';
 import App from './app';
 
 const { PORT } = process.env;
