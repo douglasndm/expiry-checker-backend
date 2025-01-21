@@ -131,7 +131,6 @@ async function sendMail(): Promise<void> {
             notifications.push({
                 name: userTeam.user.email || 'untitled',
                 to: userTeam.user.email,
-                bcc: 'noreplay@douglasndm.dev',
                 subject: `Resumo semanal dos produtos (${userTeam?.team.name})`,
                 AppName: 'Controle de Validades',
                 batches: teamBatches,
