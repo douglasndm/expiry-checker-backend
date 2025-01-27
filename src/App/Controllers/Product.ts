@@ -98,10 +98,9 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string().nullable(),
-            brand: Yup.string().uuid().nullable(),
             brand_id: Yup.string().uuid().nullable(),
-            store_id: Yup.string().uuid().nullable(),
             category_id: Yup.string().uuid().nullable(),
+            store_id: Yup.string().uuid().nullable(),
         });
 
         try {
@@ -124,13 +123,13 @@ class ProductController {
         }
 
         const { product_id } = req.params;
-        const { name, code, brand, brand_id, store_id, category_id } = req.body;
+        const { name, code, brand_id, store_id, category_id } = req.body;
 
         const updatedProduct = await updateProduct({
             id: product_id,
             name,
             code,
-            brand_id: brand_id || brand,
+            brand_id,
             store_id,
             category_id,
         });
