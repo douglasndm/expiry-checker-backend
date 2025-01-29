@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
-          
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -66,7 +66,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           source: ".,!node_modules"
-          target: "/home/deploy/expirychecker/packages/app"
+          target: "/home/deploy/expirychecker"
 
       - name: Run production scripts
         uses: appleboy/ssh-action@master
@@ -76,13 +76,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            echo "Starting deployment of root project"
+            echo "Starting deployment of app"
             cd /home/deploy/expirychecker
-            git pull
-            yarn
-            echo "Finished root project"
-            echo "Starting deployment of app project"
-            cd packages/app
             yarn
             yarn typeorm migration:run
             pm2 restart expiry-checker
