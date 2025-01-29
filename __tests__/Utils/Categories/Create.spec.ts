@@ -12,16 +12,10 @@ describe('Creation of category proccess', () => {
 	let user: User | null = null;
 	let team: Team | null = null;
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(2);
 
 		user = init.user;
 		team = init.team;
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {

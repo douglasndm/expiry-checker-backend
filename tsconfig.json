@@ -17,6 +17,7 @@
         "paths": {
             "~types/*": ["@types/*"],
             "@tests/*": ["../__tests__/*"],
+            "@baseApp/*": ["../*"],
             "@admin/*": ["Admin/*"],
             "@controllers/*": ["App/Controllers/*"],
             "@middlewares/*": ["App/Middlewares/*"],
@@ -34,6 +35,6 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
+        "forceConsistentCasingInFileNames": true
     }
 }

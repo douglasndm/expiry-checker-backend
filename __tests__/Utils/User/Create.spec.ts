@@ -1,13 +1,11 @@
 import { createUser } from '@utils/User/Create';
 
+import { setup } from '@tests/setup';
+
 import connection from '../../Services/Database';
 
 beforeAll(async () => {
-	await connection.create();
-});
-
-afterAll(async () => {
-	await connection.close();
+	await setup();
 });
 
 beforeEach(async () => {

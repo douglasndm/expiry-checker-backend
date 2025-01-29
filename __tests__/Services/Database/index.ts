@@ -1,14 +1,6 @@
 import { testDataSource } from '@services/TypeORM.test';
 
 const connection = {
-	async create(): Promise<void> {
-		await testDataSource.initialize();
-	},
-
-	async close(): Promise<void> {
-		await testDataSource.destroy();
-	},
-
 	async clear(): Promise<void> {
 		const entitiesLocal = testDataSource.entityMetadatas;
 

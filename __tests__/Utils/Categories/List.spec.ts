@@ -9,15 +9,9 @@ import { setup } from '../../setup';
 describe('Listing of category proccess', () => {
 	let team: Team | null = null;
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(2);
 
 		team = init.team;
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {

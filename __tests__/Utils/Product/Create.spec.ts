@@ -13,8 +13,6 @@ describe('Creation of a product', () => {
 	let user: User | null = null;
 	let team: Team | null = null;
 	beforeAll(async () => {
-		await connection.create();
-
 		user = await createUser({
 			firebaseUid: '123456789asd',
 			name: 'Douglas',
@@ -27,10 +25,6 @@ describe('Creation of a product', () => {
 			name: 'Team 01',
 			admin_id: '123456789asd',
 		});
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {
