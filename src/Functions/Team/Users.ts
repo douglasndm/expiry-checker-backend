@@ -49,12 +49,6 @@ export async function getAllUsersFromTeam({
     }
 
     const users: Array<UserResponse> = usersFromTeam.map(u => {
-        const stores: Store[] = [];
-
-        if (u.user.store) {
-            stores.push(u.user.store.store);
-        }
-
         return {
             uuid: u.user.id,
             id: u.user.id,
@@ -65,7 +59,6 @@ export async function getAllUsersFromTeam({
             lastName: u.user.lastName,
             email: u.user.email,
             role: u.role,
-            stores,
             status: u.status,
             code: u.code,
             store: u.user.store?.store,

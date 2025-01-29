@@ -1,7 +1,7 @@
 import { defaultDataSource } from '@services/TypeORM';
 
 import Team from '@models/Team';
-import ProductTeam from '@models/ProductTeams';
+import Product from '@models/Product';
 
 import { getUserRole } from '@utils/Team/Roles/Find';
 
@@ -16,13 +16,12 @@ export async function checkIfUserHasAccessToAProduct({
     user_id,
     product_id,
 }: checkIfUserHasAccessToAProductProps): Promise<Team> {
-    const productTeamRepository = defaultDataSource.getRepository(ProductTeam);
+    const productRepository = defaultDataSource.getRepository(Product);
 
-    const productTeam = await productTeamRepository
-        .createQueryBuilder('prodTeam')
-        .leftJoinAndSelect('prodTeam.product', 'prod')
-        .leftJoinAndSelect('prodTeam.team', 'team')
-        .where('prod.id = :id', { id: product_id })
+    const productTeam = await productRepository
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.team', 'team')
+        .where('product.id = :id', { id: product_id })
         .getOne();
 
     if (!productTeam) {

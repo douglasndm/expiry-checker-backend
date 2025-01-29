@@ -69,7 +69,12 @@ async function updateProduct({
     if (product.store) {
         await invalidadeCache(`store_products:${team.id}:${product.store.id}`);
     }
-    product.brand = findedBrand || null;
+
+    // This ensure that the new brand, category and store will be set only
+    // if we send the id or null especific, underfined will not update
+    if (brand_id === null || findedBrand) {
+        product.brand = findedBrand || null;
+    }
 
     if (category_id === null || findedCategory) {
         product.category = findedCategory || null;

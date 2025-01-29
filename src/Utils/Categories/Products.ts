@@ -23,16 +23,14 @@ async function getAllProductsFromCategory({
     );
 
     if (!productsInCategory) {
-        const productCategoryRepository =
-            defaultDataSource.getRepository(Product);
+        const repository = defaultDataSource.getRepository(Product);
 
-        productsInCategory = await productCategoryRepository
+        productsInCategory = await repository
             .createQueryBuilder('product')
             .leftJoinAndSelect('product.batches', 'batches')
             .leftJoinAndSelect('product.team', 'team')
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.store', 'store')
-            .leftJoinAndSelect('team.team', 'teamObj')
             .where('category.id = :id', { id: category_id })
             .select([
                 'category.id',
@@ -62,11 +60,14 @@ async function getAllProductsFromCategory({
         );
     }
 
+    let category_name = '';
+
+    if (productsInCategory && productsInCategory.length > 0) {
+        category_name = productsInCategory[0]?.category?.name || '';
+    }
+
     const response: getAllProductsFromCategoryResponse = {
-        category_name:
-            productsInCategory.length > 0
-                ? productsInCategory[0]?.category?.name
-                : '',
+        category_name,
         products: productsInCategory,
     };
 

@@ -16,7 +16,7 @@ async function removeStoreFromProduct(product_id: string): Promise<void> {
 
         await repository.save(prod);
 
-        await invalidadeTeamCache(prod.team.team.id);
+        await invalidadeTeamCache(prod.team.id);
     }
 }
 

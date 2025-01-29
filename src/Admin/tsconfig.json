@@ -1,0 +1,39 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "allowJs": true,
+        "outDir": "./dist",
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "baseUrl": "../",
+
+        "paths": {
+            "@admin/*": ["./admin/src/*"],
+            "~types/*": ["./app/src/@types/*"],
+            "@tests/*": ["./app/src/../__tests__/*"],
+            "@controllers/*": ["./app/src/App/Controllers/*"],
+            "@middlewares/*": ["./app/src/App/Middlewares/*"],
+            "@models/*": ["./app/src/App/Models/*"],
+            "@utils/*": ["./app/src/Utils/*"],
+            "@functions/*": ["./app/src/Functions/*"],
+            "@config/*": ["./app/src/Config/*"],
+            "@services/*": ["./app/src/Services/*"],
+            "@jobs/*": ["./app/src/Jobs/*"],
+            "@errors/*": ["./app/src/Errors/*"]
+        },
+
+        "types": ["jest"],
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": true,
+        "inlineSources": true,
+
+        "sourceRoot": "/"
+    }
+}

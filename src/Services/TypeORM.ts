@@ -9,7 +9,6 @@ import Team from '@models/Team';
 import Store from '@models/Store';
 import User from '@models/User';
 import UserTeam from '@models/UserTeam';
-import ProductTeams from '@models/ProductTeams';
 import TeamSubscriptions from '@models/TeamSubscription';
 import ProductDetails from '@models/ProductDetails';
 import ProductRequest from '@models/ProductRequest';
@@ -30,7 +29,6 @@ const entities = [
     Store,
     User,
     UserTeam,
-    ProductTeams,
     TeamSubscriptions,
     ProductDetails,
     ProductRequest,
@@ -41,6 +39,12 @@ const entities = [
     NotificationsPreferences,
 ];
 
+let migrationPath = './dist/src/Services/Database/Typeorm/migrations/*.js';
+
+if (process.env.DEV_MODE === 'true') {
+    migrationPath = './src/Services/Database/Typeorm/migrations/*.ts';
+}
+
 export const defaultDataSource = new DataSource({
     name: 'default',
     type: 'postgres',
@@ -50,7 +54,7 @@ export const defaultDataSource = new DataSource({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     entities,
-    migrations: ['./dist/src/Services/Database/Typeorm/migrations/*.js'],
+    migrations: [migrationPath],
     synchronize: false,
     logging: false,
 });

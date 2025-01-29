@@ -1,18 +1,16 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
 
+import { getTeamProductImageURLByFileName } from '@services/AWS';
+
 import { createProduct } from '@utils/Product/Create';
 import { updateProduct } from '@utils/Product/Update';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getUserRole } from '@utils/Team/Roles/Find';
 import { deleteProduct } from '@utils/Product/Delete';
+import { findProductByEAN } from '@utils/ProductSearch/Find';
 
 import { getProduct } from '@functions/Product';
-
-import {
-    getProductImageURL,
-    getProductImageURLByFileName,
-} from '@services/AWS';
 
 import AppError from '@errors/AppError';
 
@@ -28,20 +26,26 @@ class ProductController {
         let thumbnail: string | null = null;
 
         if (product.image) {
-            thumbnail = await getProductImageURLByFileName({
+            thumbnail = await getTeamProductImageURLByFileName({
                 fileName: product.image,
                 team_id,
             });
         } else if (product.code) {
-            thumbnail = await getProductImageURL(product.code);
+            // Consulta nosso banco de dados de produtos para saber se há algum com o mesmo código e com imagem
+
+            const prod = await findProductByEAN({ code: product.code });
+
+            if (prod) {
+                if (prod.thumbnail) {
+                    thumbnail = prod.thumbnail;
+                }
+            }
         }
 
-        const productWithFixCat = {
+        return res.status(200).json({
             ...product,
             thumbnail,
-        };
-
-        return res.status(200).json(productWithFixCat);
+        });
     }
 
     async create(req: Request, res: Response): Promise<Response> {
@@ -94,10 +98,9 @@ class ProductController {
         const schema = Yup.object().shape({
             name: Yup.string(),
             code: Yup.string().nullable(),
-            brand: Yup.string().uuid().nullable(),
             brand_id: Yup.string().uuid().nullable(),
-            store_id: Yup.string().uuid().nullable(),
             category_id: Yup.string().uuid().nullable(),
+            store_id: Yup.string().uuid().nullable(),
         });
 
         try {
@@ -120,13 +123,13 @@ class ProductController {
         }
 
         const { product_id } = req.params;
-        const { name, code, brand, brand_id, store_id, category_id } = req.body;
+        const { name, code, brand_id, store_id, category_id } = req.body;
 
         const updatedProduct = await updateProduct({
             id: product_id,
             name,
             code,
-            brand_id: brand_id || brand,
+            brand_id,
             store_id,
             category_id,
         });

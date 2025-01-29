@@ -5,7 +5,7 @@ import { defaultDataSource } from '@services/TypeORM';
 
 import {
     getProductImageURL,
-    getProductImageURLByFileName,
+    getTeamProductImageURLByFileName,
 } from '@services/AWS';
 import { deleteTeamFromS3 } from '@services/AWS/Team';
 import { invalidadeTeamCache } from '@services/Cache/Redis';
@@ -25,6 +25,8 @@ class TeamController {
         const schemaQuerys = Yup.object().shape({
             removeCheckedBatches: Yup.string(),
             sortByBatches: Yup.string(),
+            page: Yup.number(),
+            per_page: Yup.number(),
         });
 
         try {
@@ -38,16 +40,22 @@ class TeamController {
                 });
         }
         const { team_id } = req.params;
-        const { removeCheckedBatches, sortByBatches, page } = req.query;
+        const { removeCheckedBatches, sortByBatches, page, per_page } =
+            req.query;
 
         const user = await getUserByFirebaseId(req.userId || '');
 
-        const pg = Number(page) <= 0 ? 0 : Number(page);
+        let pg = 0;
 
-        const { products, per_page, total } = await getProductsFromTeam({
+        if (page) {
+            pg = Number(page) <= 0 ? 0 : Number(page) - 1;
+        }
+
+        const { products, total } = await getProductsFromTeam({
             team_id,
             user_id: user.id,
-            page: page ? pg : undefined,
+            page: pg,
+            per_page: per_page ? Number(per_page) : undefined,
             removeCheckedBatches: removeCheckedBatches === 'true',
             sortByBatches: sortByBatches === 'true',
         });
@@ -56,7 +64,7 @@ class TeamController {
             if (p.image) {
                 return {
                     ...p,
-                    thumbnail: getProductImageURLByFileName({
+                    thumbnail: getTeamProductImageURLByFileName({
                         fileName: p.image,
                         team_id,
                     }),

@@ -24,8 +24,7 @@ export async function getAllTeamsExpiredProducts(): Promise<
 
     const teamsData = await teamRepository
         .createQueryBuilder('team')
-        .leftJoinAndSelect('team.products', 'productTeams')
-        .leftJoinAndSelect('productTeams.product', 'product')
+        .leftJoinAndSelect('team.products', 'product')
         .leftJoinAndSelect('product.batches', 'batches')
         .leftJoinAndSelect('product.store', 'store')
         .where('batches.status != :status', { status: 'checked' })
@@ -40,7 +39,7 @@ export async function getAllTeamsExpiredProducts(): Promise<
 
     const teams = teamsWithProducts.map(team => {
         const products = team.products.map(prod => {
-            const { batches } = prod.product;
+            const { batches } = prod;
 
             const today = startOfDay(new Date());
 
@@ -63,9 +62,9 @@ export async function getAllTeamsExpiredProducts(): Promise<
             });
 
             return {
-                id: prod.product.id,
-                name: prod.product.name,
-                store_id: prod.product.store?.id,
+                id: prod.id,
+                name: prod.name,
+                store_id: prod.store?.id,
                 expired_batches: expiredBatches,
                 nextToExp_batches: nextBatches,
             };

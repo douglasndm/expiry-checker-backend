@@ -34,7 +34,7 @@ interface getProductImageURLByFileNameProps {
     team_id: string;
 }
 
-async function getProductImageURLByFileName({
+async function getTeamProductImageURLByFileName({
     fileName,
     team_id,
 }: getProductImageURLByFileNameProps): Promise<string> {
@@ -140,10 +140,11 @@ async function uploadToS3({
 
 export {
     getProductImageURL,
-    getProductImageURLByFileName,
+    getTeamProductImageURLByFileName,
     uploadToS3,
     removeProductImageFromS3,
     removeManyImages,
     s3,
     bucket,
+    signedUrlExpireSeconds,
 };

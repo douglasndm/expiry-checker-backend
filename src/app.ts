@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import 'express-async-errors';
+import * as Sentry from '@sentry/node';
 
 import './loadEnv';
 
@@ -18,6 +19,8 @@ App.use(rateLimiter);
 App.use(cors());
 
 App.use(Routes);
+
+Sentry.setupExpressErrorHandler(App);
 
 App.use((err: Error, request: Request, response: Response, _: NextFunction) => {
     if (err instanceof AppError) {

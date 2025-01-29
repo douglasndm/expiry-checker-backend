@@ -1,18 +1,16 @@
 import { defaultDataSource } from '@services/TypeORM';
 
-import ProductTeams from '@models/ProductTeams';
 import Product from '@models/Product';
 import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
 export async function getProductTeam(product: Product): Promise<Team> {
-    const productTeamRepository = defaultDataSource.getRepository(ProductTeams);
+    const productTeamRepository = defaultDataSource.getRepository(Product);
 
     const prodTeam = await productTeamRepository
-        .createQueryBuilder('prodTeam')
-        .leftJoinAndSelect('prodTeam.product', 'product')
-        .leftJoinAndSelect('prodTeam.team', 'team')
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.team', 'team')
         .where('product.id = :product_id', { product_id: product.id })
         .getOne();
 
