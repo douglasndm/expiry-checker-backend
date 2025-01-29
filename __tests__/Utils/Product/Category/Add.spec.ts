@@ -3,6 +3,7 @@ import Team from '@models/Team';
 
 import { createProduct } from '@utils/Product/Create';
 import { createCategory } from '@utils/Categories/Create';
+import { addProductToCategory } from '@utils/Product/Category/Add';
 
 import AppError from '@errors/AppError';
 
@@ -38,7 +39,7 @@ describe('Add product to a category', () => {
 		});
 
 		try {
-			await addToCategory({
+			await addProductToCategory({
 				product_id: product.id,
 				category_id: category.id,
 			});
@@ -59,7 +60,7 @@ describe('Add product to a category', () => {
 		});
 
 		try {
-			await addToCategory({
+			await addProductToCategory({
 				product_id: product.id,
 				category_id: '8de65923-c4c7-4524-b9c5-edb5623daf50',
 			});
@@ -78,7 +79,7 @@ describe('Add product to a category', () => {
 		if (!team || !user) return;
 
 		try {
-			await addToCategory({
+			await addProductToCategory({
 				product_id: 'abc',
 				category_id: 'xtz',
 			});
@@ -108,12 +109,12 @@ describe('Add product to a category', () => {
 		});
 
 		try {
-			await addToCategory({
+			await addProductToCategory({
 				product_id: product.id,
 				category_id: category.id,
 			});
 
-			await addToCategory({
+			await addProductToCategory({
 				product_id: product.id,
 				category_id: category.id,
 			});
