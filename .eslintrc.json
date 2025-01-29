@@ -33,9 +33,7 @@
                 "ts": "never"
             }
         ],
-        "no-shadow": "off",
-        "@typescript-eslint/no-shadow": ["error"],
-        "@typescript-eslint/no-unused-vars": "off"
+        "no-shadow": "off"
     },
     "settings": {
         "import/resolver": {
