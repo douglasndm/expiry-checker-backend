@@ -46,7 +46,6 @@ class SessionController {
 				firebaseUid: req.userId,
 				firebaseToken,
 				device_id: String(device_id),
-				ip_address: req.socket.remoteAddress as string,
 			});
 
 			return res.status(201).json(response);
