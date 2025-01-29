@@ -45,16 +45,18 @@ if (process.env.DEV_MODE === 'true') {
 	migrationPath = './src/Services/Database/Typeorm/migrations/*.ts';
 }
 
-export const defaultDataSource = new DataSource({
-	name: 'default',
+export const testDataSource = new DataSource({
+	name: 'test',
 	type: 'postgres',
-	host: process.env.DB_HOST,
-	port: Number(process.env.DB_PORT),
-	username: process.env.DB_USER,
-	password: process.env.DB_PASS,
-	database: process.env.DB_NAME,
+	host: process.env.DB_TEST_HOST,
+	port: Number(process.env.DB_TEST_PORT),
+	username: process.env.DB_TEST_USER,
+	password: process.env.DB_TEST_PASS,
+	database: process.env.DB_TEST_NAME,
 	entities,
 	migrations: [migrationPath],
-	synchronize: false,
+	dropSchema: true,
 	logging: false,
+	synchronize: true,
+	migrationsRun: true,
 });

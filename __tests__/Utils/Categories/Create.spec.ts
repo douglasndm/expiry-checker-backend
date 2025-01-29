@@ -9,62 +9,62 @@ import connection from '../../Services/Database';
 import { setup } from '../../setup';
 
 describe('Creation of category proccess', () => {
-    let user: User | null = null;
-    let team: Team | null = null;
-    beforeAll(async () => {
-        await connection.create();
+	let user: User | null = null;
+	let team: Team | null = null;
+	beforeAll(async () => {
+		await connection.create();
 
-        const init = await setup(2);
+		const init = await setup(2);
 
-        user = init.user;
-        team = init.team;
-    });
+		user = init.user;
+		team = init.team;
+	});
 
-    afterAll(async () => {
-        await connection.close();
-    });
+	afterAll(async () => {
+		await connection.close();
+	});
 
-    beforeEach(async () => {
-        await connection.clear();
-    });
+	beforeEach(async () => {
+		await connection.clear();
+	});
 
-    it('Should create a category', async () => {
-        if (!team || !user) {
-            return;
-        }
-        const category = await createCategory({
-            team_id: team.id,
-            name: 'Food',
-        });
+	it('Should create a category', async () => {
+		if (!team || !user) {
+			return;
+		}
+		const category = await createCategory({
+			team_id: team.id,
+			name: 'Food',
+		});
 
-        expect(category.id).not.toBe(null);
-        expect(category.name).toBe('Food');
-        expect(category.team.id).toBe(team.id);
-    });
+		expect(category.id).not.toBe(null);
+		expect(category.name).toBe('Food');
+		expect(category.team.id).toBe(team.id);
+	});
 
-    it("Shouldn't create a duplicate category", async () => {
-        if (!team || !user) {
-            return;
-        }
+	it("Shouldn't create a duplicate category", async () => {
+		if (!team || !user) {
+			return;
+		}
 
-        await createCategory({
-            team_id: team.id,
-            name: 'Drink',
-        });
+		await createCategory({
+			team_id: team.id,
+			name: 'Drink',
+		});
 
-        try {
-            await createCategory({
-                team_id: team.id,
-                name: 'drink',
-            });
+		try {
+			await createCategory({
+				team_id: team.id,
+				name: 'drink',
+			});
 
-            expect(true).toBe(false);
-        } catch (err) {
-            expect(err).toBeInstanceOf(AppError);
-            if (err instanceof AppError) {
-                expect(err.statusCode).toBe(400);
-                expect(err.errorCode).toBe(13);
-            }
-        }
-    });
+			expect(true).toBe(false);
+		} catch (err) {
+			expect(err).toBeInstanceOf(AppError);
+			if (err instanceof AppError) {
+				expect(err.statusCode).toBe(400);
+				expect(err.errorCode).toBe(13);
+			}
+		}
+	});
 });

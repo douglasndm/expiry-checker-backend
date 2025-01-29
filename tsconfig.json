@@ -17,6 +17,7 @@
         "paths": {
             "~types/*": ["@types/*"],
             "@tests/*": ["../__tests__/*"],
+            "@admin/*": ["Admin/*"],
             "@controllers/*": ["App/Controllers/*"],
             "@middlewares/*": ["App/Middlewares/*"],
             "@models/*": ["App/Models/*"],
