@@ -3,7 +3,6 @@ import { Router } from 'express';
 import User from '@controllers/User';
 import ProductInformation from '@controllers/ProductInformation';
 import ImageController from '@controllers/Products/ImageController';
-import Session from '@controllers/Session';
 import SessionController from '@controllers/User/SessionController';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
@@ -30,13 +29,11 @@ routes.post('/users', User.store);
 routes.get('/product/:ean', ProductInformation.index);
 routes.get('/product/image/:ean', ImageController.index);
 
-// from now on all routes need authentication
-routes.use(FirebaseAuth);
+routes.use(FirebaseAuth); // from now on all routes need authentication
 
 routes.delete('/baseApp/allData', AppCheck, DeleteAll.delete);
 
-routes.post('/session', SessionController.store); // This is new
-routes.post('/sessions', Session.store); // This is be removed very soon
+routes.post('/session', SessionController.store);
 
 routes.use(HandleSetUserId);
 routes.use(DeviceChecker);
