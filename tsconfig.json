@@ -8,8 +8,12 @@
         "strictPropertyInitialization": false,
         "moduleResolution": "node",
         "resolveJsonModule": true,
-        "baseUrl": "./src",
 
+        "inlineSources": true,
+        "sourceMap": true,
+        "sourceRoot": "/",
+
+        "baseUrl": "./src",
         "paths": {
             "~types/*": ["@types/*"],
             "@tests/*": ["../__tests__/*"],
@@ -30,9 +34,5 @@
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "sourceMap": true,
-        "inlineSources": true,
-
-        "sourceRoot": "/"
     }
 }
