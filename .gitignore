@@ -6,12 +6,15 @@
 !/**/.gitkeep
 
 yarn-error.log
+.yarn/install-state.gz
 
 .env
 ormconfig.json
 
 .DS_Store
 
-*.pkg
+newrelic.js
+newrelic_agent.log
 
-.yarn/
+*.pkg
+node_modules
