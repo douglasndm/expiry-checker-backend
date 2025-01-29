@@ -4,7 +4,9 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
+        "build": "tsc",
+        "build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
+        "build:upload:sourcemaps": "npx sentry-cli sourcemaps inject ./dist && npx sentry-cli sourcemaps upload ./dist",
         "dev": "yarn dev:server && yarn dev:queue",
         "dev:server": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
         "dev:queue": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/Queue.ts",

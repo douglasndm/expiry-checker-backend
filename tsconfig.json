@@ -9,7 +9,6 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
 
-        "inlineSourceMap": true,
         "inlineSources": true,
         "sourceMap": true,
         "sourceRoot": "/",
