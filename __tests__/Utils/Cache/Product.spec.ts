@@ -11,58 +11,58 @@ import connection from '@tests/Services/Database';
 import { setup } from '@tests/setup';
 
 describe('Clear product cache process', () => {
-    let user: User | null = null;
-    let team: Team | null = null;
-    beforeAll(async () => {
-        await connection.create();
+	let user: User | null = null;
+	let team: Team | null = null;
+	beforeAll(async () => {
+		await connection.create();
 
-        const init = await setup(2);
+		const init = await setup(2);
 
-        user = init.user;
-        team = init.team;
-    });
+		user = init.user;
+		team = init.team;
+	});
 
-    afterAll(async () => {
-        await connection.close();
-    });
+	afterAll(async () => {
+		await connection.close();
+	});
 
-    beforeEach(async () => {
-        await connection.clear();
-    });
+	beforeEach(async () => {
+		await connection.clear();
+	});
 
-    it('Should clear product cache and its brand, category and store', async () => {
-        if (!team || !user) return;
+	it('Should clear product cache and its brand, category and store', async () => {
+		if (!team || !user) return;
 
-        const store = await createStore({
-            name: 'store 1',
-            team_id: team.id,
-            admin_id: user.id,
-        });
+		const store = await createStore({
+			name: 'store 1',
+			team_id: team.id,
+			admin_id: user.id,
+		});
 
-        const category = await createCategory({
-            team_id: team.id,
-            name: 'Food',
-        });
+		const category = await createCategory({
+			team_id: team.id,
+			name: 'Food',
+		});
 
-        const brand = await createBrand({
-            team_id: team.id,
-            name: 'Nestle',
-            user_id: user.id,
-        });
+		const brand = await createBrand({
+			team_id: team.id,
+			name: 'Nestle',
+			user_id: user.id,
+		});
 
-        const product = await createProduct({
-            name: 'Prod1',
-            team_id: team.id,
-            user_id: user.id,
-            brand_id: brand.id,
-            category_id: category.id,
-            store_id: store.id,
-        });
+		const product = await createProduct({
+			name: 'Prod1',
+			team_id: team.id,
+			user_id: user.id,
+			brand_id: brand.id,
+			category_id: category.id,
+			store_id: store.id,
+		});
 
-        try {
-            await clearProductCache(product.id);
-        } catch (err) {
-            expect(true).toBe(false);
-        }
-    });
+		try {
+			await clearProductCache(product.id);
+		} catch (err) {
+			expect(true).toBe(false);
+		}
+	});
 });

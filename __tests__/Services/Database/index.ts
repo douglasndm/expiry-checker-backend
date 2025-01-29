@@ -1,23 +1,23 @@
-import { testDataSource } from '@services/TypeORM';
+import { testDataSource } from '@services/TypeORM.test';
 
 const connection = {
-    async create(): Promise<void> {
-        await testDataSource.initialize();
-    },
+	async create(): Promise<void> {
+		await testDataSource.initialize();
+	},
 
-    async close(): Promise<void> {
-        await testDataSource.destroy();
-    },
+	async close(): Promise<void> {
+		await testDataSource.destroy();
+	},
 
-    async clear(): Promise<void> {
-        const entitiesLocal = testDataSource.entityMetadatas;
+	async clear(): Promise<void> {
+		const entitiesLocal = testDataSource.entityMetadatas;
 
-        const entityDeletionPromises = entitiesLocal.map(entity => async () => {
-            const repository = testDataSource.getRepository(entity.name);
-            await repository.query(`DELETE FROM ${entity.tableName}`);
-        });
-        await Promise.all(entityDeletionPromises);
-    },
+		const entityDeletionPromises = entitiesLocal.map(entity => async () => {
+			const repository = testDataSource.getRepository(entity.name);
+			await repository.query(`DELETE FROM ${entity.tableName}`);
+		});
+		await Promise.all(entityDeletionPromises);
+	},
 };
 
 export default connection;
