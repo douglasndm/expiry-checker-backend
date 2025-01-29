@@ -7229,6 +7229,7 @@ __metadata:
     stream-json: "npm:^1.7.4"
     supertest: "npm:^6.3.4"
     ts-jest: "npm:^29.2.5"
+    ts-node: "npm:^10.9.2"
     ts-node-dev: "npm:^2.0.0"
     typeorm: "npm:0.3.20"
     typescript: "npm:^5.7.3"
@@ -12536,7 +12537,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-node@npm:^10.4.0":
+"ts-node@npm:^10.4.0, ts-node@npm:^10.9.2":
   version: 10.9.2
   resolution: "ts-node@npm:10.9.2"
   dependencies:

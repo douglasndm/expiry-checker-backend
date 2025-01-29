@@ -9,47 +9,45 @@ import UserLogin from '@models/UserLogin';
 import AppError from '@errors/AppError';
 
 async function registerDevice({
-    user_id,
-    device_id,
-    ip_address,
-    firebaseToken,
+	user_id,
+	device_id,
+	firebaseToken,
 }: registerDeviceProps): Promise<UserLogin> {
-    if (!firebaseToken) {
-        throw new AppError({
-            message: 'Firebase Messaging Token is required',
-            statusCode: 401,
-        });
-    }
+	if (!firebaseToken) {
+		throw new AppError({
+			message: 'Firebase Messaging Token is required',
+			statusCode: 401,
+		});
+	}
 
-    const repository = defaultDataSource.getRepository(UserLogin);
+	const repository = defaultDataSource.getRepository(UserLogin);
 
-    const prevLogin = await repository
-        .createQueryBuilder('login')
-        .leftJoinAndSelect('login.user', 'user')
-        .where('user.id = :user_id', { user_id })
-        .orWhere('login.firebaseMessagingToken = :firebaseToken', {
-            firebaseToken,
-        })
-        .getMany();
+	const prevLogin = await repository
+		.createQueryBuilder('login')
+		.leftJoinAndSelect('login.user', 'user')
+		.where('user.id = :user_id', { user_id })
+		.orWhere('login.firebaseMessagingToken = :firebaseToken', {
+			firebaseToken,
+		})
+		.getMany();
 
-    if (prevLogin.length > 0) {
-        await repository.remove(prevLogin);
-    }
+	if (prevLogin.length > 0) {
+		await repository.remove(prevLogin);
+	}
 
-    const user = await getUserById(user_id);
+	const user = await getUserById(user_id);
 
-    const userLogin = new UserLogin();
-    userLogin.deviceId = device_id;
-    userLogin.user = user;
-    userLogin.ipAddress = ip_address;
-    userLogin.firebaseMessagingToken =
-        firebaseToken === '' ? undefined : firebaseToken;
+	const userLogin = new UserLogin();
+	userLogin.deviceId = device_id;
+	userLogin.user = user;
+	userLogin.firebaseMessagingToken =
+		firebaseToken === '' ? undefined : firebaseToken;
 
-    const savedUserLogin = await repository.save(userLogin);
+	const savedUserLogin = await repository.save(userLogin);
 
-    await invalidadeCache('users_devices');
+	await invalidadeCache('users_devices');
 
-    return savedUserLogin;
+	return savedUserLogin;
 }
 
 export { registerDevice };
