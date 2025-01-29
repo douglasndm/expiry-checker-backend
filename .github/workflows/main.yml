@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: 22.x
 
+      - name: Enable coreapack
+        run: corepack enable
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -43,7 +46,7 @@ jobs:
 
       # INSTALAR DEPENDENCIAS NPM/Yarn
       - name: Instal dependencies
-        run: corepack enable && yarn
+        run: yarn
 
       # Realização da build
       - name: Run build
