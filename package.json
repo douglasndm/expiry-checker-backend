@@ -3,12 +3,11 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"license": "MIT",
-	"type": "module",
 	"scripts": {
 		"build": "tsc",
 		"build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
 		"build:upload:sourcemaps": "npx sentry-cli sourcemaps inject ./dist && npx sentry-cli sourcemaps upload ./dist",
-		"dev:server": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
+		"dev": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
 		"dev:queue": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/Queue.ts",
 		"typeorm": "ts-node -r dotenv/config -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/Services/TypeORM.ts",
 		"test": "jest",
@@ -75,6 +74,7 @@
 		"supertest": "^7.0.0",
 		"ts-jest": "^29.2.5",
 		"ts-node": "^10.9.2",
+		"ts-node-dev": "^2.0.0",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.22.0"
