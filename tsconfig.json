@@ -1,40 +1,40 @@
 {
-    "compilerOptions": {
-        "module": "CommonJS",
-        "target": "ES2015",
-        "allowJs": true,
-        "outDir": "./dist",
-        "strict": true,
-        "strictPropertyInitialization": false,
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
+	"compilerOptions": {
+		"module": "CommonJS",
+		"target": "ES2015",
+		"allowJs": true,
+		"outDir": "./dist",
+		"strict": true,
+		"strictPropertyInitialization": false,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
 
-        "inlineSources": true,
-        "sourceMap": true,
-        "sourceRoot": "/",
+		"inlineSources": true,
+		"sourceMap": true,
+		"sourceRoot": "/",
 
-        "baseUrl": "./src",
-        "paths": {
-            "~types/*": ["@types/*"],
-            "@tests/*": ["../__tests__/*"],
-            "@baseApp/*": ["../*"],
-            "@admin/*": ["Admin/*"],
-            "@controllers/*": ["App/Controllers/*"],
-            "@middlewares/*": ["App/Middlewares/*"],
-            "@models/*": ["App/Models/*"],
-            "@utils/*": ["Utils/*"],
-            "@functions/*": ["Functions/*"],
-            "@config/*": ["Config/*"],
-            "@services/*": ["Services/*"],
-            "@jobs/*": ["Jobs/*"],
-            "@errors/*": ["Errors/*"]
-        },
+		"baseUrl": "./src",
+		"paths": {
+			"~types/*": ["@types/*"],
+			"@tests/*": ["../__tests__/*"],
+			"@baseApp/*": ["../*"],
+			"@admin/*": ["Admin/*"],
+			"@controllers/*": ["App/Controllers/*"],
+			"@middlewares/*": ["App/Middlewares/*"],
+			"@models/*": ["App/Models/*"],
+			"@utils/*": ["Utils/*"],
+			"@functions/*": ["Functions/*"],
+			"@config/*": ["Config/*"],
+			"@services/*": ["Services/*"],
+			"@jobs/*": ["Jobs/*"],
+			"@errors/*": ["Errors/*"]
+		},
 
-        "types": ["jest"],
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
-    }
+		"types": ["jest"],
+		"esModuleInterop": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	}
 }
