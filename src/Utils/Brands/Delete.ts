@@ -10,70 +10,69 @@ import AppError from '@errors/AppError';
 import { getUserRoleInTeam } from '../UserRoles';
 
 async function deleteBrand({
-    brand_id,
-    user_id,
+	brand_id,
+	user_id,
 }: deleteBrandProps): Promise<void> {
-    const brandRepository = defaultDataSource.getRepository(Brand);
+	const brandRepository = defaultDataSource.getRepository(Brand);
 
-    const brand = await brandRepository
-        .createQueryBuilder('brand')
-        .leftJoinAndSelect('brand.team', 'team')
-        .where('brand.id = :brand_id', { brand_id })
-        .getOne();
+	const brand = await brandRepository
+		.createQueryBuilder('brand')
+		.leftJoinAndSelect('brand.team', 'team')
+		.where('brand.id = :brand_id', { brand_id })
+		.getOne();
 
-    if (!brand) {
-        throw new AppError({
-            message: 'Brand not found',
-            internalErrorCode: 32,
-        });
-    }
+	if (!brand) {
+		throw new AppError({
+			message: 'Brand not found',
+			internalErrorCode: 32,
+		});
+	}
 
-    const userRole = await getUserRoleInTeam({
-        user_id,
-        team_id: brand.team.id,
-    });
+	const userRole = await getUserRoleInTeam({
+		user_id,
+		team_id: brand.team.id,
+	});
 
-    if (userRole !== 'manager' && userRole !== 'supervisor') {
-        throw new AppError({
-            message: "You don't have authorization",
-            internalErrorCode: 2,
-        });
-    }
+	if (userRole !== 'manager' && userRole !== 'supervisor') {
+		throw new AppError({
+			message: "You don't have authorization",
+			internalErrorCode: 2,
+		});
+	}
 
-    const produtsInBrandRepository = defaultDataSource.getRepository(Product);
-    const produtsInBrand = await produtsInBrandRepository
-        .createQueryBuilder('prod')
-        .leftJoinAndSelect('prod.brand', 'brand')
-        .where('brand.id = :brand_id', { brand_id })
-        .getMany();
+	const produtsInBrandRepository = defaultDataSource.getRepository(Product);
+	const produtsInBrand = await produtsInBrandRepository
+		.createQueryBuilder('prod')
+		.leftJoinAndSelect('prod.brand', 'brand')
+		.where('brand.id = :brand_id', { brand_id })
+		.getMany();
 
-    const updatedProds = produtsInBrand.map(prod => {
-        return {
-            ...prod,
-            brand: null,
-        };
-    });
+	const updatedProds = produtsInBrand.map(prod => {
+		return {
+			...prod,
+			brand: null,
+		};
+	});
 
-    await produtsInBrandRepository.save(updatedProds);
+	await produtsInBrandRepository.save(updatedProds);
 
-    await brandRepository.remove(brand);
+	await brandRepository.remove(brand);
 
-    await invalidadeCache(`team_products:${brand.team.id}`);
-    await invalidadeCache(`team_brands:${brand.team.id}`);
+	await invalidadeTeamCache(`${brand.team.id}`);
 }
 
 async function deleteAllBrandsFromTeam(team_id: string): Promise<void> {
-    const repository = defaultDataSource.getRepository(Brand);
+	const repository = defaultDataSource.getRepository(Brand);
 
-    const brands = await repository
-        .createQueryBuilder('brand')
-        .leftJoinAndSelect('brand.team', 'team')
-        .where('team.id = :team_id', { team_id })
-        .getMany();
+	const brands = await repository
+		.createQueryBuilder('brand')
+		.leftJoinAndSelect('brand.team', 'team')
+		.where('team.id = :team_id', { team_id })
+		.getMany();
 
-    await repository.remove(brands);
+	await repository.remove(brands);
 
-    await invalidadeTeamCache(team_id);
+	await invalidadeTeamCache(team_id);
 }
 
 export { deleteBrand, deleteAllBrandsFromTeam };

@@ -14,16 +14,10 @@ describe('Update user roles process', () => {
 	let user: User | null = null;
 	let team: Team | null = null;
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(5);
 
 		user = init.user;
 		team = init.team;
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {

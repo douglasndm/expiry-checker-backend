@@ -20,8 +20,6 @@ describe('User stores on team process', () => {
 	let userTest: User | null = null;
 	let team: Team | null = null;
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(2);
 
 		user = init.user;
@@ -36,10 +34,6 @@ describe('User stores on team process', () => {
 			user_id: userTest.id,
 			team_id: team.id,
 		});
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {

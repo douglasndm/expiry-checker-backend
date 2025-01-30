@@ -22,7 +22,7 @@ class FindTeamController {
 
 		const { name } = req.query;
 
-		const team = await findTeamByName(name);
+		const team = await findTeamByName(String(name));
 
 		return res.json(team);
 	}
@@ -43,7 +43,7 @@ class FindTeamController {
 
 		const { email } = req.query;
 
-		const team = await findTeamByManagerEmail(email);
+		const team = await findTeamByManagerEmail(String(email));
 
 		return res.json(team);
 	}

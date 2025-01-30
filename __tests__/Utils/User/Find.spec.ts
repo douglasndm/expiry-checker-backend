@@ -16,15 +16,9 @@ describe('Find user process', () => {
 	let user: User | null = null;
 
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(2);
 
 		user = init.user;
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {

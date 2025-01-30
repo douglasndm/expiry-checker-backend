@@ -4,6 +4,7 @@ import Team from '@models/Team';
 import { createProduct } from '@utils/Product/Create';
 import { getProductById } from '@utils/Product/Get';
 import { createCategory } from '@utils/Categories/Create';
+import { removeProductFromCategory } from '@utils/Product/Category/Remove';
 
 import AppError from '@errors/AppError';
 
@@ -16,16 +17,10 @@ describe('Remove a category from product', () => {
 	let team: Team | null = null;
 
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(2);
 
 		user = init.user;
 		team = init.team;
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {
@@ -49,7 +44,7 @@ describe('Remove a category from product', () => {
 
 		expect(product.category).toBeUndefined();
 
-		await removeCategoryFromProduct(product.id);
+		await removeProductFromCategory(product.id);
 		const product2 = await getProductById({
 			product_id: product.id,
 			includeCategory: true,
@@ -62,7 +57,7 @@ describe('Remove a category from product', () => {
 		if (!team || !user) return;
 
 		try {
-			await removeCategoryFromProduct(
+			await removeProductFromCategory(
 				'60c02b9a-0157-4720-bb31-bac939154e1a'
 			);
 		} catch (err) {
@@ -78,7 +73,7 @@ describe('Remove a category from product', () => {
 		if (!team || !user) return;
 
 		try {
-			await removeCategoryFromProduct('asd asd1da ');
+			await removeProductFromCategory('asd asd1da ');
 		} catch (err) {
 			expect(err).toBeInstanceOf(AppError);
 

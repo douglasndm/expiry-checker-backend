@@ -15,17 +15,17 @@ const filesRoute = Router({ mergeParams: true });
 const upload = multer({ storage });
 
 filesRoute.post(
-    '/team/:team_id/products/import',
-    checkTeamId,
-    ManagerCheckerMiddleware,
-    upload.single('file'),
-    Import.store,
+	'/team/:team_id/products/import',
+	checkTeamId,
+	ManagerCheckerMiddleware,
+	upload.single('file'),
+	Import.store
 );
 
 filesRoute.post(
-    '/product/:product_id/image',
-    upload.single('image'),
-    ImageUpload.store,
+	'/product/:product_id/image',
+	upload.single('image'),
+	ImageUpload.store
 );
 
 filesRoute.delete('/product/:product_id/image', ImageUpload.delete);

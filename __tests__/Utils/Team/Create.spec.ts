@@ -14,8 +14,6 @@ import AppError from '@errors/AppError';
 import connection from '../../Services/Database';
 
 beforeAll(async () => {
-	await connection.create();
-
 	await createUser({
 		firebaseUid: '123456789asd',
 		name: 'Douglas',
@@ -23,10 +21,6 @@ beforeAll(async () => {
 		email: 'mail@mail.com',
 		password: '123456789',
 	});
-});
-
-afterAll(async () => {
-	await connection.close();
 });
 
 beforeEach(async () => {

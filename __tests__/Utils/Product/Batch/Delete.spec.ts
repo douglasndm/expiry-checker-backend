@@ -19,8 +19,6 @@ describe('Create of batch process', () => {
 	let product: Product | null = null;
 
 	beforeAll(async () => {
-		await connection.create();
-
 		const init = await setup(2);
 
 		user = init.user;
@@ -32,10 +30,6 @@ describe('Create of batch process', () => {
 			team_id: team.id,
 			user_id: user.id,
 		});
-	});
-
-	afterAll(async () => {
-		await connection.close();
 	});
 
 	beforeEach(async () => {

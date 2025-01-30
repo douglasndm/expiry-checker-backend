@@ -8,68 +8,66 @@ import { getTeamFromUser } from '@utils/User/Team';
 import Team from '@models/Team';
 
 interface Props {
-    firebaseUid: string;
-    firebaseToken: string;
-    device_id: string;
-    ip_address: string;
+	firebaseUid: string;
+	firebaseToken: string;
+	device_id: string;
 }
 
 interface Response {
-    id: string;
-    name?: string;
-    lastName?: string;
-    email: string;
-    role?: {
-        name: string;
-        status: string | null;
-        code: string | null;
-        team?: Team;
-        store: IStore | null;
-    };
+	id: string;
+	name?: string;
+	lastName?: string;
+	email: string;
+	role?: {
+		name: string;
+		status: string | null;
+		code: string | null;
+		team?: Team;
+		store: IStore | null;
+	};
 }
 
 async function createSession(Props: Props): Promise<Response> {
-    const { firebaseUid, firebaseToken, device_id, ip_address } = Props;
+	const { firebaseUid, firebaseToken, device_id } = Props;
 
-    const user = await getUserByFirebaseId(firebaseUid);
+	const user = await getUserByFirebaseId(firebaseUid);
 
-    await registerDevice({
-        user_id: user.id,
-        device_id: String(device_id),
-        ip_address,
-        firebaseToken,
-    });
+	await registerDevice({
+		user_id: user.id,
+		device_id: String(device_id),
+		firebaseToken,
+	});
 
-    const userTeam = await getTeamFromUser(user.id);
+	const userTeam = await getTeamFromUser(user.id);
 
-    const team = { ...userTeam };
-    const { role, status, code } = team;
+	const team = { ...userTeam };
+	const { role, status, code } = team;
 
-    const store = await getUserStore(user.id);
+	const store = await getUserStore(user.id);
 
-    let response: Response = {
-        id: user.id,
-        name: user.name,
-        lastName: user.lastName,
-        email: user.email,
-    };
+	let response: Response = {
+		id: user.id,
+		name: user.name,
+		lastName: user.lastName,
+		email: user.email,
+	};
 
-    if (role) {
-        response = {
-            ...response,
-            role: {
-                name: role ? role.toLowerCase() : '',
-                status: status ? status.toLowerCase() : null,
-                code: code || null,
-                team: team.team,
-                store,
-            },
-        };
-    }
+	if (role) {
+		response = {
+			...response,
+			role: {
+				name: role ? role.toLowerCase() : '',
+				status: status ? status.toLowerCase() : null,
+				code: code || null,
+				team: team.team,
+				store,
+			},
+		};
+	}
 
-    await invalidadeCache('users_logins');
+	await invalidadeCache('users_logins');
 
-    return response;
+	return response;
 }
 
 export { createSession };

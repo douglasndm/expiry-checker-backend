@@ -9,6 +9,18 @@ import User from '@models/User';
 import Team from '@models/Team';
 import TeamSubscription from '@models/TeamSubscription';
 
+beforeAll(async () => {
+	if (!testDataSource.isInitialized) {
+		await testDataSource.initialize();
+	}
+});
+
+afterAll(async () => {
+	if (testDataSource.isInitialized) {
+		await testDataSource.destroy();
+	}
+});
+
 interface setupResponse {
 	user: User;
 	team: Team;
