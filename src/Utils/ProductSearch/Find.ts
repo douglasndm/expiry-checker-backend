@@ -16,133 +16,136 @@ import AppError from '@errors/AppError';
 import { findProductByEANExternal } from './ExternalQuery';
 
 interface findProductByEANProps {
-    code: string;
+	code: string;
 }
 
 async function findProductByEAN({
-    code,
+	code,
 }: findProductByEANProps): Promise<ProductDetails | null> {
-    const schema = Yup.object().shape({
-        code: Yup.string().required().min(8),
-    });
+	const schema = Yup.object().shape({
+		code: Yup.string().required().min(8),
+	});
 
-    try {
-        await schema.validate({ code });
-    } catch (err) {
-        if (err instanceof Error) {
-            throw new AppError({ message: err.message });
-        }
-    }
+	try {
+		await schema.validate({ code });
+	} catch (err) {
+		if (err instanceof Error) {
+			throw new AppError({ message: err.message });
+		}
+	}
 
-    const cachedProduct = await getFromCache<ProductDetails>(
-        `product_suggestion:${code}`,
-    );
+	const query = code.replace(/^0+/, ''); // Remove zero on begin
 
-    const thumbnail = await getProductImageURL(code);
+	const cachedProduct = await getFromCache<ProductDetails>(
+		`product_suggestion:${query}`
+	);
 
-    if (cachedProduct?.name) {
-        return {
-            ...cachedProduct,
-            thumbnail,
-        };
-    }
+	const thumbnail = await getProductImageURL(query);
 
-    const productRepository = defaultDataSource.getRepository(ProductDetails);
-    const product = await productRepository
-        .createQueryBuilder('product')
-        .where('product.code = :code', { code: `${code}` })
-        .select(['product.name', 'product.brand', 'product.thumbnail'])
-        .getOne();
+	if (cachedProduct?.name) {
+		return {
+			...cachedProduct,
+			thumbnail,
+		};
+	}
 
-    if (!product) {
-        const blockRequest = await getFromCache<boolean>(
-            'external_api_request',
-        );
+	const productRepository = defaultDataSource.getRepository(ProductDetails);
+	const product = await productRepository
+		.createQueryBuilder('product')
+		.where('product.code = :code', { code: `${query}` })
+		.select(['product.name', 'product.brand', 'product.thumbnail'])
+		.getOne();
 
-        let externalProduct: null | findProductByEANExternalResponse = null;
+	if (!product) {
+		const blockRequest = await getFromCache<boolean>(
+			'external_api_request'
+		);
 
-        if (blockRequest !== true) {
-            try {
-                const externalSearch = await findProductByEANExternal(code);
+		let externalProduct: null | findProductByEANExternalResponse = null;
 
-                if (externalSearch.name) {
-                    externalProduct = externalSearch;
-                }
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    let formatedDate = formatInTimeZone(
-                        new Date(),
-                        'America/Sao_Paulo',
-                        'dd-MM-yyyy HH:mm:ss zzzz',
-                    );
+		if (blockRequest !== true) {
+			try {
+				const externalSearch = await findProductByEANExternal(query);
 
-                    // No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
-                    // até o próximo dia
-                    if (err.response?.status === 429) {
-                        formatedDate = formatInTimeZone(
-                            new Date(),
-                            'America/Sao_Paulo',
-                            'dd-MM-yyyy HH:mm:ss zzzz',
-                        );
-                        console.log('Blocking for external api request');
-                        console.log(formatedDate);
+				if (externalSearch.name) {
+					externalProduct = externalSearch;
+				}
+			} catch (err) {
+				if (axios.isAxiosError(err)) {
+					let formatedDate = formatInTimeZone(
+						new Date(),
+						'America/Sao_Paulo',
+						'dd-MM-yyyy HH:mm:ss zzzz'
+					);
 
-                        await saveOnCache('external_api_request', true);
-                    }
-                } else if (err instanceof Error) {
-                    console.log(
-                        `Erro while searching ${code} at external source`,
-                    );
-                    console.error(err);
-                }
-            }
-        }
+					// No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
+					// até o próximo dia
+					if (err.response?.status === 429) {
+						formatedDate = formatInTimeZone(
+							new Date(),
+							'America/Sao_Paulo',
+							'dd-MM-yyyy HH:mm:ss zzzz'
+						);
+						console.log('Blocking for external api request');
+						console.log(formatedDate);
 
-        await BackgroundJob.add('HandleAfterProductSearch', {
-            response: externalProduct,
-            code,
-        });
+						await saveOnCache('external_api_request', true);
+					}
+				} else if (err instanceof Error) {
+					console.log(
+						`Erro while searching ${query} at external source`
+					);
+					console.error(err);
+				}
+			}
+		}
 
-        if (externalProduct) {
-            const prod: ProductDetails = {
-                id: 'Generating',
-                name: externalProduct.name,
-                code: externalProduct.code,
-                brand: externalProduct.brand,
-                thumbnail: null,
-                lastTimeChecked: null,
-                created_at: new Date(),
-                updated_at: new Date(),
-            };
+		await BackgroundJob.add('HandleAfterProductSearch', {
+			response: externalProduct,
+			code: query,
+		});
 
-            return prod;
-        }
-    }
+		if (externalProduct) {
+			const prod: ProductDetails = {
+				id: 'Generating',
+				name: externalProduct.name,
+				code: externalProduct.code,
+				brand: externalProduct.brand,
+				thumbnail: null,
+				lastTimeChecked: null,
+				created_at: new Date(),
+				updated_at: new Date(),
+			};
 
-    let photo: undefined | string;
+			return prod;
+		}
+	}
 
-    if (product?.thumbnail) {
-        if (product.thumbnail.startsWith('http')) {
-            photo = product.thumbnail;
-        }
-    }
+	let photo: undefined | string;
 
-    if (!photo && product) {
-        photo = await getProductImageURL(code);
-    }
+	if (product?.thumbnail) {
+		if (product.thumbnail.startsWith('http')) {
+			photo = product.thumbnail;
+		}
+	}
 
-    saveOnCache(`product_suggestion:${code}`, {
-        ...product,
-    });
+	if (!photo && product) {
+		photo = await getProductImageURL(query);
+	}
 
-    if (!product) {
-        return null;
-    }
+	saveOnCache(`product_suggestion:${query}`, {
+		...product,
+	});
 
-    return {
-        ...product,
-        thumbnail: photo || null,
-    };
+	if (!product) {
+		return null;
+	}
+
+	return {
+		...product,
+		code: query,
+		thumbnail: photo || null,
+	};
 }
 
 export { findProductByEAN };

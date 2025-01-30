@@ -5,23 +5,28 @@ import { getProductImageURL } from '@services/AWS';
 import { findProductByEAN } from '@utils/ProductSearch/Find';
 
 class ProductInformationController {
-    async index(req: Request, res: Response): Promise<Response> {
-        const { ean } = req.params;
+	async index(req: Request, res: Response): Promise<Response> {
+		const { ean } = req.params;
 
-        const product = await findProductByEAN({ code: String(ean) });
-        let thumbnail: string | null = null;
+		const product = await findProductByEAN({ code: String(ean) });
 
-        if (product?.code) {
-            thumbnail = await getProductImageURL(product.code);
-        }
+		if (!product) {
+			return res.status(404).json(null);
+		}
 
-        const productWithImage = {
-            ...product,
-            thumbnail,
-        };
+		let thumbnail: string | null = null;
 
-        return res.json(productWithImage);
-    }
+		if (product?.code) {
+			thumbnail = await getProductImageURL(product.code);
+		}
+
+		const productWithImage = {
+			...product,
+			thumbnail,
+		};
+
+		return res.json(productWithImage);
+	}
 }
 
 export default new ProductInformationController();
