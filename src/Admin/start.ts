@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import express from 'express';
 
-import '@services/Firebase';
+import '@services/Firebase/Config';
 
 const App = express();
 

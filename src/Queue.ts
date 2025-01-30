@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import './Services/Firebase';
+import './Services/Firebase/Config';
 
 dotenv.config();
 

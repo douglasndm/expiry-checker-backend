@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import admin from 'firebase-admin';
 
-import { firebaseAppExpiryChecker } from '@services/Firebase';
+import { firebaseAppExpiryChecker } from '@services/Firebase/Config';
 
 class DeleteAll {
 	async delete(req: Request, res: Response): Promise<Response> {

@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
 
-import './Services/Firebase';
+import './Services/Firebase/Config';
 import './Services/Cache/Redis';
 import './Services/Database';
 import './Services/Cron';
