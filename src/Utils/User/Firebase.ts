@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-import { firebaseApp } from '@services/Firebase';
+import { firebaseApp } from '@services/Firebase/Config';
 
 import isFirebaseError from '@utils/Firebase/Error';
 

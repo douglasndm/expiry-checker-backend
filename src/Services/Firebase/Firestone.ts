@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import { Message } from 'firebase-admin/lib/messaging/messaging-api';
 
-import { firebaseAppExpiryChecker } from '@services/Firebase';
+import { firebaseAppExpiryChecker } from '@services/Firebase/Config';
 
 interface IMessage {
 	messagingToken: string;

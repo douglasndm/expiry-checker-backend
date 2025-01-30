@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-import { firebaseAppExpiryChecker } from '@services/Firebase';
+import { firebaseAppExpiryChecker } from '@services/Firebase/Config';
 import { getNotificationsFromBaseApp } from '@services/Firebase/Firestone';
 
 async function sendNotificationsForBaseApp(): Promise<void> {
