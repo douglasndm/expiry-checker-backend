@@ -10,6 +10,7 @@
 		"dev": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
 		"dev:queue": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/Queue.ts",
 		"typeorm": "ts-node -r dotenv/config -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/Services/TypeORM.ts",
+		"admin": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/Admin/server.ts",
 		"test": "jest",
 		"test:watch": "jest --watch --verbose=true"
 	},
