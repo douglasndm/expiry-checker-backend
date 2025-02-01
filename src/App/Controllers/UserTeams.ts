@@ -52,6 +52,7 @@ class UserTeams {
 				return {
 					...team.team,
 					role: team.role.toLowerCase(),
+					status: team.status?.toLowerCase(),
 					subscription: sub || null,
 				};
 			}
@@ -59,6 +60,7 @@ class UserTeams {
 			return {
 				...team.team,
 				role: team.role.toLowerCase(),
+				status: team.status?.toLowerCase(),
 			};
 		});
 
