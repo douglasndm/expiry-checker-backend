@@ -57,6 +57,7 @@ async function findProductByEAN({
 		.getOne();
 
 	if (!product) {
+		return null;
 		const blockRequest = await getFromCache<boolean>(
 			'external_api_request'
 		);
