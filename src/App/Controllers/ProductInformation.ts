@@ -4,6 +4,8 @@ import { getProductImageURL } from '@services/AWS';
 
 import { findProductByEAN } from '@utils/ProductSearch/Find';
 
+import AppError from '@errors/AppError';
+
 class ProductInformationController {
 	async index(req: Request, res: Response): Promise<Response> {
 		const { ean } = req.params;
@@ -11,7 +13,10 @@ class ProductInformationController {
 		const product = await findProductByEAN({ code: String(ean) });
 
 		if (!product) {
-			return res.status(404).json(null);
+			throw new AppError({
+				message: 'Product not found',
+				internalErrorCode: 8,
+			});
 		}
 
 		let thumbnail: string | null = null;
