@@ -25,7 +25,9 @@ class UserTeamController {
 			status: userRole.status?.toLowerCase(),
 		};
 
-		delete response?.user;
+		if (response.user) {
+			delete response.user;
+		}
 
 		return res.json(response);
 	}
