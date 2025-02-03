@@ -1,23 +1,16 @@
-import axios from 'axios';
+import { sendMail } from '@utils/Notifications/Mail/Send';
 
 interface weeklyMailProps {
-    data: {
-        notification: Omit<MailNotification, 'user_id'>;
-    };
+	data: {
+		notification: Omit<MailNotification, 'user_id'>;
+	};
 }
 
 async function weeklyMail({ data }: weeklyMailProps): Promise<void> {
-    try {
-        console.log('Sending weekly mail to: ', data.notification.to);
-        axios.post(`${process.env.MAIL_SERVICE_URL}/send`, data.notification);
-    } catch (err) {
-        if (err instanceof Error) {
-            console.error(err.message);
-        }
-    }
+	await sendMail({ data });
 }
 
 export default {
-    key: 'SendWeeklyMail',
-    handle: weeklyMail,
+	key: 'SendWeeklyMail',
+	handle: weeklyMail,
 };
