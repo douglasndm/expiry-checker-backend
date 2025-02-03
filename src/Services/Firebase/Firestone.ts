@@ -1,21 +1,21 @@
 import admin from 'firebase-admin';
-import { Message } from 'firebase-admin/lib/messaging/messaging-api';
+import { TokenMessage } from 'firebase-admin/lib/messaging/messaging-api';
 
 import { firebaseAppExpiryChecker } from '@services/Firebase/Config';
 
-interface IMessage {
+export interface IMessage {
 	messagingToken: string;
 	notificationString: string;
 	notificationTitle: string;
 }
 
-async function getNotificationsFromBaseApp(): Promise<Message[]> {
+async function getNotificationsFromBaseApp(): Promise<TokenMessage[]> {
 	const response = await admin
 		.firestore(firebaseAppExpiryChecker)
 		.collection('users')
 		.get();
 
-	const messages: Message[] = [];
+	const messages: TokenMessage[] = [];
 
 	response.forEach(doc => {
 		const data = doc.data() as IMessage;
