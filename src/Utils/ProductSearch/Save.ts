@@ -44,9 +44,16 @@ async function localSaveOnError(product: Product) {
 async function saveProductOnFirestore(product: Product) {
 	try {
 		const firestore = admin.firestore(firebaseAppExpiryChecker);
+		firestore.settings({ ignoreUndefinedProperties: true });
+
 		const productRef = firestore.collection('products').doc(product.code);
 
-		await productRef.set(product);
+		await productRef.set({
+			name: product.name,
+			code: product.code,
+			brand: product.brand,
+			image: product.image,
+		});
 	} catch (error) {
 		await localSaveOnError(product);
 
