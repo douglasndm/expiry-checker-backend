@@ -55,7 +55,7 @@ jobs:
           FIREBASE_EXPIRYCHECKER_FILE: ${{ secrets.EXPIRY_CHECKER_FIREBASE_ACCOUNT_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
-          yarn build
+          yarn build:babel
           ls
           echo $FIREBASE_FILE > ./dist/Config/Firebase/ServiceAccountKey.json
           echo $FIREBASE_EXPIRYCHECKER_FILE > ./dist/Config/Firebase/ExpiryCheckerServiceAccountKey.json
