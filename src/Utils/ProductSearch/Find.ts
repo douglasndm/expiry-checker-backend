@@ -1,19 +1,20 @@
 import axios from 'axios';
 import * as Yup from 'yup';
-import { formatInTimeZone } from 'date-fns-tz';
 
 import { defaultDataSource } from '@services/TypeORM';
-
 import { saveOnCache, getFromCache } from '@services/Cache/Redis';
 
 import BackgroundJob from '@services/Background';
 import { getProductImageURL } from '@services/AWS';
+
+import { logDateTime } from '@utils/Logs/LogDateTime';
 
 import ProductDetails from '@models/ProductDetails';
 
 import AppError from '@errors/AppError';
 
 import { findProductByEANExternal } from './ExternalQuery';
+import { captureException } from '@services/ExceptionsHandler';
 
 interface findProductByEANProps {
 	code: string;
@@ -57,46 +58,31 @@ async function findProductByEAN({
 		.getOne();
 
 	if (!product) {
-		return null;
-		const blockRequest = await getFromCache<boolean>(
-			'external_api_request'
-		);
+		const isBlocked = await getFromCache<boolean>('external_api_request');
 
 		let externalProduct: null | findProductByEANExternalResponse = null;
 
-		if (blockRequest !== true) {
+		if (isBlocked !== true) {
 			try {
 				const externalSearch = await findProductByEANExternal(query);
 
 				if (externalSearch.name) {
 					externalProduct = externalSearch;
 				}
-			} catch (err) {
-				if (axios.isAxiosError(err)) {
-					let formatedDate = formatInTimeZone(
-						new Date(),
-						'America/Sao_Paulo',
-						'dd-MM-yyyy HH:mm:ss zzzz'
-					);
+			} catch (error) {
+				if (axios.isAxiosError(error)) {
+					logDateTime();
 
 					// No erro 429 antigimos o limite da api, a partir daqui desabilitamos as consultas
 					// até o próximo dia
-					if (err.response?.status === 429) {
-						formatedDate = formatInTimeZone(
-							new Date(),
-							'America/Sao_Paulo',
-							'dd-MM-yyyy HH:mm:ss zzzz'
-						);
+					if (error.response?.status === 429) {
 						console.log('Blocking for external api request');
-						console.log(formatedDate);
+						logDateTime();
 
 						await saveOnCache('external_api_request', true);
 					}
-				} else if (err instanceof Error) {
-					console.log(
-						`Erro while searching ${query} at external source`
-					);
-					console.error(err);
+				} else if (error instanceof Error) {
+					captureException(error);
 				}
 			}
 		}
