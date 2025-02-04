@@ -7,31 +7,36 @@ import User from '@models/User';
 import AppError from '@errors/AppError';
 
 export async function updateUser({
-    id,
-    name,
-    lastName,
-    email,
-    password,
+	id,
+	name,
+	lastName,
+	email,
+	password,
 }: updateUserProps): Promise<User> {
-    const repository = defaultDataSource.getRepository(User);
+	const repository = defaultDataSource.getRepository(User);
 
-    const user = await repository.findOne({ where: { id } });
+	const user = await repository.findOne({ where: { id } });
 
-    if (!user) {
-        throw new AppError({ message: 'User not found', internalErrorCode: 7 });
-    }
+	if (!user) {
+		throw new AppError({ message: 'User not found', internalErrorCode: 7 });
+	}
 
-    if (email) user.email = email;
+	if (email) user.email = email;
 
-    user.name = name;
-    user.lastName = lastName;
+	if (user.name) {
+		user.name = name as string;
+	}
 
-    if (password) {
-        const encrypedPassword = await bcrypt.hash(password, 8);
-        user.password = encrypedPassword;
-    }
+	if (user.lastName) {
+		user.lastName = lastName as string;
+	}
 
-    const updatedUser = await repository.save(user);
+	if (password) {
+		const encrypedPassword = await bcrypt.hash(password, 8);
+		user.password = encrypedPassword;
+	}
 
-    return updatedUser;
+	const updatedUser = await repository.save(user);
+
+	return updatedUser;
 }

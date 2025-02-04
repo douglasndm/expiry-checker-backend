@@ -85,7 +85,7 @@ class UserController {
 										{
 											...subscriptions[0],
 										},
-								  ]
+									]
 								: [],
 					},
 				},
@@ -107,7 +107,7 @@ class UserController {
 			email: Yup.string().required().email(),
 			password: Yup.string(),
 			passwordConfirm: Yup.string().oneOf(
-				[Yup.ref('password'), null],
+				[Yup.ref('password'), undefined],
 				'Password confirmation does not match'
 			),
 		});
@@ -166,7 +166,7 @@ class UserController {
 			email: Yup.string().email(),
 			password: Yup.string(),
 			passwordConfirm: Yup.string().oneOf(
-				[Yup.ref('password'), null],
+				[Yup.ref('password'), undefined],
 				'Password confirmation does not match'
 			),
 		});
