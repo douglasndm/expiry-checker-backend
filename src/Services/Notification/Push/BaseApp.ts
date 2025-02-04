@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import * as Sentry from '@sentry/node';
 
 import { firebaseAppExpiryChecker } from '@services/Firebase/Config';
 import { getNotificationsFromBaseApp } from '@services/Firebase/Firestone';
@@ -6,6 +7,11 @@ import { getNotificationsFromBaseApp } from '@services/Firebase/Firestone';
 import { logDateTime } from '@utils/Logs/LogDateTime';
 
 async function sendNotificationsForBaseApp(): Promise<void> {
+	const checkInId = Sentry.captureCheckIn({
+		monitorSlug: 'daily-push-notifications-for-base-app',
+		status: 'in_progress',
+	});
+
 	logDateTime();
 	console.log('Sending notifications for base app');
 	const messages = await getNotificationsFromBaseApp();
@@ -31,6 +37,12 @@ async function sendNotificationsForBaseApp(): Promise<void> {
 			await new Promise(resolve => setTimeout(resolve, 5000)); // aguarda 5 segundos
 		}
 	}
+
+	Sentry.captureCheckIn({
+		checkInId,
+		monitorSlug: 'daily-push-notifications-for-base-app',
+		status: 'ok',
+	});
 }
 
 export { sendNotificationsForBaseApp };

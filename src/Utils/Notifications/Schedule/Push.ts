@@ -1,11 +1,17 @@
 import admin from 'firebase-admin';
+import * as Sentry from '@sentry/node';
 
 import { getAllTeamsExpiredProducts } from '@utils/Notifications/Teams';
 import { getAllLoginsFromAllUsers } from '@utils/User/Login';
 
 import { getAllStoreTeamsToNotificate } from './TeamStores';
 
-export async function dailyPushNotification(): Promise<void> {
+async function dailyPushNotification(): Promise<void> {
+	const checkInId = Sentry.captureCheckIn({
+		monitorSlug: 'daily-push-notifications',
+		status: 'in_progress',
+	});
+
 	const teamsToNotificate = await getAllStoreTeamsToNotificate();
 
 	const teamProducts = await getAllTeamsExpiredProducts();
@@ -198,4 +204,12 @@ export async function dailyPushNotification(): Promise<void> {
 
 	const messaging = admin.messaging();
 	await messaging.sendEach(messages);
+
+	Sentry.captureCheckIn({
+		checkInId,
+		monitorSlug: 'daily-push-notifications',
+		status: 'ok',
+	});
 }
+
+export { dailyPushNotification };

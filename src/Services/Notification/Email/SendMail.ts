@@ -1,4 +1,5 @@
 import { addDays, format, isBefore } from 'date-fns';
+import * as Sentry from '@sentry/node';
 
 import BackgroundJob from '@services/Background';
 
@@ -12,6 +13,11 @@ import UserTeam from '@models/UserTeam';
 import Store from '@models/Store';
 
 async function sendMail(): Promise<void> {
+	const checkInId = Sentry.captureCheckIn({
+		monitorSlug: 'weekly-mail-notifications',
+		status: 'in_progress',
+	});
+
 	const filtedUsersTeams = await getUsersAllowedToSendMail();
 
 	// remove duplicades team before get all products
@@ -146,6 +152,12 @@ async function sendMail(): Promise<void> {
 			});
 		});
 	}
+
+	Sentry.captureCheckIn({
+		checkInId,
+		monitorSlug: 'weekly-mail-notifications',
+		status: 'ok',
+	});
 }
 
 export { sendMail };
