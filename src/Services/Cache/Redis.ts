@@ -2,6 +2,8 @@ import IORedis, { Redis } from 'ioredis';
 
 import { captureException } from '@services/ExceptionsHandler';
 
+import { logDateTime } from '@utils/Logs/LogDateTime';
+
 // team_products:team_id
 // team_brands:team_id
 // team_categories:team_id
@@ -24,27 +26,29 @@ let redis: Redis | null = null;
 
 // Função para conectar ao Redis
 async function connectToRedis(): Promise<void> {
-	try {
-		redis = new IORedis({
-			host: process.env.REDIS_HOST,
-			port: Number(process.env.REDIS_PORT),
-			password: process.env.REDIS_PASS || undefined,
+	redis = new IORedis({
+		host: process.env.REDIS_HOST,
+		port: Number(process.env.REDIS_PORT),
+		password: process.env.REDIS_PASS || undefined,
 
-			maxRetriesPerRequest: 30,
-			enableReadyCheck: false,
-			retryStrategy(times) {
-				if (times > 3) {
-					return null;
-				}
-				return Math.min(times * 100, 3000);
-			},
+		maxRetriesPerRequest: 30,
+		enableReadyCheck: false,
+		retryStrategy(times) {
+			if (times > 3) {
+				return null;
+			}
+			return Math.min(times * 100, 3000);
+		},
+	})
+		.on('error', error => {
+			captureException(error);
+		})
+		.on('connect', () => {
+			logDateTime();
+			console.log('Conectado ao Redis');
 		});
 
-		await redis.ping(); // Verifica se a conexão está funcionando
-	} catch (error) {
-		console.error('Erro ao conectar ao Redis:', error);
-		redis = null;
-	}
+	await redis.ping(); // Verifica se a conexão está funcionando
 }
 
 async function checkAndClear() {
@@ -54,14 +58,8 @@ async function checkAndClear() {
 
 	redis.info((err, info) => {
 		if (err || !info) {
-			console.error(
-				'Erro ao recuperar informações do servidor Redis:',
-				err
-			);
+			captureException(err);
 
-			if (err instanceof Error) {
-				captureException(err);
-			}
 			return;
 		}
 
@@ -82,6 +80,7 @@ async function checkAndClear() {
 
 		if (redis) {
 			if (usedMemoryMB > 150) {
+				logDateTime();
 				console.log(
 					'Redis is using: ',
 					usedMemoryMB.toFixed(2),
@@ -98,9 +97,11 @@ async function checkAndClear() {
 async function getFromCache<T>(key: string): Promise<T | null> {
 	// Se não estiver conectado, tenta conectar novamente
 	if (!redis) {
+		logDateTime();
 		console.log('Tentando reconectar ao Redis...');
 		await connectToRedis();
 		if (!redis) {
+			logDateTime();
 			console.log(
 				'Não foi possível se reconectar ao Redis. Usando o cache indisponível.'
 			);
@@ -119,20 +120,19 @@ async function getFromCache<T>(key: string): Promise<T | null> {
 
 		return parsedData;
 	} catch (error) {
-		if (error instanceof Error) {
-			captureException(error);
-		}
-		console.error('Erro ao obter dados do cache: ', error);
+		captureException(error);
+
 		return null;
 	}
 }
 
-async function saveOnCache(key: string, value: any): Promise<void> {
+async function saveOnCache(key: string, value: unknown): Promise<void> {
 	// Se não estiver conectado, tenta conectar novamente
 	if (!redis) {
 		console.log('Tentando reconectar ao Redis...');
 		await connectToRedis();
 		if (!redis) {
+			logDateTime();
 			console.log(
 				'Não foi possível se reconectar ao Redis. Usando o cache indisponível.'
 			);
@@ -145,10 +145,7 @@ async function saveOnCache(key: string, value: any): Promise<void> {
 
 		await redis.set(key, JSON.stringify(value));
 	} catch (error) {
-		if (error instanceof Error) {
-			captureException(error);
-		}
-		console.error('Erro ao salvar dados no cache: ', error);
+		captureException(error);
 	}
 }
 
@@ -158,6 +155,7 @@ async function invalidadeCache(key: string): Promise<void> {
 		console.log('Tentando reconectar ao Redis...');
 		await connectToRedis();
 		if (!redis) {
+			logDateTime();
 			console.log(
 				'Não foi possível se reconectar ao Redis. Usando o cache indisponível.'
 			);
@@ -168,9 +166,8 @@ async function invalidadeCache(key: string): Promise<void> {
 	try {
 		await redis.del(key);
 	} catch (error) {
-		if (error instanceof Error) {
-			captureException(error);
-		}
+		captureException(error);
+
 		console.error('Erro ao invalidar dados do cache: ', error);
 	}
 }
@@ -180,7 +177,9 @@ async function invalidadePrefix(prefix: string): Promise<void> {
 	if (!redis) {
 		console.log('Tentando reconectar ao Redis...');
 		await connectToRedis();
+
 		if (!redis) {
+			logDateTime();
 			console.log(
 				'Não foi possível se reconectar ao Redis. Usando o cache indisponível.'
 			);
@@ -200,9 +199,8 @@ async function invalidadePrefix(prefix: string): Promise<void> {
 
 		await pipeline.exec();
 	} catch (error) {
-		if (error instanceof Error) {
-			captureException(error);
-		}
+		captureException(error);
+
 		console.error(
 			`Erro ao invalidar o cache com o prefixo: ${prefix} `,
 			error
@@ -216,6 +214,7 @@ async function invalidadeTeamCache(team_id: string): Promise<void> {
 		console.log('Tentando reconectar ao Redis...');
 		await connectToRedis();
 		if (!redis) {
+			logDateTime();
 			console.log(
 				'Não foi possível se reconectar ao Redis. Usando o cache indisponível.'
 			);
@@ -235,9 +234,8 @@ async function invalidadeTeamCache(team_id: string): Promise<void> {
 
 		await pipeline.exec();
 	} catch (error) {
-		if (error instanceof Error) {
-			captureException(error);
-		}
+		captureException(error);
+
 		console.error(`Erro ao invalidar o cache do time: ${team_id} `, error);
 	}
 }
@@ -248,6 +246,7 @@ async function invalidadeAllCache(): Promise<void> {
 		console.log('Tentando reconectar ao Redis...');
 		await connectToRedis();
 		if (!redis) {
+			logDateTime();
 			console.log(
 				'Não foi possível se reconectar ao Redis. Usando o cache indisponível.'
 			);
@@ -258,9 +257,8 @@ async function invalidadeAllCache(): Promise<void> {
 	try {
 		await redis.flushall();
 	} catch (error) {
-		if (error instanceof Error) {
-			captureException(error);
-		}
+		captureException(error);
+
 		console.error('Erro ao invalidar todo o cache: ', error);
 	}
 }
