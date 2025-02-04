@@ -19,15 +19,15 @@ const scheduleWithCheckIn = Sentry.cron.instrumentNodeSchedule(schedule);
 // schedule for push notifications
 scheduleWithCheckIn.scheduleJob(
 	'daily-push-notifications',
-	'0 11 * * 1,2,3,4,5',
+	'0 8 * * 1,2,3,4,5',
 	dailyPushNotification
 );
 
-// At 06:00 on Monday
+// At 07:00 on Monday
 // schedule for mail notifications
 scheduleWithCheckIn.scheduleJob(
 	'weekly-mail-notifications',
-	'0 9 * * 1',
+	'0 7 * * 1',
 	sendMail
 );
 
@@ -35,7 +35,7 @@ scheduleWithCheckIn.scheduleJob(
 // schedule for reset daily block for request for external ean search
 scheduleWithCheckIn.scheduleJob(
 	'removing-block-for-external-api-request',
-	'0 3 * * *',
+	'0 0 * * *',
 	allowExternalQuery
 );
 
@@ -43,14 +43,13 @@ scheduleWithCheckIn.scheduleJob(
 // if API is not block it will call remaning call to complete db
 scheduleWithCheckIn.scheduleJob(
 	'call-remaining-daily-api-calls',
-	'0 2 * * *',
+	'0 23 * * *',
 	callRemainingDailyAPICalls
 );
 
-// At 09:00 AM and 05:00 PM
-// At minute 0 past hour 9 and 15.
+// At 08:00 and 14:00
 scheduleWithCheckIn.scheduleJob(
 	'daily-push-notifications-for-base-app',
-	'0 12,18 * * *',
+	'0 8,14 * * *',
 	sendNotificationsForBaseApp
 );
