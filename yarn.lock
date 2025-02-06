@@ -4371,7 +4371,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^4.17.17, @types/express@npm:^4.17.21":
+"@types/express@npm:4.17.21, @types/express@npm:^4.17.17":
   version: 4.17.21
   resolution: "@types/express@npm:4.17.21"
   dependencies:
@@ -6909,7 +6909,7 @@ __metadata:
     "@types/cors": "npm:^2.8.17"
     "@types/crypto-js": "npm:^4.0.1"
     "@types/dotenv": "npm:^8.2.3"
-    "@types/express": "npm:^4.17.21"
+    "@types/express": "npm:4.17.21"
     "@types/jest": "npm:^29.5.14"
     "@types/multer": "npm:^1.4.12"
     "@types/node": "npm:^22.13.1"
