@@ -1,7 +1,7 @@
 import { addDays, format, isBefore } from 'date-fns';
 import * as Sentry from '@sentry/node';
 
-import BackgroundJob from '@services/Background';
+import BackgroundJob from '@services/Queue';
 
 import { getTeamsWithActiveSubscriptions } from '@utils/Subscriptions/Actives';
 import { getUsersAllowedToSendMail } from '@utils/Notifications/Mail/UsersAllowed';
