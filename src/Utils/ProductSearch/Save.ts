@@ -35,17 +35,14 @@ async function localSaveOnError(product: Product) {
 		console.log('Dados adicionados com sucesso!');
 	} catch (error) {
 		console.error('Erro ao escrever no arquivo JSON:', error);
-		if (error instanceof Error) {
-			captureException(error);
-		}
+
+		captureException(error);
 	}
 }
 
 async function saveProductOnFirestore(product: Product) {
 	try {
 		const firestore = admin.firestore(firebaseAppExpiryChecker);
-		firestore.settings({ ignoreUndefinedProperties: true });
-
 		const productRef = firestore.collection('products').doc(product.code);
 
 		await productRef.set({
@@ -57,9 +54,7 @@ async function saveProductOnFirestore(product: Product) {
 	} catch (error) {
 		await localSaveOnError(product);
 
-		if (error instanceof Error) {
-			captureException(error);
-		}
+		captureException(error);
 	}
 }
 
