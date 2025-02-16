@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
+import { firestore } from 'firebase-admin';
 
 import { defaultDataSource } from '@services/TypeORM';
 
 import User from '@models/User';
 
-export async function createUser({
+async function createUser({
 	firebaseUid,
 	name,
 	lastName,
@@ -26,5 +27,21 @@ export async function createUser({
 
 	const savedUser = await userRepository.save(user);
 
+	// find if user exists on firestore
+	const userDoc = await firestore().collection('users').doc(email).get();
+
+	if (!userDoc.exists) {
+		await firestore().collection('users').doc(email).set({
+			name,
+			lastName,
+			firebaseUid,
+
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+	}
+
 	return savedUser;
 }
+
+export { createUser };
