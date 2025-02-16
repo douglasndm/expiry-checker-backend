@@ -1,68 +1,71 @@
-import { defaultDataSource } from '@services/TypeORM';
-
-import User from '@models/User';
+import { firestore } from 'firebase-admin';
 
 import AppError from '@errors/AppError';
 
-async function getUserByFirebaseId(firebase_id: string): Promise<User> {
-    const userReposity = defaultDataSource.getRepository(User);
+type IResponse = Omit<IUser, 'createdAt' | 'updatedAt'>;
 
-    const user = await userReposity
-        .createQueryBuilder('user')
-        .where('user.firebase_uid = :firebase_id', { firebase_id })
-        .select([
-            'user.id',
-            'user.name',
-            'user.lastName',
-            'user.email',
-            'user.firebaseUid',
-        ])
-        .getOne();
+async function processUser(
+	userRef: firestore.Query<firestore.DocumentData, firestore.DocumentData>
+): Promise<IResponse> {
+	const firebaseUser = await userRef.get();
 
-    if (!user) {
-        throw new AppError({
-            message: 'User not found',
-            internalErrorCode: 7,
-        });
-    }
+	if (firebaseUser.size === 0) {
+		throw new AppError({
+			message: 'User not found',
+			internalErrorCode: 7,
+		});
+	}
 
-    return user;
+	const data = firebaseUser.docs[0].data();
+
+	const user: IResponse = {
+		id: data.id,
+		name: data.name,
+		lastName: data.lastName,
+		email: data.email,
+		firebaseUid: data.firebaseUid,
+	};
+
+	return user;
 }
 
-async function getUserById(id: string): Promise<User> {
-    const userReposity = defaultDataSource.getRepository(User);
+async function getUserByFirebaseId(firebase_id: string): Promise<IResponse> {
+	const userCollection = firestore().collection('users');
+	const userRef = userCollection.where('firebaseUid', '==', firebase_id);
 
-    const user = await userReposity
-        .createQueryBuilder('user')
-        .where('user.id = :id', { id })
-        .getOne();
-
-    if (!user) {
-        throw new AppError({
-            message: 'User not found',
-            internalErrorCode: 7,
-        });
-    }
-
-    return user;
+	return processUser(userRef);
 }
 
-async function getUserByEmail(email: string): Promise<User> {
-    const userReposity = defaultDataSource.getRepository(User);
+async function getUserById(id: string): Promise<IResponse> {
+	const userCollection = firestore().collection('users');
+	const userRef = userCollection.where('id', '==', id);
 
-    const user = await userReposity
-        .createQueryBuilder('user')
-        .where('lower(user.email) = lower(:email)', { email })
-        .getOne();
+	return processUser(userRef);
+}
 
-    if (!user) {
-        throw new AppError({
-            message: 'User not found',
-            internalErrorCode: 7,
-        });
-    }
+async function getUserByEmail(email: string): Promise<IResponse> {
+	const userCollection = firestore().collection('users');
+	const userRef = userCollection.doc(email);
 
-    return user;
+	const response = await userRef.get();
+	const data = response.data();
+
+	if (!response.exists || !data) {
+		throw new AppError({
+			message: 'User not found',
+			internalErrorCode: 7,
+		});
+	}
+
+	const user: IResponse = {
+		id: data.id,
+		name: data.name,
+		lastName: data.lastName,
+		email: data.email,
+		firebaseUid: data.firebaseUid,
+	};
+
+	return user;
 }
 
 export { getUserById, getUserByEmail, getUserByFirebaseId };
