@@ -32,6 +32,7 @@ async function createUser({
 
 	if (!userDoc.exists) {
 		await firestore().collection('users').doc(email).set({
+			id: savedUser.id,
 			name,
 			lastName,
 			firebaseUid,
