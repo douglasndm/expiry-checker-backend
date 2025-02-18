@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 
 import FirestoreImportController from '@admin/controllers/Products/Suggestions/FirestoreImport';
+import CountController from '@admin/controllers/Products/Suggestions/Count';
 
 import { storage } from '@config/Multer';
 
@@ -14,5 +15,7 @@ routes.post(
 	upload.single('file'),
 	FirestoreImportController.store
 );
+
+routes.get('/suggestions/count', CountController.index);
 
 export default routes;
