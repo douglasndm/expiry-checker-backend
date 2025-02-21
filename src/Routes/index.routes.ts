@@ -8,7 +8,6 @@ import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
 import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
-import AppCheck from '@middlewares/AppChecker';
 import DeviceChecker from '@middlewares/DeviceChecker';
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import LogRequests from '@middlewares/LogRequests';
