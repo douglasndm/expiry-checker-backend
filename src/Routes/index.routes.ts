@@ -4,6 +4,7 @@ import User from '@controllers/User';
 import ProductInformation from '@controllers/ProductInformation';
 import ImageController from '@controllers/Products/ImageController';
 import SessionController from '@controllers/User/SessionController';
+import TokenController from '@controllers/Auth/TokenController';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
 import NotificationsPreferences from '@controllers/Notifications/Preferences';
@@ -29,6 +30,7 @@ routes.get('/product/image/:ean', ImageController.index);
 routes.use(FirebaseAuth); // from now on all routes need authentication
 
 routes.post('/session', SessionController.store);
+routes.post('/auth/token', TokenController.store);
 
 routes.use(HandleSetUserId);
 routes.use(DeviceChecker);
