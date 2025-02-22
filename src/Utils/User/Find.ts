@@ -22,7 +22,7 @@ async function processUser(
 		id: data.id,
 		name: data.name,
 		lastName: data.lastName,
-		email: data.email,
+		email: firebaseUser.docs[0].id,
 		firebaseUid: data.firebaseUid,
 	};
 
