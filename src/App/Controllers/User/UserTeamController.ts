@@ -14,9 +14,7 @@ class UserTeamController {
 		const userRole = await getTeamFromUser(req.userUUID);
 
 		if (!userRole) {
-			throw new AppError({
-				message: 'User is not in team',
-			});
+			return res.send(null);
 		}
 
 		const response = {
