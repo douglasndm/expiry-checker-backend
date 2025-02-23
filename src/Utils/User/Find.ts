@@ -1,5 +1,10 @@
 import { firestore } from 'firebase-admin';
 
+import { defaultDataSource } from '@services/TypeORM';
+import { captureException } from '@services/ExceptionsHandler';
+
+import User from '@models/User';
+
 import AppError from '@errors/AppError';
 
 type IResponse = Omit<IUser, 'createdAt' | 'updatedAt'>;
@@ -37,10 +42,30 @@ async function getUserByFirebaseId(firebase_id: string): Promise<IResponse> {
 }
 
 async function getUserById(id: string): Promise<IResponse> {
-	const userCollection = firestore().collection('users');
-	const userRef = userCollection.where('id', '==', id);
+	try {
+		const userCollection = firestore().collection('users');
+		const userRef = userCollection.where('id', '==', id);
 
-	return processUser(userRef);
+		return processUser(userRef);
+	} catch (error) {
+		captureException(error, { userId: id });
+
+		const userReposity = defaultDataSource.getRepository(User);
+
+		const user = await userReposity
+			.createQueryBuilder('user')
+			.where('user.id = :id', { id })
+			.getOne();
+
+		if (!user) {
+			throw new AppError({
+				message: 'User not found',
+				internalErrorCode: 7,
+			});
+		}
+
+		return user;
+	}
 }
 
 async function getUserByEmail(email: string): Promise<IResponse> {
