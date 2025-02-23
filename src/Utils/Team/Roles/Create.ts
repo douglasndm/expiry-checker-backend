@@ -112,9 +112,9 @@ async function addUserToTeam({
 	teamUser.code = Math.random().toString(36).substring(7);
 
 	if (!bypassCode) {
-		teamUser.status = 'Pending';
+		teamUser.status = 'pending';
 	} else {
-		teamUser.status = 'Completed';
+		teamUser.status = 'completed';
 	}
 
 	const savedRole = await userRolesRepository.save(teamUser);
@@ -123,11 +123,14 @@ async function addUserToTeam({
 	const teamRef = teamsCollection.doc(team_id);
 
 	const roleRef = teamRef.collection('roles').doc(user_id);
+	const userDoc = firestore().collection('users').doc(user.email);
 
 	await roleRef.set({
 		name: 'repositor',
 		code: savedRole.code,
 		status: savedRole.status,
+
+		userRef: userDoc,
 
 		createdAt: new Date(),
 		updatedAt: new Date(),
