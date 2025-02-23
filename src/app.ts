@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 import './loadEnv';
 
 import '@services/Sentry';
+import { captureException } from '@services/ExceptionsHandler';
 
 import rateLimiter from './App/Middlewares/RateLimiter';
 
@@ -31,7 +32,7 @@ App.use((err: Error, request: Request, response: Response, _: NextFunction) => {
 		});
 	}
 
-	console.error(err);
+	captureException(err);
 
 	return response.status(500).json({
 		status: 'error',
