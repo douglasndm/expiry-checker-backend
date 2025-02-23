@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import { getTeamFromUser } from '@utils/User/Team';
-import AppError from '@errors/AppError';
 
 class UserTeamController {
 	async index(req: Request, res: Response): Promise<Response> {

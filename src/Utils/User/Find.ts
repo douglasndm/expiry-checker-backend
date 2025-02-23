@@ -20,8 +20,8 @@ async function processUser(
 
 	const user: IResponse = {
 		id: data.id,
-		name: data.name,
-		lastName: data.lastName,
+		name: data.name || null,
+		lastName: data.lastName || null,
 		email: firebaseUser.docs[0].id,
 		firebaseUid: data.firebaseUid,
 	};
