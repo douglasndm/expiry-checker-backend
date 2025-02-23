@@ -78,6 +78,11 @@ async function createTeam({ name, admin_id }: createTeamProps): Promise<Team> {
 
 	// save on firestore
 	const teamsCollection = firestore().collection('teams');
+	const usersCollection = firestore().collection('users');
+
+	await usersCollection.doc(user.email).update({
+		teamId: savedTeam.id,
+	});
 
 	await teamsCollection.doc(savedTeam.id).set({
 		name,

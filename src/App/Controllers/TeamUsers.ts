@@ -99,6 +99,12 @@ class TeamUsersController {
 		const teamsCollection = firestore().collection('teams');
 		const teamRef = teamsCollection.doc(team_id);
 
+		const usersCollection = firestore().collection('users');
+		const userRef = usersCollection.doc(roles.user.email);
+		await userRef.update({
+			teamId: team_id,
+		});
+
 		const roleRef = teamRef.collection('roles').doc(roles.user.id);
 
 		await roleRef.update({

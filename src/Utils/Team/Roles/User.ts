@@ -86,6 +86,15 @@ async function removeUser({
 	const teamRef = teamsCollection.doc(team_id);
 
 	const roleRef = teamRef.collection('roles').doc(user_id);
+	const roleDoc = await roleRef.get();
+	const data = roleDoc.data();
+	if (data) {
+		const userRef = data.userRef as firestore.DocumentReference;
+
+		await userRef.update({
+			teamId: null,
+		});
+	}
 
 	await roleRef.delete();
 
