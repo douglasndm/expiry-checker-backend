@@ -2,14 +2,17 @@ import { defaultDataSource } from '@services/TypeORM';
 
 import User from '@models/User';
 
-import { getUserById } from './Find';
-
 async function deleteUser(user_id: string): Promise<void> {
-    const repository = defaultDataSource.getRepository(User);
+	const repository = defaultDataSource.getRepository(User);
 
-    const user = await getUserById(user_id);
+	const user = await repository
+		.createQueryBuilder('user')
+		.where('user.id = :id', { id: user_id })
+		.getOne();
 
-    await repository.remove(user);
+	if (user) {
+		await repository.remove(user);
+	}
 }
 
 export { deleteUser };
