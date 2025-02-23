@@ -9,6 +9,7 @@ const expiryServiceAccount = expiryAccountCredentials as admin.ServiceAccount;
 const firebaseApp = admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 });
+firebaseApp.firestore().settings({ ignoreUndefinedProperties: true });
 
 const firebaseAppExpiryChecker = admin.initializeApp(
 	{
