@@ -47,7 +47,7 @@ async function getUserByEmail(email: string): Promise<IResponse> {
 
 	const user = await userReposity
 		.createQueryBuilder('user')
-		.where('user.email = :email', { email })
+		.where('lower(user.email) = :email', { email: email.toLowerCase() })
 		.getOne();
 
 	if (!user) {
