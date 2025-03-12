@@ -33,7 +33,11 @@ async function sendNotificationsForBaseApp(): Promise<void> {
 			console.log(
 				`Sending batch ${i + 1} of ${batches} with ${batchMessages.length} notifications`
 			);
-			await messaging.sendEach(batchMessages);
+			if (process.env.DEV_MODE === 'false') {
+				await messaging.sendEach(batchMessages);
+			} else {
+				console.log('Not sending batch with notifications in dev mode');
+			}
 			await new Promise(resolve => setTimeout(resolve, 5000)); // aguarda 5 segundos
 		}
 	}
