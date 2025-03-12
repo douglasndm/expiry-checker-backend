@@ -4,23 +4,22 @@
 	"main": "index.js",
 	"license": "MIT",
 	"scripts": {
-		"build": "tsc",
-		"build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
-		"build:upload:sourcemaps": "npx sentry-cli sourcemaps inject ./dist && npx sentry-cli sourcemaps upload ./dist",
+		"build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files && yarn sentry:sourcemaps",
 		"dev": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
 		"dev:queue": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/Queue.ts",
 		"typeorm": "ts-node -r dotenv/config -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/Services/TypeORM.ts",
 		"admin": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/Admin/server.ts",
 		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
 		"test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --watch",
-		"test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --coverage"
+		"test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --coverage",
+		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org sentry --project expiry-checker-backend ./dist && sentry-cli --url https://exceptions.controledevalidades.com/ sourcemaps upload --org sentry --project expiry-checker-backend ./dist"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.741.0",
 		"@aws-sdk/lib-storage": "^3.741.0",
 		"@aws-sdk/s3-request-presigner": "^3.741.0",
-		"@sentry/node": "^8.54.0",
-		"@sentry/profiling-node": "^8.54.0",
+		"@sentry/node": "^9.5.0",
+		"@sentry/profiling-node": "^9.5.0",
 		"axios": "^1.7.9",
 		"bcrypt": "^5.1.1",
 		"bull": "^4.16.5",
@@ -38,7 +37,7 @@
 		"rate-limiter-flexible": "^5.0.5",
 		"reflect-metadata": "^0.2.2",
 		"sharp": "^0.32.6",
-		"typeorm": "0.3.20",
+		"typeorm": "0.3.21",
 		"yup": "^1.6.1"
 	},
 	"devDependencies": {
@@ -51,7 +50,7 @@
 		"@babel/preset-typescript": "^7.26.0",
 		"@eslint/js": "^9.19.0",
 		"@jest/globals": "^29.7.0",
-		"@sentry/cli": "^2.41.1",
+		"@sentry/cli": "^2.42.1",
 		"@types/bcrypt": "^5.0.0",
 		"@types/cors": "^2.8.17",
 		"@types/dotenv": "^8.2.3",
@@ -77,5 +76,5 @@
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.23.0"
 	},
-	"packageManager": "yarn@4.6.0"
+	"packageManager": "yarn@4.7.0"
 }
