@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as Sentry from '@sentry/node';
 import { formatInTimeZone } from 'date-fns-tz';
 
 import { invalidadeCache } from '@services/Cache/Redis';
@@ -31,6 +32,11 @@ async function findProductByEANExternal(
 }
 
 async function allowExternalQuery(): Promise<void> {
+	const checkInId = Sentry.captureCheckIn({
+		monitorSlug: 'removing-block-for-external-api-request',
+		status: 'in_progress',
+	});
+
 	const formatedDate = formatInTimeZone(
 		new Date(),
 		'America/Sao_Paulo',
@@ -40,6 +46,12 @@ async function allowExternalQuery(): Promise<void> {
 	console.log(formatedDate);
 
 	await invalidadeCache('external_api_request');
+
+	Sentry.captureCheckIn({
+		checkInId,
+		monitorSlug: 'removing-block-for-external-api-request',
+		status: 'ok',
+	});
 }
 
 export { findProductByEANExternal, allowExternalQuery };

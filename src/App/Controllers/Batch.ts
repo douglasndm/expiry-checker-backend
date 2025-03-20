@@ -3,7 +3,7 @@ import { parseISO, isValid, endOfDay } from 'date-fns';
 
 import { defaultDataSource } from '@services/TypeORM';
 
-import BackgroundJob from '@services/Background';
+import BackgroundJob from '@services/Queue';
 
 import Batch from '@models/Batch';
 

@@ -6,28 +6,26 @@ let redisClient: Redis | null = null;
 let redisOptions = null;
 
 try {
-    redisClient = new IORedis({
-        host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT),
-        username: process.env.REDIS_USER,
-        password: process.env.REDIS_PASS || undefined,
+	redisClient = new IORedis({
+		host: process.env.REDIS_HOST,
+		port: Number(process.env.REDIS_PORT),
+		username: process.env.REDIS_USER,
+		password: process.env.REDIS_PASS || undefined,
 
-        maxRetriesPerRequest: 30,
-        retryStrategy(times) {
-            if (times > 3) {
-                return null;
-            }
-            return Math.min(times * 100, 3000);
-        },
-    });
+		maxRetriesPerRequest: 30,
+		retryStrategy(times) {
+			if (times > 3) {
+				return null;
+			}
+			return Math.min(times * 100, 3000);
+		},
+	});
 
-    redisOptions = redisClient.options;
+	redisOptions = redisClient.options;
 } catch (error) {
-    if (error instanceof Error) {
-        captureException(error);
-    }
+	captureException(error);
 
-    redisClient = null;
+	redisClient = null;
 }
 
 export { redisClient, redisOptions };

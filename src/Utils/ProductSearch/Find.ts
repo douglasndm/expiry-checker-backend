@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { defaultDataSource } from '@services/TypeORM';
 import { saveOnCache, getFromCache } from '@services/Cache/Redis';
 
-import BackgroundJob from '@services/Background';
+import BackgroundJob from '@services/Queue';
 import { getProductImageURL } from '@services/AWS';
 
 import { logDateTime } from '@utils/Logs/LogDateTime';

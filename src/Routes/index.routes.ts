@@ -4,13 +4,11 @@ import User from '@controllers/User';
 import ProductInformation from '@controllers/ProductInformation';
 import ImageController from '@controllers/Products/ImageController';
 import SessionController from '@controllers/User/SessionController';
+import TokenController from '@controllers/Auth/TokenController';
 import Team from '@controllers/Team';
 import UserTeams from '@controllers/UserTeams';
 import NotificationsPreferences from '@controllers/Notifications/Preferences';
 
-import DeleteAll from '@controllers/BaseApp/DeleteAll';
-
-import AppCheck from '@middlewares/AppChecker';
 import DeviceChecker from '@middlewares/DeviceChecker';
 import FirebaseAuth from '@middlewares/FirebaseAuth';
 import LogRequests from '@middlewares/LogRequests';
@@ -31,9 +29,8 @@ routes.get('/product/image/:ean', ImageController.index);
 
 routes.use(FirebaseAuth); // from now on all routes need authentication
 
-routes.delete('/baseApp/allData', AppCheck, DeleteAll.delete);
-
 routes.post('/session', SessionController.store);
+routes.post('/auth/token', TokenController.store);
 
 routes.use(HandleSetUserId);
 routes.use(DeviceChecker);

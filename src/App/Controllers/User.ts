@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { firestore } from 'firebase-admin';
 import * as Yup from 'yup';
 
 import { defaultDataSource } from '@services/TypeORM';
@@ -61,12 +62,25 @@ class UserController {
 			});
 		}
 
+		const userRef = firestore().collection('users').doc(user.email);
+		const firebaseUser = await userRef.get();
+
+		const userData = firebaseUser.data();
+
+		if (!userData) {
+			throw new AppError({
+				message: 'User not found',
+				statusCode: 401,
+				internalErrorCode: 7,
+			});
+		}
+
 		let organizedUser = {
-			id: user.id,
-			fid: user.firebaseUid,
+			id: userData.id,
+			fid: userData.firebaseUid,
 			email: user.email,
-			name: user.name,
-			last_name: user.lastName,
+			name: userData.name,
+			last_name: userData.lastName,
 			role: user.role,
 		};
 
@@ -85,7 +99,7 @@ class UserController {
 										{
 											...subscriptions[0],
 										},
-								  ]
+									]
 								: [],
 					},
 				},
@@ -107,7 +121,7 @@ class UserController {
 			email: Yup.string().required().email(),
 			password: Yup.string(),
 			passwordConfirm: Yup.string().oneOf(
-				[Yup.ref('password'), null],
+				[Yup.ref('password'), undefined],
 				'Password confirmation does not match'
 			),
 		});
@@ -166,7 +180,7 @@ class UserController {
 			email: Yup.string().email(),
 			password: Yup.string(),
 			passwordConfirm: Yup.string().oneOf(
-				[Yup.ref('password'), null],
+				[Yup.ref('password'), undefined],
 				'Password confirmation does not match'
 			),
 		});

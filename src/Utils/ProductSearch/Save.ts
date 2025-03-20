@@ -35,9 +35,8 @@ async function localSaveOnError(product: Product) {
 		console.log('Dados adicionados com sucesso!');
 	} catch (error) {
 		console.error('Erro ao escrever no arquivo JSON:', error);
-		if (error instanceof Error) {
-			captureException(error);
-		}
+
+		captureException(error);
 	}
 }
 
@@ -46,13 +45,16 @@ async function saveProductOnFirestore(product: Product) {
 		const firestore = admin.firestore(firebaseAppExpiryChecker);
 		const productRef = firestore.collection('products').doc(product.code);
 
-		await productRef.set(product);
+		await productRef.set({
+			name: product.name,
+			code: product.code,
+			brand: product.brand,
+			image: product.image,
+		});
 	} catch (error) {
 		await localSaveOnError(product);
 
-		if (error instanceof Error) {
-			captureException(error);
-		}
+		captureException(error);
 	}
 }
 

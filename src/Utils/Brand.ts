@@ -71,8 +71,6 @@ export async function createBrand({
 
 	const createdBrand = await brandRepository.save(brand);
 
-	console.log(createdBrand);
-
 	await invalidadeCache(`team_brands:${team_id}`);
 
 	return createdBrand;

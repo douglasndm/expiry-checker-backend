@@ -47,8 +47,8 @@ async function createSession(Props: Props): Promise<Response> {
 
 	let response: Response = {
 		id: user.id,
-		name: user.name,
-		lastName: user.lastName,
+		name: user.name || undefined,
+		lastName: user.lastName || undefined,
 		email: user.email,
 	};
 

@@ -11,108 +11,108 @@ import AppError from '@errors/AppError';
 // Parent route (team) has a middleware to check if user is on team
 // so it is not necessary to check it here
 class StoreControle {
-    async index(req: Request, res: Response): Promise<Response> {
-        const { team_id } = req.params;
+	async index(req: Request, res: Response): Promise<Response> {
+		const { team_id } = req.params;
 
-        const stores = await getAllStoresFromTeam({ team_id });
+		const stores = await getAllStoresFromTeam({ team_id });
 
-        return res.json(stores);
-    }
+		return res.json(stores);
+	}
 
-    async create(req: Request, res: Response): Promise<Response> {
-        const { team_id } = req.params;
-        const { name } = req.body;
+	async create(req: Request, res: Response): Promise<Response> {
+		const { team_id } = req.params;
+		const { name } = req.body;
 
-        if (!req.userId) {
-            throw new AppError({
-                message: 'Provider your id',
-                internalErrorCode: 1,
-            });
-        }
+		if (!req.userId) {
+			throw new AppError({
+				message: 'Provider your id',
+				internalErrorCode: 1,
+			});
+		}
 
-        const user = await getUserByFirebaseId(req.userId);
+		const user = await getUserByFirebaseId(req.userId);
 
-        const allStoresInTeam = await getAllStoresFromTeam({ team_id });
-        const alreadyExists = allStoresInTeam.find(
-            store => store.name.toLowerCase() === name.toLowerCase(),
-        );
+		const allStoresInTeam = await getAllStoresFromTeam({ team_id });
+		const alreadyExists = allStoresInTeam.find(
+			store => store.name.toLowerCase() === name.toLowerCase()
+		);
 
-        if (alreadyExists) {
-            throw new AppError({
-                message: 'There are already a store with the same name',
-                internalErrorCode: 36,
-            });
-        }
+		if (alreadyExists) {
+			throw new AppError({
+				message: 'There are already a store with the same name',
+				internalErrorCode: 36,
+			});
+		}
 
-        const createdStore = await createStore({
-            name,
-            team_id,
-            admin_id: user.id,
-        });
+		const createdStore = await createStore({
+			name,
+			team_id,
+			admin_id: user.id,
+		});
 
-        return res.status(201).json(createdStore);
-    }
+		return res.status(201).json(createdStore);
+	}
 
-    async update(req: Request, res: Response): Promise<Response> {
-        const { team_id, store_id } = req.params;
-        const { name } = req.body;
+	async update(req: Request, res: Response): Promise<Response> {
+		const { team_id, store_id } = req.params;
+		const { name } = req.body;
 
-        if (!req.userId) {
-            throw new AppError({
-                message: 'Provider your id',
-                internalErrorCode: 1,
-            });
-        }
+		if (!req.userId) {
+			throw new AppError({
+				message: 'Provider your id',
+				internalErrorCode: 1,
+			});
+		}
 
-        const user = await getUserByFirebaseId(req.userId);
+		const user = await getUserByFirebaseId(req.userId);
 
-        const allStoresInTeam = await getAllStoresFromTeam({ team_id });
-        const alreadyExists = allStoresInTeam.find(store => {
-            if (store.name.toLowerCase() === name.toLowerCase()) {
-                if (store_id !== store.id) {
-                    return true;
-                }
-            }
-            return false;
-        });
+		const allStoresInTeam = await getAllStoresFromTeam({ team_id });
+		const alreadyExists = allStoresInTeam.find(store => {
+			if (store.name.toLowerCase() === name.toLowerCase()) {
+				if (store_id !== store.id) {
+					return true;
+				}
+			}
+			return false;
+		});
 
-        if (alreadyExists) {
-            throw new AppError({
-                message: 'There are already a store with the same name',
-                internalErrorCode: 36,
-            });
-        }
+		if (alreadyExists) {
+			throw new AppError({
+				message: 'There are already a store with the same name',
+				internalErrorCode: 36,
+			});
+		}
 
-        const updatedStore = await updateStore({
-            name,
-            store_id,
-            team_id,
-            admin_id: user.id,
-        });
+		const updatedStore = await updateStore({
+			name,
+			store_id,
+			team_id,
+			admin_id: user.id,
+		});
 
-        return res.status(201).json(updatedStore);
-    }
+		return res.status(201).json(updatedStore);
+	}
 
-    async delete(req: Request, res: Response): Promise<Response> {
-        const { team_id, store_id } = req.params;
+	async delete(req: Request, res: Response): Promise<Response> {
+		const { team_id, store_id } = req.params;
 
-        if (!req.userId) {
-            throw new AppError({
-                message: 'Provider your id',
-                internalErrorCode: 1,
-            });
-        }
+		if (!req.userId) {
+			throw new AppError({
+				message: 'Provider your id',
+				internalErrorCode: 1,
+			});
+		}
 
-        const user = await getUserByFirebaseId(req.userId);
+		const user = await getUserByFirebaseId(req.userId);
 
-        await deleteStore({
-            store_id,
-            team_id,
-            admin_id: user.id,
-        });
+		await deleteStore({
+			store_id,
+			team_id,
+			admin_id: user.id,
+		});
 
-        return res.status(200).send();
-    }
+		return res.status(200).send();
+	}
 }
 
 export default new StoreControle();

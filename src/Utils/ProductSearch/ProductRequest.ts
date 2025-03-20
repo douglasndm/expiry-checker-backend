@@ -1,3 +1,4 @@
+import Sentry from '@sentry/node';
 import { formatInTimeZone } from 'date-fns-tz';
 
 import { defaultDataSource } from '@services/TypeORM';
@@ -9,39 +10,50 @@ import ProductRequest from '@models/ProductRequest';
 import { findProductByEAN } from './Find';
 
 async function getProductsRequestsByRank(
-    limit?: number,
+	limit?: number
 ): Promise<ProductRequest[]> {
-    const requestRepository = defaultDataSource.getRepository(ProductRequest);
+	const requestRepository = defaultDataSource.getRepository(ProductRequest);
 
-    const products = await requestRepository
-        .createQueryBuilder('request')
-        .orderBy('request.rank')
-        .where('length(request.code) > 7')
-        .limit(limit)
-        .getMany();
+	const products = await requestRepository
+		.createQueryBuilder('request')
+		.orderBy('request.rank')
+		.where('length(request.code) > 7')
+		.limit(limit)
+		.getMany();
 
-    return products;
+	return products;
 }
 
 async function callRemainingDailyAPICalls(): Promise<void> {
-    const blockRequest = await getFromCache<boolean>('external_api_request');
+	const checkInId = Sentry.captureCheckIn({
+		monitorSlug: 'call-remaining-daily-api-calls',
+		status: 'in_progress',
+	});
 
-    if (blockRequest !== true) {
-        const requests = await getProductsRequestsByRank(100);
+	const blockRequest = await getFromCache<boolean>('external_api_request');
 
-        requests.forEach(async request => {
-            await findProductByEAN({ code: request.code });
-        });
-    }
-    const formatedDate = formatInTimeZone(
-        new Date(),
-        'America/Sao_Paulo',
-        'dd-MM-yyyy HH:mm:ss zzzz',
-    );
-    console.log(
-        'Tried to request remaing API request but it is already blocked for external api request',
-    );
-    console.log(formatedDate);
+	if (blockRequest !== true) {
+		const requests = await getProductsRequestsByRank(100);
+
+		requests.forEach(async request => {
+			await findProductByEAN({ code: request.code });
+		});
+	}
+	const formatedDate = formatInTimeZone(
+		new Date(),
+		'America/Sao_Paulo',
+		'dd-MM-yyyy HH:mm:ss zzzz'
+	);
+	console.log(
+		'Tried to request remaing API request but it is already blocked for external api request'
+	);
+	console.log(formatedDate);
+
+	Sentry.captureCheckIn({
+		checkInId,
+		monitorSlug: 'call-remaining-daily-api-calls',
+		status: 'ok',
+	});
 }
 
 export { callRemainingDailyAPICalls };
