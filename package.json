@@ -12,7 +12,7 @@
 		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
 		"test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --watch",
 		"test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --coverage",
-		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org sentry --project expiry-checker-backend ./dist && sentry-cli --url https://exceptions.controledevalidades.com/ sourcemaps upload --org sentry --project expiry-checker-backend ./dist"
+		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org varlabs --project expiry-checker-backend ./dist && sentry-cli --url https://exceptions.controledevalidades.com/ sourcemaps upload --org varlabs --project expiry-checker-backend ./dist"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.741.0",
@@ -50,7 +50,7 @@
 		"@babel/preset-typescript": "^7.26.0",
 		"@eslint/js": "^9.19.0",
 		"@jest/globals": "^29.7.0",
-		"@sentry/cli": "^2.42.1",
+		"@sentry/cli": "^2.42.4",
 		"@types/bcrypt": "^5.0.0",
 		"@types/cors": "^2.8.17",
 		"@types/dotenv": "^8.2.3",
