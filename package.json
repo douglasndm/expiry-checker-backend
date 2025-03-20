@@ -5,9 +5,12 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files && yarn sentry:sourcemaps",
+		"build:no-sourcemaps": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files",
 		"dev": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
 		"dev:queue": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/Queue.ts",
-		"typeorm": "ts-node -r dotenv/config -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/Services/TypeORM.ts",
+		"db:migrate:create": "npx typeorm migration:create",
+		"db:migrate": "ts-node -r dotenv/config ./node_modules/typeorm/cli.js migration:run -d ./src/Services/TypeORM.ts",
+		"db:migrate:show": "ts-node -r dotenv/config ./node_modules/typeorm/cli.js migration:show -d ./src/Services/TypeORM.ts",
 		"admin": "ts-node-dev --inspect -r dotenv/config -r tsconfig-paths/register --respawn --transpile-only src/Admin/server.ts",
 		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
 		"test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --watch",
