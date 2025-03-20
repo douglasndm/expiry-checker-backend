@@ -37,6 +37,7 @@
 		"rate-limiter-flexible": "^5.0.5",
 		"reflect-metadata": "^0.2.2",
 		"sharp": "^0.32.6",
+		"stripe": "^17.7.0",
 		"typeorm": "0.3.21",
 		"yup": "^1.6.1"
 	},
