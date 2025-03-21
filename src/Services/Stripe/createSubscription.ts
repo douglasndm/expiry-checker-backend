@@ -26,7 +26,7 @@ async function createSubscriptionAndPaymentLink(
 	try {
 		const session = await stripeInstance.checkout.sessions.create({
 			mode: 'subscription', // Indica que é para assinatura
-			payment_method_types: ['card'],
+			payment_method_types: ['card', 'boleto'],
 			customer: customerId,
 			line_items: [
 				{

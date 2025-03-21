@@ -79,4 +79,29 @@ export async function getCustomerByEmail(
 	}
 }
 
-export { getCustomer };
+async function getCustomerById(id: string): Promise<Stripe.Customer | null> {
+	try {
+		const customers = await stripeInstance.customers.search({
+			query: `metadata['team_id']:'${id}'`,
+		});
+
+		if (customers.data.length === 0) {
+			return null;
+		}
+
+		// Caso haja mais de um produto, pode-se optar por tratar cada um ou pegar o primeiro.
+		const customer = customers.data[0];
+
+		return customer;
+	} catch (error) {
+		if (error instanceof Stripe.errors.StripeError) {
+			throw new AppError({
+				message: error.message,
+			});
+		}
+
+		throw error;
+	}
+}
+
+export { getCustomer, getCustomerById };
