@@ -27,6 +27,7 @@ async function generateStripeCheckoutURL({
 	if (!stripeCustomer) {
 		stripeCustomer = await stripeInstance.customers.create({
 			name: team.name,
+			preferred_locales: ['pt-BR'],
 			metadata: {
 				team_id: team_id,
 			},
