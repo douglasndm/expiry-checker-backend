@@ -2,7 +2,7 @@ import admin from 'firebase-admin';
 import * as Sentry from '@sentry/node';
 
 import { getAllTeamsExpiredProducts } from '@utils/Notifications/Teams';
-import { getAllLoginsFromAllUsers } from '@utils/User/Login';
+import { getAllUsers } from '@utils/User/GetAllUsers';
 
 import { getAllStoreTeamsToNotificate } from './TeamStores';
 
@@ -53,7 +53,7 @@ async function dailyPushNotification(): Promise<void> {
 		});
 	});
 
-	const usersDevices = await getAllLoginsFromAllUsers();
+	const users = await getAllUsers();
 
 	// busca o usuário na lista de times para enviar notificação
 	// e atrui a ele o device id para enviar a notificação
@@ -61,22 +61,20 @@ async function dailyPushNotification(): Promise<void> {
 		team.stores.forEach(store => {
 			if (store.users) {
 				store.users.forEach(user => {
-					const userDevice = usersDevices.find(
-						u => u.user.id === user.id
-					);
+					const userDevice = users.find(u => u.id === user.id);
 
-					if (userDevice) {
-						user.device_id = userDevice.firebaseMessagingToken;
+					if (userDevice && userDevice.device) {
+						user.device_id = userDevice.device.messagingToken;
 					}
 				});
 			}
 		});
 
 		team.noStore.users.forEach(user => {
-			const userDevice = usersDevices.find(u => u.user.id === user.id);
+			const userDevice = users.find(u => u.id === user.id);
 
-			if (userDevice) {
-				user.device_id = userDevice.firebaseMessagingToken;
+			if (userDevice && userDevice.device) {
+				user.device_id = userDevice.device.messagingToken;
 			}
 		});
 	});

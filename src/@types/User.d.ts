@@ -5,6 +5,9 @@ interface IUser {
 	lastName: string | null;
 	email: string;
 
+	teamId: string | null;
+	device: IUserDevice | null;
+
 	createdAt: Date;
 	updatedAt: Date;
 }

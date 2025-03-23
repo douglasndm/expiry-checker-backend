@@ -10,7 +10,6 @@ import {
 
 import UserTeam from './UserTeam';
 import UserStore from './UsersStores';
-import UserLogin from './UserLogin';
 import UserLogs from './UserLogs';
 
 @Entity({ name: 'users' })
@@ -38,9 +37,6 @@ export default class User {
 
 	@OneToOne(() => UserStore, userStore => userStore.user)
 	store: UserStore;
-
-	@OneToOne(() => UserLogin, userLogin => userLogin.user)
-	login: UserLogin;
 
 	@OneToMany(() => UserLogs, userLogs => userLogs.user)
 	logs: Array<UserLogs>;
