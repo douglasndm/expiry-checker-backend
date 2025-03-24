@@ -48,6 +48,7 @@ async function saveProductOnFirestore(product: Product) {
 		const firestore = admin.firestore(firebaseAppExpiryChecker);
 		const productRef = firestore.collection('products').doc(product.code);
 
+		console.log('Saving product: ' + product.code);
 		await productRef.set({
 			name: product.name,
 			code: product.code,
@@ -60,6 +61,17 @@ async function saveProductOnFirestore(product: Product) {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		});
+
+		console.log('Checking if product is in request list: ' + product.code);
+		const prodRequestRef = firestore
+			.collection('products_request')
+			.doc(product.code);
+		const request = await prodRequestRef.get();
+
+		if (request.exists) {
+			console.log('Deleting product from request list: ' + product.code);
+			await prodRequestRef.delete();
+		}
 	} catch (error) {
 		await localSaveOnError(product);
 

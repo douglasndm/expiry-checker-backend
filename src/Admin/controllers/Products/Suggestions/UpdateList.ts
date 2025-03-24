@@ -3,21 +3,16 @@ import { Request, Response } from 'express';
 import { getProduct } from '@services/APIs/GTIN/Product';
 import { saveProductOnFirestore } from '@utils/ProductSearch/Save';
 
-import {
-	getProductsRequestsByRank,
-	removeProductsFromRequest,
-	updateRequest,
-} from '@utils/ProductsSuggestions/Request';
+import { getProductsRequestsByRank } from '@utils/ProductsSuggestions/GetRequests';
+import { updateProductRequest } from '@utils/ProductsSuggestions/Request';
 
 import AppError from '@errors/AppError';
 
 class ProductSuggestionsUpdateListController {
 	async update(req: Request, res: Response): Promise<Response> {
 		const productsRequests = await getProductsRequestsByRank({
-			limit: 50,
+			limit: 20,
 		});
-
-		const listCodeToRemoveFromRequests: string[] = [];
 
 		productsRequests.forEach(async request => {
 			try {
@@ -27,7 +22,7 @@ class ProductSuggestionsUpdateListController {
 				console.log('Saving product: ' + request.code);
 				await saveProductOnFirestore({
 					name: product.nome,
-					code: request.code,
+					code: product.ean,
 					brand: product.marca,
 					image: product.link_foto,
 					ncm: product.ncm,
@@ -35,30 +30,28 @@ class ProductSuggestionsUpdateListController {
 					data_from: 'API_GTIN',
 				});
 
-				listCodeToRemoveFromRequests.push(request.code);
-
 				//sleep to avoid rate limit
 				await new Promise(resolve => setTimeout(resolve, 1000));
 			} catch (error) {
 				if (error instanceof AppError) {
+					console.log(error.message);
 					if (error.statusCode === 404) {
-						await updateRequest({
+						await updateProductRequest({
 							code: request.code,
 							rank: request.rank,
 
 							notFound: true,
 							notFoundOn: 'API_GTIN',
+
+							updatedAt: new Date(),
 						});
 					}
+				} else {
+					console.log(error);
+					console.log('Error getting product: ' + request.code);
 				}
-				console.log(error);
-				console.log('Error getting product: ' + request.code);
 			}
 		});
-
-		if (listCodeToRemoveFromRequests.length > 0) {
-			await removeProductsFromRequest(listCodeToRemoveFromRequests);
-		}
 
 		return res.json(productsRequests);
 	}

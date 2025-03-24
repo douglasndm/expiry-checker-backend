@@ -18,7 +18,6 @@ routes.post(
 );
 
 routes.get('/suggestions/count', CountController.index);
-
 routes.put('/suggestions/update/list', UpdateList.update);
 
 export default routes;

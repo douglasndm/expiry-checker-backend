@@ -28,10 +28,10 @@ async function updateProductRequest(props: IUpdateProps): Promise<void> {
 	const firestore = admin.firestore(firebaseAppExpiryChecker);
 	const productRef = firestore.collection('products_request').doc(code);
 
-	await productRef.set({
+	await productRef.update({
 		rank,
-		notFound,
-		notFoundOn,
+		notFound: notFound || false,
+		notFoundOn: notFoundOn || null,
 
 		createdAt,
 		updatedAt,
@@ -45,22 +45,4 @@ async function removeProductRequest(code: string): Promise<void> {
 	await productRef.delete();
 }
 
-async function removeProductsFromRequest(codes: string[]): Promise<void> {
-	const firestore = admin.firestore(firebaseAppExpiryChecker);
-	const productRef = firestore.collection('products_request');
-
-	const products = await productRef.where('code', 'in', codes).get();
-
-	await Promise.all(
-		products.docs.map(async doc => {
-			await doc.ref.delete();
-		})
-	);
-}
-
-export {
-	getProductRequest,
-	updateProductRequest,
-	removeProductRequest,
-	removeProductsFromRequest,
-};
+export { getProductRequest, updateProductRequest, removeProductRequest };
