@@ -1,28 +1,11 @@
 import Sentry from '@sentry/node';
 import { formatInTimeZone } from 'date-fns-tz';
 
-import { defaultDataSource } from '@services/TypeORM';
-
 import { getFromCache } from '@services/Cache/Redis';
 
-import ProductRequest from '@models/ProductRequest';
+import { getProductsRequestsByRank } from '@utils/ProductsSuggestions/GetRequests';
 
 import { findProductByEAN } from './Find';
-
-async function getProductsRequestsByRank(
-	limit?: number
-): Promise<ProductRequest[]> {
-	const requestRepository = defaultDataSource.getRepository(ProductRequest);
-
-	const products = await requestRepository
-		.createQueryBuilder('request')
-		.orderBy('request.rank')
-		.where('length(request.code) > 7')
-		.limit(limit)
-		.getMany();
-
-	return products;
-}
 
 async function callRemainingDailyAPICalls(): Promise<void> {
 	const checkInId = Sentry.captureCheckIn({

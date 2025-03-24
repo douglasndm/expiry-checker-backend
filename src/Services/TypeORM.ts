@@ -11,7 +11,6 @@ import User from '@models/User';
 import UserTeam from '@models/UserTeam';
 import TeamSubscriptions from '@models/TeamSubscription';
 import ProductDetails from '@models/ProductDetails';
-import ProductRequest from '@models/ProductRequest';
 import UsersStores from '@models/UsersStores';
 import UserLogs from '@models/UserLogs';
 import TeamPreferences from '@models/TeamPreferences';
@@ -30,7 +29,6 @@ const entities = [
 	UserTeam,
 	TeamSubscriptions,
 	ProductDetails,
-	ProductRequest,
 	UsersStores,
 	UserLogs,
 	TeamPreferences,

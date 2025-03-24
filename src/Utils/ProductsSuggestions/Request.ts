@@ -2,27 +2,13 @@ import admin from 'firebase-admin';
 
 import { firebaseAppExpiryChecker } from '@services/Firebase/Config';
 
-import { defaultDataSource } from '@services/TypeORM';
+async function getProductRequest(code: string): Promise<IProductRequest> {
+	const firestore = admin.firestore(firebaseAppExpiryChecker);
+	const productRef = firestore.collection('products_request').doc(code);
 
-import ProductRequest from '@models/ProductRequest';
+	const response = await productRef.get();
 
-interface Props {
-	limit?: number;
-}
-
-async function getProductsRequestsByRank({
-	limit,
-}: Props): Promise<ProductRequest[]> {
-	const requestRepository = defaultDataSource.getRepository(ProductRequest);
-
-	const products = await requestRepository
-		.createQueryBuilder('request')
-		.orderBy('request.rank', 'DESC')
-		.where('length(request.code) > 7')
-		.limit(limit)
-		.getMany();
-
-	return products;
+	return response.data() as IProductRequest;
 }
 
 interface IUpdateProps {
@@ -31,10 +17,13 @@ interface IUpdateProps {
 
 	notFound?: boolean;
 	notFoundOn?: string;
+
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
-async function updateRequest(props: IUpdateProps): Promise<void> {
-	const { code, rank, notFound, notFoundOn } = props;
+async function updateProductRequest(props: IUpdateProps): Promise<void> {
+	const { code, rank, notFound, notFoundOn, createdAt, updatedAt } = props;
 
 	const firestore = admin.firestore(firebaseAppExpiryChecker);
 	const productRef = firestore.collection('products_request').doc(code);
@@ -43,19 +32,35 @@ async function updateRequest(props: IUpdateProps): Promise<void> {
 		rank,
 		notFound,
 		notFoundOn,
+
+		createdAt,
+		updatedAt,
 	});
 }
 
-async function removeProductsFromRequest(codes: string[]): Promise<void> {
-	console.log('codes to remove', codes);
-	const requestRepository = defaultDataSource.getRepository(ProductRequest);
+async function removeProductRequest(code: string): Promise<void> {
+	const firestore = admin.firestore(firebaseAppExpiryChecker);
+	const productRef = firestore.collection('products_request').doc(code);
 
-	const products = await requestRepository
-		.createQueryBuilder('request')
-		.where('request.code IN (:...codes)', { codes })
-		.getMany();
-
-	await requestRepository.remove(products);
+	await productRef.delete();
 }
 
-export { getProductsRequestsByRank, updateRequest, removeProductsFromRequest };
+async function removeProductsFromRequest(codes: string[]): Promise<void> {
+	const firestore = admin.firestore(firebaseAppExpiryChecker);
+	const productRef = firestore.collection('products_request');
+
+	const products = await productRef.where('code', 'in', codes).get();
+
+	await Promise.all(
+		products.docs.map(async doc => {
+			await doc.ref.delete();
+		})
+	);
+}
+
+export {
+	getProductRequest,
+	updateProductRequest,
+	removeProductRequest,
+	removeProductsFromRequest,
+};
