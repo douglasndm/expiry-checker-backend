@@ -11,6 +11,9 @@ interface Product {
 	code: string;
 	brand: string | null;
 	image: string | null;
+	data_from?: string;
+	ncm?: number;
+	country?: string;
 }
 async function localSaveOnError(product: Product) {
 	try {
@@ -50,6 +53,12 @@ async function saveProductOnFirestore(product: Product) {
 			code: product.code,
 			brand: product.brand,
 			image: product.image,
+			ncm: product.ncm,
+			country: product.country,
+			data_from: product.data_from,
+
+			createdAt: new Date(),
+			updatedAt: new Date(),
 		});
 	} catch (error) {
 		await localSaveOnError(product);
