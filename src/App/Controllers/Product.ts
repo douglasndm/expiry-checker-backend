@@ -8,7 +8,7 @@ import { updateProduct } from '@utils/Product/Update';
 import { getUserByFirebaseId } from '@utils/User/Find';
 import { getUserRole } from '@utils/Team/Roles/Find';
 import { deleteProduct } from '@utils/Product/Delete';
-import { findProductByEAN } from '@utils/ProductSearch/Find';
+import { getProductSuggestion } from '@utils/ProductsSuggestions/GetSuggestion';
 
 import { getProduct } from '@functions/Product';
 
@@ -33,11 +33,11 @@ class ProductController {
 		} else if (product.code) {
 			// Consulta nosso banco de dados de produtos para saber se há algum com o mesmo código e com imagem
 
-			const prod = await findProductByEAN({ code: product.code });
+			const prod = await getProductSuggestion(product.code);
 
 			if (prod) {
-				if (prod.thumbnail) {
-					thumbnail = prod.thumbnail;
+				if (prod.image) {
+					thumbnail = prod.image;
 				}
 			}
 		}
