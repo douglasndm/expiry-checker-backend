@@ -1,3 +1,5 @@
+import admin from 'firebase-admin';
+
 import { defaultDataSource } from '@services/TypeORM';
 
 import User from '@models/User';
@@ -6,22 +8,22 @@ import AppError from '@errors/AppError';
 
 type IResponse = Omit<IUser, 'createdAt' | 'updatedAt'>;
 
-async function getUserByFirebaseId(firebase_id: string): Promise<IResponse> {
-	const userReposity = defaultDataSource.getRepository(User);
+async function getUserByFirebaseId(firebase_id: string): Promise<IUser> {
+	const firestore = admin.firestore();
+	const usersCollection = firestore.collection('users');
 
-	const user = await userReposity
-		.createQueryBuilder('user')
-		.where('user.firebase_uid = :firebase_id', { firebase_id })
-		.getOne();
+	const user = await usersCollection
+		.where('firebaseUid', '==', firebase_id)
+		.get();
 
-	if (!user) {
+	if (user.size === 0) {
 		throw new AppError({
 			message: 'User not found',
 			internalErrorCode: 7,
 		});
 	}
 
-	return user;
+	return user.docs[0].data() as IUser;
 }
 
 async function getUserById(id: string): Promise<IResponse> {
