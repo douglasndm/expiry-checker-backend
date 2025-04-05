@@ -18,6 +18,7 @@ routes.get('/find/byManager', TeamFindController.byManager);
 routes.get('/:team_id', checkTeamId, GetTeamController.index);
 routes.get('/:team_id/users', checkTeamId, GetRolesController.index);
 
+routes.use('/:team_id/stores', checkTeamId, StoreRoutes);
 routes.delete(
 	'/:team_id/store/:store_id/products',
 	checkTeamId,
