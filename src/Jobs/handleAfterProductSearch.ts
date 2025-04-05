@@ -1,42 +1,43 @@
-import { defaultDataSource } from '@services/TypeORM';
-
+import {
+	getProductRequest,
+	removeProductRequest,
+} from '@utils/ProductsSuggestions/Request';
+import { updateProductRequest } from '@utils/ProductsSuggestions/Request';
 import { saveProductOnFirestore } from '@utils/ProductSearch/Save';
-
-import ProductDetails from '@models/ProductDetails';
-import ProductRequest from '@models/ProductRequest';
 
 interface Props {
 	data: { response: findProductByEANExternalResponse | null; code: string };
 }
 
 async function handleAfterProductSearch({ data }: Props): Promise<void> {
-	const { response, code } = data;
+	const { response } = data;
 
-	const productRepository = defaultDataSource.getRepository(ProductDetails);
-	const requestRepository = defaultDataSource.getRepository(ProductRequest);
+	// remove everything that is not number from code
+	const code = data.code.replace(/[^0-9]/g, '');
 
-	const request = await requestRepository
-		.createQueryBuilder('request')
-		.where('request.code = :code', { code })
-		.getOne();
+	const request = await getProductRequest(code);
 
 	// Check if product is already on request table and add 1 to rank if
 	// we didn't find a response this time
 	if (request) {
 		if (response !== null) {
-			await requestRepository.remove(request);
+			await removeProductRequest(request.code);
 		} else {
-			request.rank += 1;
-
-			await requestRepository.save(request);
+			await updateProductRequest({
+				code: request.code,
+				rank: request.rank + 1,
+			});
 		}
 	} else if (!response) {
 		if (code.trim().length >= 8) {
-			const productRequest = new ProductRequest();
-			productRequest.code = code.trim();
-			productRequest.rank = 1;
+			await updateProductRequest({
+				code: code.trim(),
+				rank: 1,
+				notFound: true,
 
-			await requestRepository.save(productRequest);
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
 		}
 	} else if (response) {
 		await saveProductOnFirestore({
@@ -45,21 +46,6 @@ async function handleAfterProductSearch({ data }: Props): Promise<void> {
 			brand: response.brand || null,
 			image: response.thumbnail,
 		});
-
-		const alreadyExists = await productRepository
-			.createQueryBuilder('product')
-			.where('product.code = :code', { code: response.code })
-			.getOne();
-
-		if (!alreadyExists) {
-			const newProduct = new ProductDetails();
-			newProduct.name = response.name;
-			newProduct.code = response.code;
-			newProduct.brand = response.brand;
-			newProduct.thumbnail = response.thumbnail;
-
-			await productRepository.save(newProduct);
-		}
 	}
 }
 

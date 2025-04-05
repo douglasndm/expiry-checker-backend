@@ -5,7 +5,6 @@ import { sendNotificationsForBaseApp } from '@services/Notification/Push/BaseApp
 
 import { dailyPushNotification } from '@utils/Notifications/Schedule/Push';
 import { allowExternalQuery } from '@utils/ProductSearch/ExternalQuery';
-import { callRemainingDailyAPICalls } from '@utils/ProductSearch/ProductRequest';
 
 import { sendMail } from './Notification/Email/SendMail';
 
@@ -37,14 +36,6 @@ scheduleWithCheckIn.scheduleJob(
 	'removing-block-for-external-api-request',
 	'0 0 * * *',
 	allowExternalQuery
-);
-
-// At 23:00
-// if API is not block it will call remaning call to complete db
-scheduleWithCheckIn.scheduleJob(
-	'call-remaining-daily-api-calls',
-	'0 23 * * *',
-	callRemainingDailyAPICalls
 );
 
 // At 08:00 and 14:00

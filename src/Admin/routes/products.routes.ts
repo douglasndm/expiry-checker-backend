@@ -3,6 +3,8 @@ import multer from 'multer';
 
 import FirestoreImportController from '@admin/controllers/Products/Suggestions/FirestoreImport';
 import CountController from '@admin/controllers/Products/Suggestions/Count';
+import UpdateList from '@admin/controllers/Products/Suggestions/UpdateList';
+import CreateProductSuggestion from '@admin/controllers/Products/Suggestions/Create';
 
 import { storage } from '@config/Multer';
 
@@ -17,5 +19,7 @@ routes.post(
 );
 
 routes.get('/suggestions/count', CountController.index);
+routes.post('/suggestions/create', CreateProductSuggestion.store);
+routes.put('/suggestions/update/list', UpdateList.update);
 
 export default routes;

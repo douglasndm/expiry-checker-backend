@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 import User from '@controllers/User';
-import ProductInformation from '@controllers/ProductInformation';
 import ImageController from '@controllers/Products/ImageController';
 import SessionController from '@controllers/User/SessionController';
 import TokenController from '@controllers/Auth/TokenController';
@@ -24,7 +23,6 @@ routes.use(LogRequests);
 
 routes.post('/users', User.store);
 
-routes.get('/product/:ean', ProductInformation.index);
 routes.get('/product/image/:ean', ImageController.index);
 
 routes.use(FirebaseAuth); // from now on all routes need authentication

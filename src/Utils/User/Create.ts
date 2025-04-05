@@ -35,6 +35,7 @@ async function createUser({
 			id: savedUser.id,
 			name,
 			lastName,
+			email,
 			firebaseUid,
 
 			createdAt: new Date(),

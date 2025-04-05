@@ -15,9 +15,6 @@ import { logDateTime } from '@utils/Logs/LogDateTime';
 // category_products:team_id:category_id
 // brand_products:team_id:brand_id
 
-// users_devices
-// users_logins
-
 // external_api_request
 
 // product_suggestion:${code}

@@ -3,7 +3,6 @@ import { firestore } from 'firebase-admin';
 import * as Yup from 'yup';
 
 import { defaultDataSource } from '@services/TypeORM';
-import { invalidadeCache } from '@services/Cache/Redis';
 
 import User from '@models/User';
 
@@ -168,8 +167,6 @@ class UserController {
 			password,
 		});
 
-		await invalidadeCache('users_devices');
-
 		return res.status(201).json(savedUser);
 	}
 
@@ -219,8 +216,6 @@ class UserController {
 		}
 
 		await deleteUser({ user_id: req.userId });
-
-		await invalidadeCache('users_devices');
 
 		return res.status(204).send();
 	}
