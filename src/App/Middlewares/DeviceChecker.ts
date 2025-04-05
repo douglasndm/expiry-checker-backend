@@ -10,6 +10,7 @@ async function deviceChecker(
 	res: Response,
 	next: NextFunction
 ): Promise<void> {
+	return next();
 	if (process.env.DEV_MODE === 'true') {
 		return next();
 	}
