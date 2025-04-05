@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { defaultDataSource } from '@services/TypeORM';
 
 import { invalidadeTeamCache } from '@services/Cache/Redis';
@@ -24,15 +22,6 @@ async function deleteTeam(team_id: string): Promise<void> {
 	await teamRepository.remove(team);
 
 	await invalidadeTeamCache(team_id);
-
-	const firestoreTeam = await firestore()
-		.collection('teams')
-		.doc(team_id)
-		.get();
-
-	if (firestoreTeam.exists) {
-		await firestoreTeam.ref.delete();
-	}
 }
 
 export { deleteTeam };

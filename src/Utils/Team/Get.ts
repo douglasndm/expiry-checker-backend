@@ -1,18 +1,24 @@
-import { firestore } from 'firebase-admin';
+import { defaultDataSource } from '@services/TypeORM';
+
+import Team from '@models/Team';
 
 import AppError from '@errors/AppError';
 
 async function getTeam(team_id: string): Promise<ITeam> {
-	const team = await firestore().collection('teams').doc(team_id).get();
+	const repository = defaultDataSource.getRepository(Team);
+	const team = await repository
+		.createQueryBuilder('team')
+		.where('team.id = :team_id', { team_id })
+		.getOne();
 
-	if (!team.exists) {
+	if (!team) {
 		throw new AppError({
 			message: 'Team not found',
 			internalErrorCode: 6,
 		});
 	}
 
-	return team.data() as ITeam;
+	return team;
 }
 
 export { getTeam };

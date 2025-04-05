@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { defaultDataSource } from '@services/TypeORM';
 
 import Team from '@models/Team';
@@ -75,21 +73,6 @@ async function createTeam({ name, admin_id }: createTeamProps): Promise<Team> {
 	userRole.role = 'manager';
 
 	await userRolesRepository.save(userRole);
-
-	// save on firestore
-	const teamsCollection = firestore().collection('teams');
-	const usersCollection = firestore().collection('users');
-
-	await usersCollection.doc(user.email).update({
-		teamId: savedTeam.id,
-	});
-
-	await teamsCollection.doc(savedTeam.id).set({
-		name,
-
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	});
 
 	return savedTeam;
 }

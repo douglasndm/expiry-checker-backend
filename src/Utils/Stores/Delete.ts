@@ -1,4 +1,3 @@
-import { firestore } from 'firebase-admin';
 import * as Yup from 'yup';
 
 import { defaultDataSource } from '@services/TypeORM';
@@ -65,17 +64,6 @@ async function deleteStore({
 	}
 
 	await storeRepository.remove(store);
-
-	const storeCollections = firestore()
-		.collection('teams')
-		.doc(team_id)
-		.collection('stores');
-
-	const firestoreStore = await storeCollections.doc(store_id).get();
-
-	if (firestoreStore.exists) {
-		await firestoreStore.ref.delete();
-	}
 
 	await invalidadeCache(`team_stores:${team_id}`);
 	await invalidadeCache(`store_products:${team_id}:${store_id}`);

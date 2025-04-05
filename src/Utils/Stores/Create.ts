@@ -1,4 +1,3 @@
-import { firestore } from 'firebase-admin';
 import * as Yup from 'yup';
 
 import { defaultDataSource } from '@services/TypeORM';
@@ -62,19 +61,6 @@ async function createStore({
 	store.team = team;
 
 	const createdStore = await storeRepository.save(store);
-
-	const storeCollections = firestore()
-		.collection('teams')
-		.doc(team_id)
-		.collection('stores');
-
-	await storeCollections.doc(createdStore.id).set({
-		id: createdStore.id,
-		name,
-
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	});
 
 	await invalidadeCache(`team_stores:${team_id}`);
 

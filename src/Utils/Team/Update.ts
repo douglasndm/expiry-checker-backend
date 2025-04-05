@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { defaultDataSource } from '@services/TypeORM';
 import { invalidadeTeamCache } from '@services/Cache/Redis';
 
@@ -32,19 +30,6 @@ async function updateTeam(team: IUpdateTeam): Promise<Team> {
 	teamUpdated.name = team_name;
 
 	await teamRepository.save(teamUpdated);
-
-	const firestoreTeam = await firestore()
-		.collection('teams')
-		.doc(team_id)
-		.get();
-
-	if (firestoreTeam.exists) {
-		await firestoreTeam.ref.update({
-			name: team_name,
-
-			updatedAt: new Date(),
-		});
-	}
 
 	await invalidadeTeamCache(team_id);
 

@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { defaultDataSource } from '@services/TypeORM';
 
 import { getFromCache, saveOnCache } from '@services/Cache/Redis';
@@ -32,17 +30,4 @@ async function getAllStoresFromTeam({
 	return stores;
 }
 
-async function getStoresFromTeamOnFirestore(team_id: string) {
-	const teamCollection = firestore().collection('teams').doc(team_id);
-
-	const stores = await teamCollection.collection('stores').get();
-
-	return stores.docs.map(doc => {
-		return {
-			id: doc.id,
-			name: doc.data().name,
-		};
-	});
-}
-
-export { getAllStoresFromTeam, getStoresFromTeamOnFirestore };
+export { getAllStoresFromTeam };

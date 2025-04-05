@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { defaultDataSource } from '@services/TypeORM';
 import { invalidadeCache } from '@services/Cache/Redis';
 
@@ -43,17 +41,6 @@ async function updateRole({
 
 	const updatedRole = await roleRepository.save(findedRole);
 
-	const teamsCollection = firestore().collection('teams');
-	const teamRef = teamsCollection.doc(team_id);
-
-	const roleRef = teamRef.collection('roles').doc(user_id);
-
-	await roleRef.update({
-		name: fixedRole,
-
-		updatedAt: firestore.Timestamp.fromDate(new Date()),
-	});
-
 	await invalidadeCache(`team_users:${team_id}`);
 
 	return updatedRole;
@@ -81,25 +68,6 @@ async function removeUser({
 
 	await removeFromALlStores(user_id);
 	await roleRepository.remove(role);
-
-	const teamsCollection = firestore().collection('teams');
-	const teamRef = teamsCollection.doc(team_id);
-
-	const roleRef = teamRef.collection('roles').doc(user_id);
-	const roleDoc = await roleRef.get();
-	const data = roleDoc.data();
-	if (data) {
-		const userRef = data.userRef as firestore.DocumentReference;
-		const userDoc = await userRef.get();
-
-		if (userDoc.exists) {
-			await userDoc.ref.update({
-				teamId: null,
-			});
-		}
-	}
-
-	await roleRef.delete();
 
 	await invalidadeCache(`team_users:${team_id}`);
 }

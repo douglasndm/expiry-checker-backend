@@ -1,10 +1,10 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
 } from 'typeorm';
 import Brand from './Brand';
 
@@ -17,36 +17,36 @@ import Product from './Product';
 
 @Entity({ name: 'teams' })
 export default class Team {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
-    @Column('varchar')
-    name?: string;
+	@Column('varchar')
+	name: string;
 
-    @OneToMany(() => Category, category => category.team)
-    categories: Array<Category>;
+	@OneToMany(() => Category, category => category.team)
+	categories: Array<Category>;
 
-    @OneToMany(() => UserTeam, userTeam => userTeam.user)
-    users: Array<UserTeam>;
+	@OneToMany(() => UserTeam, userTeam => userTeam.user)
+	users: Array<UserTeam>;
 
-    @OneToMany(() => Product, product => product.team)
-    products: Array<Product>;
+	@OneToMany(() => Product, product => product.team)
+	products: Array<Product>;
 
-    @OneToMany(() => Brand, brand => brand.team)
-    brands: Array<Brand>;
+	@OneToMany(() => Brand, brand => brand.team)
+	brands: Array<Brand>;
 
-    @OneToMany(() => Store, store => store.team)
-    stores: Array<Store>;
+	@OneToMany(() => Store, store => store.team)
+	stores: Array<Store>;
 
-    @OneToMany(() => TeamSubscription, subscriptions => subscriptions.team)
-    subscriptions: Array<TeamSubscription>;
+	@OneToMany(() => TeamSubscription, subscriptions => subscriptions.team)
+	subscriptions: Array<TeamSubscription>;
 
-    @OneToMany(() => UserLogs, userLogs => userLogs.team)
-    logs: Array<UserLogs>;
+	@OneToMany(() => UserLogs, userLogs => userLogs.team)
+	logs: Array<UserLogs>;
 
-    @CreateDateColumn()
-    created_at: Date;
+	@CreateDateColumn({ name: 'created_at' })
+	createdAt: Date;
 
-    @UpdateDateColumn()
-    updated_at: Date;
+	@UpdateDateColumn({ name: 'updated_at' })
+	updatedAt: Date;
 }

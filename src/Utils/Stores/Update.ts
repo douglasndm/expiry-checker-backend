@@ -1,4 +1,3 @@
-import { firestore } from 'firebase-admin';
 import * as Yup from 'yup';
 
 import { defaultDataSource } from '@services/TypeORM';
@@ -70,20 +69,6 @@ async function updateStore({
 	store.name = name;
 
 	const updatedStore = await storeRepository.save(store);
-
-	const storeCollections = firestore()
-		.collection('teams')
-		.doc(team_id)
-		.collection('stores');
-
-	const firebaseStore = await storeCollections.doc(store_id).get();
-
-	if (firebaseStore.exists) {
-		await firebaseStore.ref.update({
-			name,
-			updatedAt: new Date(),
-		});
-	}
 
 	await invalidadeTeamCache(`${team_id}`);
 

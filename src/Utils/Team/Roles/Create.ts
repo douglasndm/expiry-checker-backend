@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { defaultDataSource } from '@services/TypeORM';
 
 import UserTeam from '@models/UserTeam';
@@ -118,23 +116,6 @@ async function addUserToTeam({
 	}
 
 	const savedRole = await userRolesRepository.save(teamUser);
-
-	const teamsCollection = firestore().collection('teams');
-	const teamRef = teamsCollection.doc(team_id);
-
-	const roleRef = teamRef.collection('roles').doc(user_id);
-	const userDoc = firestore().collection('users').doc(user.email);
-
-	await roleRef.set({
-		name: 'repositor',
-		code: savedRole.code,
-		status: savedRole.status,
-
-		userRef: userDoc,
-
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	});
 
 	await invalidadeCache(`team_users:${team_id}`);
 
