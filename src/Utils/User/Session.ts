@@ -1,4 +1,7 @@
+import { invalidadeCache } from '@services/Cache/Redis';
+
 import { getUserByFirebaseId } from '@utils/User/Find';
+import { registerDevice } from '@utils/User/Devices/Register';
 import { getUserStore } from '@utils/Stores/User/GetStore';
 import { getTeamFromUser } from '@utils/User/Team';
 
@@ -6,6 +9,8 @@ import Team from '@models/Team';
 
 interface Props {
 	firebaseUid: string;
+	firebaseToken: string;
+	device_id: string;
 }
 
 interface Response {
@@ -23,9 +28,15 @@ interface Response {
 }
 
 async function createSession(Props: Props): Promise<Response> {
-	const { firebaseUid } = Props;
+	const { firebaseUid, firebaseToken, device_id } = Props;
 
 	const user = await getUserByFirebaseId(firebaseUid);
+
+	await registerDevice({
+		user_id: user.id,
+		device_id: String(device_id),
+		firebaseToken,
+	});
 
 	const userTeam = await getTeamFromUser(user.id);
 
@@ -53,6 +64,8 @@ async function createSession(Props: Props): Promise<Response> {
 			},
 		};
 	}
+
+	await invalidadeCache('users_logins');
 
 	return response;
 }

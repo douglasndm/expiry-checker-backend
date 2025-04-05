@@ -38,8 +38,14 @@ class SessionController {
 		}
 
 		if (req.headers.authorization) {
+			const device_id = req.headers.deviceid;
+
+			const { firebaseToken } = req.body;
+
 			const response = await createSession({
 				firebaseUid: req.userId,
+				firebaseToken,
+				device_id: String(device_id),
 			});
 
 			return res.status(201).json(response);

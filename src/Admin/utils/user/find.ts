@@ -1,3 +1,5 @@
+import { firestore } from 'firebase-admin';
+
 import { defaultDataSource } from '@services/TypeORM';
 
 import User from '@models/User';
@@ -47,7 +49,12 @@ async function getUserById(id: string): Promise<User> {
 	return user;
 }
 
-async function getUserByEmail(email: string): Promise<User> {
+interface IGetUserByEmailResponse {
+	user: IUser;
+	firestoreUser: IUser;
+}
+
+async function getUserByEmail(email: string): Promise<IGetUserByEmailResponse> {
 	const userReposity = defaultDataSource.getRepository(User);
 
 	const user = await userReposity
@@ -62,7 +69,13 @@ async function getUserByEmail(email: string): Promise<User> {
 		});
 	}
 
-	return user;
+	const usersCollection = firestore().collection('users');
+	const firestoreUser = await usersCollection.doc(user.email).get();
+
+	return {
+		user,
+		firestoreUser: firestoreUser.data(),
+	};
 }
 
 export { getUserById, getUserByEmail, getUserByFirebaseId };

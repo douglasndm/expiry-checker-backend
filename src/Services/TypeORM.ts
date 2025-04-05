@@ -12,6 +12,7 @@ import UserTeam from '@models/UserTeam';
 import TeamSubscriptions from '@models/TeamSubscription';
 import ProductDetails from '@models/ProductDetails';
 import UsersStores from '@models/UsersStores';
+import UserLogin from '@models/UserLogin';
 import UserLogs from '@models/UserLogs';
 import TeamPreferences from '@models/TeamPreferences';
 import NotificationsPreferences from '@models/NotificationsPreferences';
@@ -30,6 +31,7 @@ const entities = [
 	TeamSubscriptions,
 	ProductDetails,
 	UsersStores,
+	UserLogin,
 	UserLogs,
 	TeamPreferences,
 	NotificationsPreferences,
